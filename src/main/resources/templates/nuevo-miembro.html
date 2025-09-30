@@ -134,35 +134,5 @@
         </div>
     </div>
     <script th:src="@{/sidebar.js}"></script>
-    <script>
-        // Debug del formulario
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const submitBtn = document.querySelector('button[type="submit"]');
-            
-            console.log('Formulario encontrado:', form);
-            console.log('Botón submit encontrado:', submitBtn);
-            
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    console.log('=== FORMULARIO ENVIÁNDOSE ===');
-                    console.log('Action:', form.action);
-                    console.log('Method:', form.method);
-                    
-                    // Verificar que los campos tengan valores
-                    const formData = new FormData(form);
-                    for (let [key, value] of formData.entries()) {
-                        console.log(key + ':', value);
-                    }
-                });
-            }
-            
-            if (submitBtn) {
-                submitBtn.addEventListener('click', function(e) {
-                    console.log('=== BOTÓN GUARDAR CLICKEADO ===');
-                });
-            }
-        });
-    </script>
 </body>
 </html>

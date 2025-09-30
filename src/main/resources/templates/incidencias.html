@@ -654,15 +654,10 @@
                 const select = e.target;
                 const value = select.value;
                 
-                console.log('Select cambiado, valor:', value);
-                
                 if (value === 'RESUELTO') {
                     const card = select.closest('.incident-card');
                     const incidenciaId = card.dataset.id;
                     const titulo = card.querySelector('h3').textContent;
-                    
-                    console.log('ID de incidencia:', incidenciaId);
-                    console.log('Título:', titulo);
                     
                     // Mostrar modal de confirmación
                     const modalConfirmar = document.getElementById('modal-confirmar-resuelto');

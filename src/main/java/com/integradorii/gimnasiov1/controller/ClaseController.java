@@ -63,21 +63,7 @@ public class ClaseController {
     @PostMapping("/crear")
     @ResponseBody
     public Clase crearClase(@RequestBody Clase clase) {
-        System.out.println("=== GUARDANDO CLASE ===");
-        System.out.println("Nombre: " + clase.getNombre());
-        System.out.println("Instructor: " + clase.getInstructor());
-        System.out.println("Fecha: " + clase.getFecha());
-        System.out.println("Hora: " + clase.getHora());
-        
-        try {
-            Clase guardada = claseRepository.save(clase);
-            System.out.println("✅ Clase guardada con ID: " + guardada.getId());
-            return guardada;
-        } catch (Exception e) {
-            System.err.println("❌ ERROR al guardar clase: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        return claseRepository.save(clase);
     }
     
     @DeleteMapping("/{id}")
