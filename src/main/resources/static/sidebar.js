@@ -125,4 +125,128 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // =================== Filtros Universales (estilo fitmanager) ===================
+    const searchInput = document.querySelector('input[name="buscar"]');
+    const estadoSelect = document.querySelector('select[name="estado"]');
+    const prioridadSelect = document.querySelector('select[name="prioridad"]');
+    
+    // Filtros para Incidencias
+    function applyIncidenciasFilters() {
+        const incidentCards = document.querySelectorAll('.space-y-4 > div[class*="border"]');
+        if (incidentCards.length === 0) return;
+        
+        const searchTerm = (searchInput?.value || '').toLowerCase();
+        const estadoValue = (estadoSelect?.value || 'todos').toLowerCase();
+        const prioridadValue = (prioridadSelect?.value || 'todas').toLowerCase();
+        
+        incidentCards.forEach(card => {
+            const titulo = (card.querySelector('h3')?.textContent || '').toLowerCase();
+            const descripcion = (card.querySelector('p')?.textContent || '').toLowerCase();
+            const reportadoPor = (card.textContent || '').toLowerCase();
+            
+            const estadoSpans = card.querySelectorAll('span[class*="rounded-full"]');
+            let cardEstado = 'todos';
+            let cardPrioridad = 'todas';
+            
+            estadoSpans.forEach(span => {
+                const text = span.textContent.toLowerCase();
+                if (text.includes('abierto')) cardEstado = 'abierto';
+                else if (text.includes('resuelto')) cardEstado = 'resuelto';
+                
+                if (text.includes('alta')) cardPrioridad = 'alta';
+                else if (text.includes('media')) cardPrioridad = 'media';
+                else if (text.includes('baja')) cardPrioridad = 'baja';
+            });
+            
+            const matchesSearch = searchTerm === '' || titulo.includes(searchTerm) || descripcion.includes(searchTerm) || reportadoPor.includes(searchTerm);
+            const matchesEstado = estadoValue === 'todos' || cardEstado === estadoValue;
+            const matchesPrioridad = prioridadValue === 'todas' || cardPrioridad === prioridadValue;
+            
+            card.style.display = (matchesSearch && matchesEstado && matchesPrioridad) ? '' : 'none';
+        });
+    }
+    
+    // Filtros para Clases (tabla)
+    function applyClasesFilters() {
+        const rows = document.querySelectorAll('table tbody tr');
+        if (rows.length === 0) return;
+        
+        const searchTerm = (searchInput?.value || '').toLowerCase();
+        
+        rows.forEach(row => {
+            const nombre = (row.cells[0]?.textContent || '').toLowerCase();
+            const instructor = (row.cells[1]?.textContent || '').toLowerCase();
+            
+            const matchesSearch = searchTerm === '' || nombre.includes(searchTerm) || instructor.includes(searchTerm);
+            
+            row.style.display = matchesSearch ? '' : 'none';
+        });
+    }
+    
+    // Filtros para Miembros/Pagos (tabla)
+    function applyTableFilters() {
+        const rows = document.querySelectorAll('table tbody tr');
+        if (rows.length === 0) return;
+        
+        const searchTerm = (searchInput?.value || '').toLowerCase();
+        const estadoValue = (estadoSelect?.value || 'todos').toLowerCase();
+        
+        rows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            const matchesSearch = searchTerm === '' || rowText.includes(searchTerm);
+            
+            let matchesEstado = true;
+            if (estadoValue !== 'todos' && estadoValue !== '') {
+                matchesEstado = rowText.includes(estadoValue);
+            }
+            
+            row.style.display = (matchesSearch && matchesEstado) ? '' : 'none';
+        });
+    }
+    
+    // Detectar qué tipo de filtro aplicar según la página
+    function applyFilters() {
+        if (document.querySelector('.incident-card')) {
+            applyIncidenciasFilters();
+        } else if (window.location.pathname.includes('/clases')) {
+            applyClasesFilters();
+        } else {
+            applyTableFilters();
+        }
+    }
+    
+    // Aplicar filtros sin recargar la página
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            e.preventDefault();
+            applyFilters();
+        });
+    }
+    
+    if (estadoSelect) {
+        estadoSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            applyFilters();
+        });
+    }
+    
+    if (prioridadSelect) {
+        prioridadSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            applyFilters();
+        });
+    }
+    
+    // Prevenir envío SOLO de formularios de filtro (que tienen método GET)
+    const filterForms = document.querySelectorAll('form[method="get"]');
+    filterForms.forEach(form => {
+        // Solo prevenir si tiene campos de filtro
+        if (form.querySelector('input[name="buscar"]') || form.querySelector('select[name="estado"]')) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                applyFilters();
+            });
+        }
+    });
 });

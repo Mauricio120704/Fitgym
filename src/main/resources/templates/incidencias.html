@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidencias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+    <style>
+        :root { --sidebar-width: 5rem; }
+        #sidebar { width: var(--sidebar-width) !important; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
+            <div class="p-4 border-b flex justify-center items-center">
+                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
+                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="mt-4">
+                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
+                <ul class="mt-2">
+                    <li><a href="/" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Inicio</span>
+                    </a></li>
+                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Miembros">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Miembros</span>
+                    </a></li>
+                    <li><a href="/incidencias" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Incidencias">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Incidencias</span>
+                    </a></li>
+                    <li><a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
+                    </a></li>
+                    <li><a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Incidencias</div>
+                </div>
+                <button id="btn-nueva-incidencia" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nueva Incidencia
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="container mx-auto">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Sistema de Incidencias</h1>
+                    <p class="text-gray-600 mb-6">Gestiona y da seguimiento a los reportes del gimnasio</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Total</h3>
+                            <p class="text-2xl font-bold text-gray-800 mt-2" th:text="${totalIncidencias}">0</p>
+                            <p class="text-sm text-gray-500 mt-1">Incidencias</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Abiertas</h3>
+                            <p class="text-2xl font-bold text-red-500 mt-2" th:text="${abiertas}">0</p>
+                            <p class="text-sm text-gray-500 mt-1">Pendientes</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Resueltas</h3>
+                            <p class="text-2xl font-bold text-green-500 mt-2" th:text="${resueltas}">0</p>
+                            <p class="text-sm text-gray-500 mt-1">Completadas</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Lista de Incidencias</h2>
+                            <form th:action="@{/incidencias}" method="get" class="flex gap-2 flex-wrap">
+                                <input type="text" name="buscar" th:value="${buscarActual}" 
+                                       placeholder="Buscar..." 
+                                       class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <select name="estado" th:value="${estadoActual}" 
+                                        class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="todos" th:selected="${estadoActual == 'todos'}">Todos los estados</option>
+                                    <option value="ABIERTO" th:selected="${estadoActual == 'ABIERTO'}">Abierto</option>
+                                    <option value="RESUELTO" th:selected="${estadoActual == 'RESUELTO'}">Resuelto</option>
+                                </select>
+                                <select name="prioridad" th:value="${prioridadActual}" 
+                                        class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="todas" th:selected="${prioridadActual == 'todas'}">Todas las prioridades</option>
+                                    <option value="ALTA" th:selected="${prioridadActual == 'ALTA'}">Alta</option>
+                                    <option value="MEDIA" th:selected="${prioridadActual == 'MEDIA'}">Media</option>
+                                    <option value="BAJA" th:selected="${prioridadActual == 'BAJA'}">Baja</option>
+                                </select>
+                                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div th:if="${incidencias.empty}" class="text-center py-8 text-gray-500">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <p class="mt-2">No hay incidencias registradas</p>
+                            </div>
+                            
+                            <div th:each="inc : ${incidencias}" class="border rounded-lg p-4 hover:shadow-md transition incident-card" th:data-id="${inc.id}">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-semibold text-gray-800" th:text="${inc.titulo}">Título</h3>
+                                        <p class="text-sm text-gray-600 mt-1 incident-summary" th:text="${inc.descripcion}">Descripción</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span th:if="${inc.prioridad == 'ALTA'}" class="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Alta</span>
+                                        <span th:if="${inc.prioridad == 'MEDIA'}" class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Media</span>
+                                        <span th:if="${inc.prioridad == 'BAJA'}" class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-200 rounded-full">Baja</span>
+                                        
+                                        <span th:if="${inc.estado == 'ABIERTO'}" class="px-3 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full status-badge">Abierto</span>
+                                        <span th:if="${inc.estado == 'RESUELTO'}" class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full status-badge">Resuelto</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Detalles ocultos por defecto -->
+                                <div class="incident-details hidden mt-4 pt-4 border-t">
+                                    <p class="text-sm text-gray-700 mb-3" th:text="${inc.descripcion}">Descripción completa</p>
+                                    
+                                    <!-- Imágenes si existen -->
+                                    <div th:if="${inc.imagenes != null}" class="mt-3">
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2" th:attr="data-imagenes=${inc.imagenes}">
+                                            <!-- Las imágenes se cargarán dinámicamente con JavaScript -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex gap-4 text-sm text-gray-600 mt-3">
+                                        <span><strong>Reportado por:</strong> <span th:text="${inc.reportadoPor}">Usuario</span></span>
+                                        <span><strong>Asignado a:</strong> <span th:text="${inc.asignadoA ?: 'Sin asignar'}">Asignado</span></span>
+                                        <span><strong>Fecha:</strong> <span th:text="${#temporals.format(inc.fechaCreacion, 'dd/MM/yyyy HH:mm')}">28/01/2025 10:30</span></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between items-center mt-3 pt-3 border-t">
+                                    <div class="flex gap-3">
+                                        <button class="btn-ver-detalles text-blue-600 hover:underline text-sm font-medium">
+                                            Ver Detalles
+                                        </button>
+                                        <button class="btn-eliminar-incidencia text-red-600 hover:underline text-sm font-medium"
+                                                th:data-id="${inc.id}"
+                                                th:data-titulo="${inc.titulo}">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-2 items-center">
+                                        <select class="select-estado text-sm px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                th:disabled="${inc.estado == 'RESUELTO'}"
+                                                th:data-id="${inc.id}">
+                                            <option value="">Cambiar estado</option>
+                                            <option value="RESUELTO" th:if="${inc.estado != 'RESUELTO'}">Marcar como Resuelto</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <!-- Modal Nueva Incidencia -->
+    <div id="modal-nueva-incidencia" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-8">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">Nueva Incidencia</h2>
+                <button id="modal-close" class="text-gray-500 hover:text-gray-700">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="form-nueva-incidencia" class="p-6 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Título *</label>
+                    <input type="text" id="inc-titulo" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción *</label>
+                    <textarea id="inc-descripcion" rows="4" required
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Reportado por *</label>
+                        <input type="text" id="inc-reportado" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Asignado a</label>
+                        <select id="inc-asignado"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="">Sin asignar</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Técnico HVAC">Técnico HVAC</option>
+                            <option value="Plomería">Plomería</option>
+                            <option value="Electricidad">Electricidad</option>
+                            <option value="Instructor">Instructor</option>
+                            <option value="Administración">Administración</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Prioridad *</label>
+                    <select id="inc-prioridad" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="BAJA">Baja</option>
+                        <option value="MEDIA" selected>Media</option>
+                        <option value="ALTA">Alta</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Imágenes (opcional)</label>
+                    <input type="file" id="inc-imagen" accept="image/*" multiple
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                    <p class="text-xs text-gray-500 mt-1">Puedes seleccionar múltiples imágenes. Formatos: JPG, PNG, GIF (máx. 5MB cada una)</p>
+                </div>
+                <div id="preview-container" class="hidden">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Vista previa (<span id="image-count">0</span> imágenes)</label>
+                    <div id="preview-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+                </div>
+            </form>
+            <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
+                <button type="button" id="modal-cancel" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                    Cancelar
+                </button>
+                <button type="button" id="modal-save" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                    Guardar Incidencia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Marcar como Resuelto -->
+    <div id="modal-confirmar-resuelto" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">¿Marcar como resuelta?</h3>
+            <p class="text-gray-600 mb-6" id="confirmar-mensaje"></p>
+            <div class="flex justify-end gap-3">
+                <button id="confirmar-cancelar" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                    Cancelar
+                </button>
+                <button id="confirmar-aceptar" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script>
+        // Modal Nueva Incidencia
+        const btnNuevaIncidencia = document.getElementById('btn-nueva-incidencia');
+        const modal = document.getElementById('modal-nueva-incidencia');
+        const modalClose = document.getElementById('modal-close');
+        const modalCancel = document.getElementById('modal-cancel');
+        const modalSave = document.getElementById('modal-save');
+        const form = document.getElementById('form-nueva-incidencia');
+        const inputImagen = document.getElementById('inc-imagen');
+        const previewContainer = document.getElementById('preview-container');
+        const previewGrid = document.getElementById('preview-grid');
+        const imageCount = document.getElementById('image-count');
+        let imagenesDataUrls = [];
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+            form.reset();
+            previewContainer.classList.add('hidden');
+            previewGrid.innerHTML = '';
+            imagenesDataUrls = [];
+            imageCount.textContent = '0';
+        }
+
+        if (btnNuevaIncidencia) btnNuevaIncidencia.addEventListener('click', openModal);
+        if (modalClose) modalClose.addEventListener('click', closeModal);
+        if (modalCancel) modalCancel.addEventListener('click', closeModal);
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // Cerrar al hacer click fuera
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Manejar selección de múltiples imágenes
+        if (inputImagen) {
+            inputImagen.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) return;
+                
+                imagenesDataUrls = [];
+                previewGrid.innerHTML = '';
+                let validFiles = 0;
+                
+                files.forEach((file, index) => {
+                    // Validar tamaño (5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert(`La imagen "${file.name}" es muy grande. Máximo 5MB.`);
+                        return;
+                    }
+                    
+                    validFiles++;
+                    
+                    // Leer y mostrar preview
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const dataUrl = event.target.result;
+                        imagenesDataUrls.push(dataUrl);
+                        
+                        // Crear preview con botón de eliminar
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'relative group';
+                        previewDiv.innerHTML = `
+                            <img src="${dataUrl}" 
+                                 class="w-full h-32 object-cover rounded-lg border border-gray-300 cursor-pointer hover:opacity-90 transition"
+                                 data-index="${imagenesDataUrls.length - 1}"
+                                 alt="Preview ${imagenesDataUrls.length}">
+                            <button type="button" 
+                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                                    data-remove="${imagenesDataUrls.length - 1}">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        `;
+                        
+                        previewGrid.appendChild(previewDiv);
+                        previewContainer.classList.remove('hidden');
+                        imageCount.textContent = imagenesDataUrls.length;
+                        
+                        // Event listener para abrir lightbox
+                        const img = previewDiv.querySelector('img');
+                        img.addEventListener('click', () => openLightbox(imagenesDataUrls, parseInt(img.dataset.index)));
+                        
+                        // Event listener para eliminar imagen
+                        const removeBtn = previewDiv.querySelector('[data-remove]');
+                        removeBtn.addEventListener('click', () => {
+                            const indexToRemove = parseInt(removeBtn.dataset.remove);
+                            imagenesDataUrls.splice(indexToRemove, 1);
+                            updatePreviews();
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                if (validFiles === 0) {
+                    inputImagen.value = '';
+                }
+            });
+        }
+        
+        function updatePreviews() {
+            previewGrid.innerHTML = '';
+            if (imagenesDataUrls.length === 0) {
+                previewContainer.classList.add('hidden');
+                inputImagen.value = '';
+                return;
+            }
+            
+            imagenesDataUrls.forEach((dataUrl, index) => {
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'relative group';
+                previewDiv.innerHTML = `
+                    <img src="${dataUrl}" 
+                         class="w-full h-32 object-cover rounded-lg border border-gray-300 cursor-pointer hover:opacity-90 transition"
+                         data-index="${index}"
+                         alt="Preview ${index + 1}">
+                    <button type="button" 
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                            data-remove="${index}">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                `;
+                
+                previewGrid.appendChild(previewDiv);
+                
+                const img = previewDiv.querySelector('img');
+                img.addEventListener('click', () => openLightbox(imagenesDataUrls, index));
+                
+                const removeBtn = previewDiv.querySelector('[data-remove]');
+                removeBtn.addEventListener('click', () => {
+                    imagenesDataUrls.splice(index, 1);
+                    updatePreviews();
+                });
+            });
+            
+            imageCount.textContent = imagenesDataUrls.length;
+        }
+        
+        // ========= Lightbox para ver imágenes a tamaño completo =========
+        let lightboxGallery = [];
+        let lightboxIndex = 0;
+        
+        function createLightbox() {
+            const lightbox = document.createElement('div');
+            lightbox.id = 'lightbox';
+            lightbox.className = 'fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-[100]';
+            lightbox.innerHTML = `
+                <button class="absolute top-4 right-4 text-white text-4xl hover:text-gray-300" id="lightbox-close">&times;</button>
+                <button class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-5xl hover:text-gray-300" id="lightbox-prev">‹</button>
+                <button class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-5xl hover:text-gray-300" id="lightbox-next">›</button>
+                <img id="lightbox-img" class="max-w-[90vw] max-h-[90vh] object-contain" alt="Imagen ampliada">
+                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-lg">
+                    <span id="lightbox-counter"></span>
+                </div>
+            `;
+            document.body.appendChild(lightbox);
+            
+            document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+            document.getElementById('lightbox-prev').addEventListener('click', () => navigateLightbox(-1));
+            document.getElementById('lightbox-next').addEventListener('click', () => navigateLightbox(1));
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                const lb = document.getElementById('lightbox');
+                if (lb && !lb.classList.contains('hidden')) {
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowLeft') navigateLightbox(-1);
+                    if (e.key === 'ArrowRight') navigateLightbox(1);
+                }
+            });
+        }
+        
+        function openLightbox(images, index = 0) {
+            if (!document.getElementById('lightbox')) createLightbox();
+            
+            lightboxGallery = images;
+            lightboxIndex = index;
+            
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const counter = document.getElementById('lightbox-counter');
+            
+            img.src = lightboxGallery[lightboxIndex];
+            counter.textContent = `${lightboxIndex + 1} / ${lightboxGallery.length}`;
+            
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            if (lightbox) {
+                lightbox.classList.add('hidden');
+                lightbox.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        function navigateLightbox(direction) {
+            lightboxIndex += direction;
+            if (lightboxIndex < 0) lightboxIndex = lightboxGallery.length - 1;
+            if (lightboxIndex >= lightboxGallery.length) lightboxIndex = 0;
+            
+            const img = document.getElementById('lightbox-img');
+            const counter = document.getElementById('lightbox-counter');
+            
+            img.src = lightboxGallery[lightboxIndex];
+            counter.textContent = `${lightboxIndex + 1} / ${lightboxGallery.length}`;
+        }
+
+        // Guardar incidencia
+        if (modalSave) {
+            modalSave.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Validar formulario
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                const nuevaIncidencia = {
+                    titulo: document.getElementById('inc-titulo').value,
+                    descripcion: document.getElementById('inc-descripcion').value,
+                    reportadoPor: document.getElementById('inc-reportado').value,
+                    asignadoA: document.getElementById('inc-asignado').value || 'Sin asignar',
+                    prioridad: document.getElementById('inc-prioridad').value,
+                    estado: 'ABIERTO',
+                    imagenUrl: imagenesDataUrls.length > 0 ? imagenesDataUrls[0] : null,
+                    imagenes: imagenesDataUrls.length > 0 ? JSON.stringify(imagenesDataUrls) : null
+                };
+
+                // Guardar en la base de datos
+                fetch('/incidencias/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(nuevaIncidencia)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Incidencia guardada:', data);
+                    closeModal();
+                    // Recargar la página para mostrar la nueva incidencia
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al guardar la incidencia');
+                });
+            });
+        }
+        
+        // ========= Cargar imágenes dinámicamente =========
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageContainers = document.querySelectorAll('[data-imagenes]');
+            imageContainers.forEach(container => {
+                const imagenesJson = container.dataset.imagenes;
+                if (imagenesJson) {
+                    try {
+                        const imagenes = JSON.parse(imagenesJson);
+                        imagenes.forEach((imgUrl, index) => {
+                            const img = document.createElement('img');
+                            img.src = imgUrl;
+                            img.className = 'w-full h-24 object-cover rounded border border-gray-300 cursor-pointer hover:opacity-80 transition incident-image';
+                            img.dataset.imgIndex = index;
+                            img.dataset.allImages = imagenesJson;
+                            container.appendChild(img);
+                        });
+                    } catch (e) {
+                        console.error('Error parsing images JSON:', e);
+                    }
+                }
+            });
+        });
+        
+        // ========= Ver Detalles y Cambio de Estado =========
+        document.addEventListener('click', (e) => {
+            // Ver/Ocultar detalles
+            if (e.target.classList.contains('btn-ver-detalles')) {
+                const card = e.target.closest('.incident-card');
+                const details = card.querySelector('.incident-details');
+                const summary = card.querySelector('.incident-summary');
+                
+                if (details.classList.contains('hidden')) {
+                    details.classList.remove('hidden');
+                    summary.classList.add('hidden');
+                    e.target.textContent = 'Ocultar Detalles';
+                } else {
+                    details.classList.add('hidden');
+                    summary.classList.remove('hidden');
+                    e.target.textContent = 'Ver Detalles';
+                }
+            }
+            
+            // Abrir lightbox al hacer click en imágenes
+            if (e.target.classList.contains('incident-image')) {
+                const allImagesJson = e.target.dataset.allImages;
+                const currentIndex = parseInt(e.target.dataset.imgIndex) || 0;
+                
+                if (allImagesJson) {
+                    try {
+                        const allImages = JSON.parse(allImagesJson);
+                        openLightbox(allImages, currentIndex);
+                    } catch (e) {
+                        console.error('Error parsing images for lightbox:', e);
+                    }
+                }
+            }
+            
+            // Eliminar incidencia
+            if (e.target.classList.contains('btn-eliminar-incidencia')) {
+                const incidenciaId = e.target.dataset.id;
+                const titulo = e.target.dataset.titulo;
+                
+                if (confirm(`¿Estás seguro de eliminar la incidencia "${titulo}"?\n\nEsta acción no se puede deshacer.`)) {
+                    fetch(`/incidencias/${incidenciaId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Incidencia eliminada');
+                            // Recargar la página
+                            window.location.reload();
+                        } else {
+                            throw new Error('Error al eliminar');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error al eliminar la incidencia');
+                    });
+                }
+            }
+        });
+        
+        // Cambio de estado
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('select-estado')) {
+                const select = e.target;
+                const value = select.value;
+                
+                console.log('Select cambiado, valor:', value);
+                
+                if (value === 'RESUELTO') {
+                    const card = select.closest('.incident-card');
+                    const incidenciaId = card.dataset.id;
+                    const titulo = card.querySelector('h3').textContent;
+                    
+                    console.log('ID de incidencia:', incidenciaId);
+                    console.log('Título:', titulo);
+                    
+                    // Mostrar modal de confirmación
+                    const modalConfirmar = document.getElementById('modal-confirmar-resuelto');
+                    const mensajeConfirmar = document.getElementById('confirmar-mensaje');
+                    const btnAceptar = document.getElementById('confirmar-aceptar');
+                    const btnCancelar = document.getElementById('confirmar-cancelar');
+                    
+                    mensajeConfirmar.textContent = `¿Marcar "${titulo}" como resuelta?`;
+                    modalConfirmar.classList.remove('hidden');
+                    modalConfirmar.classList.add('flex');
+                    
+                    // Función para cerrar modal
+                    const cerrarModal = () => {
+                        modalConfirmar.classList.add('hidden');
+                        modalConfirmar.classList.remove('flex');
+                        select.selectedIndex = 0;
+                    };
+                    
+                    // Cancelar
+                    btnCancelar.onclick = cerrarModal;
+                    
+                    // Aceptar
+                    btnAceptar.onclick = () => {
+                        cerrarModal();
+                        
+                        // Guardar en la base de datos
+                        fetch(`/incidencias/${incidenciaId}/estado`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify('RESUELTO')
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Estado actualizado en BD:', data);
+                            
+                            // Actualizar visualmente
+                            const statusBadge = card.querySelector('.status-badge');
+                            statusBadge.textContent = 'Resuelto';
+                            statusBadge.className = 'px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full status-badge';
+                            
+                            // Deshabilitar el select
+                            select.disabled = true;
+                            select.classList.add('opacity-50', 'cursor-not-allowed');
+                        })
+                        .catch(error => {
+                            console.error('Error al actualizar estado:', error);
+                            alert('Error al actualizar el estado');
+                            select.selectedIndex = 0;
+                        });
+                    };
+                } else {
+                    select.selectedIndex = 0;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

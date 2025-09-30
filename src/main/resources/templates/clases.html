@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cupos de Clases</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+    <style>
+        :root { --sidebar-width: 5rem; }
+        #sidebar { width: var(--sidebar-width) !important; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
+            <div class="p-4 border-b flex justify-center items-center">
+                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
+                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="mt-4">
+                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
+                <ul class="mt-2">
+                    <li><a href="/" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Inicio</span>
+                    </a></li>
+                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Miembros">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Miembros</span>
+                    </a></li>
+                    <li><a href="/incidencias" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Incidencias</span>
+                    </a></li>
+                    <li><a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
+                    </a></li>
+                    <li><a href="/clases" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Cupos de Clases">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Cupos de Clases</div>
+                </div>
+                <button id="btn-nueva-clase" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition flex items-center gap-2">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nueva Clase
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="container mx-auto">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Gestión de Clases</h1>
+                    <p class="text-gray-600 mb-6">Administra los cupos y horarios de las clases</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Total Clases</h3>
+                            <p class="text-2xl font-bold text-gray-800 mt-2" th:text="${totalClases}">0</p>
+                            <p class="text-sm text-gray-500 mt-1">Programadas</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Clases Llenas</h3>
+                            <p class="text-2xl font-bold text-orange-500 mt-2" th:text="${clasesLlenas}">0</p>
+                            <p class="text-sm text-gray-500 mt-1">Sin cupos disponibles</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Total Cupos</h3>
+                            <p class="text-2xl font-bold text-gray-800 mt-2" th:text="${totalCupos}">0</p>
+                            <p class="text-sm text-gray-500 mt-1">Capacidad total</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Clases Programadas</h2>
+                            <form th:action="@{/clases}" method="get" class="flex gap-2">
+                                <input type="text" name="buscar" th:value="${buscarActual}" 
+                                       placeholder="Buscar clases..." 
+                                       class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-xs text-gray-500 uppercase bg-gray-50">
+                                        <th class="px-4 py-3">Clase</th>
+                                        <th class="px-4 py-3">Instructor</th>
+                                        <th class="px-4 py-3">Fecha y Hora</th>
+                                        <th class="px-4 py-3">Duración</th>
+                                        <th class="px-4 py-3">Cupos Premium/Elite</th>
+                                        <th class="px-4 py-3">Ocupación Actual</th>
+                                        <th class="px-4 py-3">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-gray-700">
+                                    <tr th:each="clase : ${clases}" class="border-b hover:bg-gray-50">
+                                        <td class="px-4 py-3 font-medium" th:text="${clase.nombre}">Yoga</td>
+                                        <td class="px-4 py-3" th:text="${clase.instructor}">María</td>
+                                        <td class="px-4 py-3">
+                                            <span th:text="${#temporals.format(clase.fecha, 'dd/MM/yyyy')}">15/02/2025</span>
+                                            <span th:text="${#temporals.format(clase.hora, 'HH:mm')}">07:00</span>
+                                        </td>
+                                        <td class="px-4 py-3"><span th:text="${clase.duracion}">60</span> min</td>
+                                        <td class="px-4 py-3">
+                                            <span th:text="${clase.cuposPremium}">15</span> / <span th:text="${clase.cuposElite}">10</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-semibold">
+                                                <span th:text="${clase.ocupadosPremium + clase.ocupadosElite}">20</span>/<span th:text="${clase.cuposPremium + clase.cuposElite}">25</span>
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                Premium: <span th:text="${clase.ocupadosPremium}">12</span> | Elite: <span th:text="${clase.ocupadosElite}">8</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span th:if="${(clase.ocupadosPremium + clase.ocupadosElite) >= (clase.cuposPremium + clase.cuposElite)}" 
+                                                  class="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Llena</span>
+                                            <span th:unless="${(clase.ocupadosPremium + clase.ocupadosElite) >= (clase.cuposPremium + clase.cuposElite)}" 
+                                                  class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Disponible</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Información sobre Membresías -->
+                    <div class="mt-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Información sobre Cupos por Membresía</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg shadow border border-blue-200">
+                                <h3 class="text-xl font-bold text-blue-800 mb-3">Membresía Premium</h3>
+                                <p class="text-gray-700">Los miembros Premium pueden reservar cuando haya cupos disponibles, asegurando su lugar en la mayoría de las clases.</p>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg shadow border border-purple-200">
+                                <h3 class="text-xl font-bold text-purple-800 mb-3">Membresía Elite</h3>
+                                <p class="text-gray-700">Los miembros Elite pueden reservar con mayor prioridad y cuentan con más cupos disponibles en todas las clases.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <!-- Modal Nueva Clase -->
+    <div id="modal-nueva-clase" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-8">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">Configurar Nueva Clase</h2>
+                <button id="modal-close" class="text-gray-500 hover:text-gray-700">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <form id="form-nueva-clase" class="p-6 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de la Clase *</label>
+                        <input type="text" id="clase-nombre" required placeholder="Ej: Yoga Matutino"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Instructor *</label>
+                        <select id="clase-instructor" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <option value="">Seleccionar instructor</option>
+                            <option value="Ana García">Ana García</option>
+                            <option value="Carlos López">Carlos López</option>
+                            <option value="María Rodríguez">María Rodríguez</option>
+                            <option value="Pedro Martín">Pedro Martín</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha *</label>
+                        <input type="date" id="clase-fecha" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Hora *</label>
+                        <input type="time" id="clase-hora" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Duración (min) *</label>
+                        <input type="number" id="clase-duracion" min="10" step="5" value="60" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Cupos por Tipo de Membresía</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Membresía Premium *</label>
+                            <input type="number" id="clase-cupos-premium" min="0" step="1" value="15" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Membresía Elite *</label>
+                            <input type="number" id="clase-cupos-elite" min="0" step="1" value="20" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
+                <button type="button" id="modal-cancel" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                    Cancelar
+                </button>
+                <button type="button" id="modal-save" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                    Guardar Clase
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script>
+        // Modal Nueva Clase
+        const btnNuevaClase = document.getElementById('btn-nueva-clase');
+        const modal = document.getElementById('modal-nueva-clase');
+        const modalClose = document.getElementById('modal-close');
+        const modalCancel = document.getElementById('modal-cancel');
+        const modalSave = document.getElementById('modal-save');
+        const form = document.getElementById('form-nueva-clase');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+            form.reset();
+        }
+
+        if (btnNuevaClase) btnNuevaClase.addEventListener('click', openModal);
+        if (modalClose) modalClose.addEventListener('click', closeModal);
+        if (modalCancel) modalCancel.addEventListener('click', closeModal);
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // Cerrar al hacer click fuera
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Guardar clase
+        if (modalSave) {
+            modalSave.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Validar formulario
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                const nuevaClase = {
+                    nombre: document.getElementById('clase-nombre').value,
+                    instructor: document.getElementById('clase-instructor').value,
+                    fecha: document.getElementById('clase-fecha').value,
+                    hora: document.getElementById('clase-hora').value,
+                    duracion: parseInt(document.getElementById('clase-duracion').value),
+                    cuposPremium: parseInt(document.getElementById('clase-cupos-premium').value),
+                    cuposElite: parseInt(document.getElementById('clase-cupos-elite').value),
+                    ocupadosPremium: 0,
+                    ocupadosElite: 0,
+                    estado: 'ACTIVA'
+                };
+
+                // Guardar en la base de datos
+                fetch('/clases/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(nuevaClase)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Clase guardada en BD:', data);
+                    closeModal();
+                    // Recargar la página para mostrar la nueva clase
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('❌ Error al guardar clase:', error);
+                    alert('Error al guardar la clase');
+                });
+            });
+        }
+        
+        // Función para agregar clase a la tabla
+        function agregarClaseATabla(clase) {
+            const tbody = document.querySelector('.classes-table tbody, table tbody');
+            if (!tbody) return;
+            
+            const row = document.createElement('tr');
+            row.className = 'border-b hover:bg-gray-50';
+            
+            // Formatear fecha
+            const fechaObj = new Date(clase.fecha + 'T00:00:00');
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            
+            const totalOcupados = clase.ocupadosPremium + clase.ocupadosElite;
+            const totalCupos = clase.cuposPremium + clase.cuposElite;
+            const estaLlena = totalOcupados >= totalCupos;
+            
+            row.innerHTML = `
+                <td class="px-4 py-3 font-medium">${clase.nombre}</td>
+                <td class="px-4 py-3">${clase.instructor}</td>
+                <td class="px-4 py-3">
+                    <span>${fechaFormateada}</span>
+                    <span>${clase.hora}</span>
+                </td>
+                <td class="px-4 py-3">${clase.duracion} min</td>
+                <td class="px-4 py-3">
+                    ${clase.cuposPremium} / ${clase.cuposElite}
+                </td>
+                <td class="px-4 py-3">
+                    <div class="font-semibold">
+                        ${totalOcupados}/${totalCupos}
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        Premium: ${clase.ocupadosPremium} | Elite: ${clase.ocupadosElite}
+                    </div>
+                </td>
+                <td class="px-4 py-3">
+                    <span class="px-3 py-1 text-xs font-semibold ${estaLlena ? 'text-red-800 bg-red-200' : 'text-green-800 bg-green-200'} rounded-full">
+                        ${estaLlena ? 'Llena' : 'Disponible'}
+                    </span>
+                </td>
+            `;
+            
+            // Agregar al inicio de la tabla
+            tbody.insertBefore(row, tbody.firstChild);
+            
+            // Actualizar estadísticas
+            actualizarEstadisticasClases();
+        }
+        
+        function actualizarEstadisticasClases() {
+            const rows = document.querySelectorAll('table tbody tr');
+            const total = rows.length;
+            
+            // Actualizar total de clases
+            const stats = document.querySelectorAll('.grid.grid-cols-1.md\\:grid-cols-3 .bg-white');
+            if (stats[0]) stats[0].querySelector('.text-2xl').textContent = total;
+        }
+    </script>
+</body>
+</html>

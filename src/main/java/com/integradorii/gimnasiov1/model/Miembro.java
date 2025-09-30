@@ -28,9 +28,13 @@ public class Miembro {
     @Column(name = "membresia_activa")
     private Boolean membresiaActiva;
     
+    @Column(name = "tipo_membresia")
+    private String tipoMembresia;
+    
     // Constructor vacío
     public Miembro() {
         this.membresiaActiva = true;
+        this.tipoMembresia = "BASICA";
     }
     
     @PrePersist
@@ -105,5 +109,13 @@ public class Miembro {
     
     public void setMembresiaActiva(Boolean membresiaActiva) {
         this.membresiaActiva = membresiaActiva;
+    }
+    
+    public String getTipoMembresia() {
+        return tipoMembresia;
+    }
+    
+    public void setTipoMembresia(String tipoMembresia) {
+        this.tipoMembresia = tipoMembresia;
     }
 }

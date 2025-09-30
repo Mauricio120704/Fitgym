@@ -6,11 +6,10 @@ import com.integradorii.gimnasiov1.repository.MiembroRepository;
 import com.integradorii.gimnasiov1.repository.PagoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Component
+//@Component  // Deshabilitado - Los datos ya están en PostgreSQL
 public class DataInitializer implements CommandLineRunner {
     
     @Autowired

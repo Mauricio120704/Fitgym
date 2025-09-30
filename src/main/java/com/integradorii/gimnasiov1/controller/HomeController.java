@@ -73,7 +73,25 @@ public class HomeController {
     
     @PostMapping("/miembros")
     public String guardarMiembro(@ModelAttribute Miembro miembro) {
-        miembroService.guardar(miembro);
+        System.out.println("=== GUARDANDO MIEMBRO ===");
+        System.out.println("Nombre: " + miembro.getNombre());
+        System.out.println("Apellido: " + miembro.getApellido());
+        System.out.println("Email: " + miembro.getEmail());
+        System.out.println("Teléfono: " + miembro.getTelefono());
+        System.out.println("Membresía Activa: " + miembro.getMembresiaActiva());
+        
+        if (miembro.getFechaRegistro() == null) {
+            miembro.setFechaRegistro(java.time.LocalDate.now());
+        }
+        
+        try {
+            Miembro guardado = miembroService.guardar(miembro);
+            System.out.println("✅ Miembro guardado con ID: " + guardado.getId());
+        } catch (Exception e) {
+            System.err.println("❌ ERROR al guardar miembro: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         return "redirect:/miembros";
     }
     
