@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pagos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/heroicons@2.1.1/dist/bundle.js"></script>
+    <script>
+        // Aplicar estado del sidebar INMEDIATAMENTE antes de renderizar
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            --sidebar-width: 5rem;
+        }
+        #sidebar {
+            width: var(--sidebar-width) !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
+            <div class="p-4 border-b flex justify-center items-center">
+                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
+                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="mt-4">
+                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
+                <ul class="mt-2">
+                    <li>
+                        <a href="/" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Inicio</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Miembros">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Miembros</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Reportes de Ingresos">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Reportes de Ingresos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
+                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Incidencias</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/pagos" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Historial de Pagos">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
+                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Programar Entrenamientos">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Programar Entrenamientos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Mi Progreso">
+                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Mi Progreso</span>
+                        </a>
+                    </li>
+                </ul>
+                 <span class="sidebar-text px-4 mt-4 text-sm font-semibold text-gray-500 hidden">Ajustes</span>
+                <ul class="mt-2">
+                    <li>
+                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Configuración">
+                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Historial de Pagos</div>
+                </div>
+                <div></div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="container mx-auto">
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Historial de Pagos</h1>
+                    <p class="text-gray-600 mb-6">Consulta tu historial de pagos y suscripciones</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Próximo Pago</h3>
+                            <p class="text-2xl font-bold text-gray-800 mt-2">15 Feb</p>
+                            <p class="text-sm text-gray-500 mt-1">Membresía Premium - S/ 899</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Gastado este Año</h3>
+                            <p class="text-2xl font-bold text-gray-800 mt-2">S/ <span th:text="${#numbers.formatDecimal(totalAnio, 1, 'COMMA', 2, 'POINT')}">0</span></p>
+                            <p class="text-sm text-gray-500 mt-1"><span th:text="${cantidadPagos}">0</span> pagos realizados</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-sm font-medium text-gray-500">Estado de Membresía</h3>
+                            <p class="text-2xl font-bold text-green-500 mt-2">Activa</p>
+                            <p class="text-sm text-gray-500 mt-1">Premium hasta Feb 2024</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                           <div class="flex border-b">
+                               <button class="px-4 py-2 border-b-2 border-orange-500 text-orange-500 font-semibold">Pagos</button>
+                               <button class="px-4 py-2 text-gray-500 hover:text-orange-500">Suscripciones</button>
+                           </div>
+                           <form th:action="@{/pagos}" method="get" class="flex items-center gap-4 w-full md:w-auto">
+                               <input type="text" name="buscar" th:value="${buscarActual}" 
+                                      placeholder="Buscar pagos..." 
+                                      class="w-full md:w-auto px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                               <select name="estado" th:value="${estadoActual}" 
+                                       onchange="this.form.submit()"
+                                       class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                   <option value="todos" th:selected="${estadoActual == 'todos'}">Todos los estados</option>
+                                   <option value="Completado" th:selected="${estadoActual == 'Completado'}">Completado</option>
+                                   <option value="Pendiente" th:selected="${estadoActual == 'Pendiente'}">Pendiente</option>
+                                   <option value="Fallido" th:selected="${estadoActual == 'Fallido'}">Fallido</option>
+                               </select>
+                               <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                   </svg>
+                               </button>
+                           </form>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-xs text-gray-500 uppercase bg-gray-50">
+                                        <th class="px-4 py-3">ID</th>
+                                        <th class="px-4 py-3">Fecha</th>
+                                        <th class="px-4 py-3">Plan/Servicio</th>
+                                        <th class="px-4 py-3">Método</th>
+                                        <th class="px-4 py-3">Monto</th>
+                                        <th class="px-4 py-3">Estado</th>
+                                        <th class="px-4 py-3">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-gray-700">
+                                    <tr th:if="${pagos.empty}">
+                                        <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                            No hay pagos registrados
+                                        </td>
+                                    </tr>
+                                    <tr th:each="pago : ${pagos}" class="border-b">
+                                        <td class="px-4 py-3 font-medium" th:text="${pago.codigoPago}">PAY-001</td>
+                                        <td class="px-4 py-3" th:text="${#temporals.format(pago.fecha, 'dd/MM/yyyy')}">14/1/2024</td>
+                                        <td class="px-4 py-3" th:text="${pago.planServicio}">Membresía Premium</td>
+                                        <td class="px-4 py-3" th:text="${pago.metodoPago}">Tarjeta de Crédito</td>
+                                        <td class="px-4 py-3">S/ <span th:text="${#numbers.formatDecimal(pago.monto, 1, 'COMMA', 2, 'POINT')}">899.00</span></td>
+                                        <td class="px-4 py-3">
+                                            <span th:if="${pago.estado == 'Completado'}" class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Completado</span>
+                                            <span th:if="${pago.estado == 'Pendiente'}" class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Pendiente</span>
+                                            <span th:if="${pago.estado == 'Fallido'}" class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Fallido</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <button class="flex items-center text-blue-600 hover:underline">
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                Recibo
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>
