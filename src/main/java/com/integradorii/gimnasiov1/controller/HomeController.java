@@ -15,7 +15,34 @@ public class HomeController {
     
     @GetMapping("/")
     public String home() {
-        return "redirect:/miembros";
+        return "index";
+    }
+    
+    @GetMapping("/inicio")
+    public String inicio() {
+        return "index";
+    }
+    
+    @GetMapping("/registro")
+    public String registro() {
+        return "registro";
+    }
+    
+    @GetMapping("/planes")
+    public String planes() {
+        return "planes";
+    }
+    
+    @GetMapping("/checkout")
+    public String checkout(
+            @RequestParam(required = false, defaultValue = "Básico") String plan,
+            @RequestParam(required = false, defaultValue = "mensual") String periodo,
+            @RequestParam(required = false, defaultValue = "49.900") String precio,
+            Model model) {
+        model.addAttribute("planNombre", plan);
+        model.addAttribute("periodo", periodo);
+        model.addAttribute("precio", precio);
+        return "checkout";
     }
     
     @GetMapping("/miembros")
@@ -99,5 +126,29 @@ public class HomeController {
     public String eliminarMiembro(@PathVariable Long id) {
         miembroService.eliminar(id);
         return "redirect:/miembros";
+    }
+    
+    @GetMapping("/perfil")
+    public String perfilUsuario(Model model) {
+        // Datos de ejemplo estáticos - NO conecta a la base de datos
+        Miembro miembroEjemplo = new Miembro();
+        miembroEjemplo.setId(1L);
+        miembroEjemplo.setNombre("Juan");
+        miembroEjemplo.setApellido("Pérez");
+        miembroEjemplo.setEmail("juan.perez@email.com");
+        miembroEjemplo.setTelefono("555-0101");
+        miembroEjemplo.setFechaRegistro(java.time.LocalDate.of(2024, 1, 14));
+        miembroEjemplo.setMembresiaActiva(true);
+        miembroEjemplo.setTipoMembresia("Premium");
+        miembroEjemplo.setRol("DEPORTISTA");
+        
+        model.addAttribute("miembro", miembroEjemplo);
+        return "perfil-usuario";
+    }
+    
+    @GetMapping("/configuracion")
+    public String configuracion() {
+        // Vista de configuración - solo visual, sin conexión a BD
+        return "configuracion";
     }
 }

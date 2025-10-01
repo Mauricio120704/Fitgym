@@ -1,0 +1,148 @@
+/* --- Estilos Generales --- */
+body {
+    background-color: #f8f9fa;
+}
+
+
+/* --- Encabezado --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.fw-bold{
+    color: #e67e22;
+    font-size: 1.5rem;
+}
+
+
+.user-initial {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #495057;
+}
+
+
+/* --- Interruptor de Planes --- */
+.plan-toggle {
+    background-color: #e9ecef;
+    border-radius: 20px;
+    padding: 4px;
+    display: inline-flex;
+}
+
+
+.plan-toggle .btn {
+    border: none;
+    border-radius: 16px;
+    padding: 6px 20px;
+    font-weight: 500;
+    color: #6c757d;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+
+.plan-toggle .btn.active {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+/* --- Tarjetas de Precios --- */
+.card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+
+.plan-icon {
+    height: 50px;
+}
+
+
+.price-container {
+    color: #212529;
+}
+
+
+.price-amount {
+    font-size: 2.75rem;
+    font-weight: bold;
+}
+
+
+.price-period {
+    font-size: 1rem;
+    color: #6c757d;
+}
+.price-old {
+    text-decoration: line-through;
+    height: 1.5em; /* Evita que el layout salte */
+}
+
+
+.feature-list li {
+    margin-bottom: 0.75rem;
+    color: #495057;
+}
+
+
+/* --- Tarjeta Popular --- */
+.card-popular {
+    border: 2px solid #f39c12;
+    position: relative;
+    overflow: visible; /* Permite que el badge se vea */
+}
+
+
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f39c12;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+
+/* --- Botones --- */
+.btn {
+    padding: 0.75rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+
+.btn-custom-orange {
+    background-color: #f39c12;
+    border-color: #f39c12;
+    color: #fff;
+}
+.btn-custom-orange:hover {
+    background-color: #e67e22;
+    border-color: #e67e22;
+    color: #fff;
+}

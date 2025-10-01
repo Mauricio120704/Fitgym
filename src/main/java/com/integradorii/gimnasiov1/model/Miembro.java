@@ -31,10 +31,14 @@ public class Miembro {
     @Column(name = "tipo_membresia")
     private String tipoMembresia;
     
+    @Column(nullable = false)
+    private String rol = "DEPORTISTA";
+    
     // Constructor vacío
     public Miembro() {
         this.membresiaActiva = true;
         this.tipoMembresia = "BASICA";
+        this.rol = "DEPORTISTA";
     }
     
     @PrePersist
@@ -117,5 +121,13 @@ public class Miembro {
     
     public void setTipoMembresia(String tipoMembresia) {
         this.tipoMembresia = tipoMembresia;
+    }
+    
+    public String getRol() {
+        return rol;
+    }
+    
+    public void setRol(String rol) {
+        this.rol = rol;
     }
 }

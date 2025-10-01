@@ -66,6 +66,23 @@ public class ClaseController {
         return claseRepository.save(clase);
     }
     
+    @PutMapping("/{id}")
+    @ResponseBody
+    public Clase actualizarClase(@PathVariable Long id, @RequestBody Clase claseActualizada) {
+        return claseRepository.findById(id)
+                .map(clase -> {
+                    clase.setNombre(claseActualizada.getNombre());
+                    clase.setInstructor(claseActualizada.getInstructor());
+                    clase.setFecha(claseActualizada.getFecha());
+                    clase.setHora(claseActualizada.getHora());
+                    clase.setDuracion(claseActualizada.getDuracion());
+                    clase.setCuposPremium(claseActualizada.getCuposPremium());
+                    clase.setCuposElite(claseActualizada.getCuposElite());
+                    return claseRepository.save(clase);
+                })
+                .orElseThrow(() -> new RuntimeException("Clase no encontrada con id: " + id));
+    }
+    
     @DeleteMapping("/{id}")
     @ResponseBody
     public void eliminarClase(@PathVariable Long id) {

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes - FitGym</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/Estilos/planes.css}">
+</head>
+<body>
+    <header class="page-header">
+        <div class="logo-steps">
+            <span class="fw-bold">FitGym</span>
+        </div>
+    </header>
+    <main class="container my-5">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold">Selecciona tu Plan Ideal</h1>
+            <p class="lead text-muted mb-4">
+                Encuentra el plan que mejor se adapte a tus objetivos fitness
+            </p>
+        </div>
+
+
+        <div class="d-flex justify-content-center align-items-center mb-5">
+            <div class="plan-toggle">
+                <button type="button" id="monthly-btn" class="btn active">Mensual</button>
+                <button type="button" id="annual-btn" class="btn">Anual</button>
+            </div>
+            <span class="badge bg-success-subtle text-success-emphasis ms-3">Ahorra 17%</span>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="text-center">
+                            <img th:src="@{/images/plan1.0.png}" alt="Icono Básico" class="plan-icon mb-3">
+                            <h3 class="card-title">Básico</h3>
+                            <p class="text-muted">Perfecto para comenzar tu rutina fitness</p>
+                            <div class="price-container my-3">
+                                <span class="price-currency">S/</span>
+                                <span class="price-amount" data-monthly="49.900" data-annual="499.900">49.900</span>
+                                <span class="price-period" data-monthly="/ mes" data-annual="/ año">/ mes</span>
+                            </div>
+                            <p class="price-old text-muted" data-annual="S/ 598.800 / año" style="display: none;"></p>
+                        </div>
+                        <ul class="list-unstyled feature-list mt-3 mb-4">
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Acceso al gimnasio 24/7</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Uso de máquinas básicas</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Área de cardio</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Vestuarios y duchas</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>App móvil básica</li>
+                        </ul>
+                        <div class="mt-auto">
+                            <a href="#" class="btn btn-outline-secondary w-100 btn-select-plan" data-plan="Básico">Seleccionar Plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 card-popular shadow">
+                    <div class="popular-badge">Más Popular</div>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="text-center">
+                            <img th:src="@{/images/plan2.jpg}" alt="Icono Premium" class="plan-icon mb-3">
+                            <h3 class="card-title">Premium</h3>
+                            <p class="text-muted">La opción más completa para resultados serios</p>
+                            <div class="price-container my-3">
+                                <span class="price-currency">S/</span>
+                                <span class="price-amount" data-monthly="79.900" data-annual="799.900">79.900</span>
+                                <span class="price-period" data-monthly="/ mes" data-annual="/ año">/ mes</span>
+                            </div>
+                            <p class="price-old text-muted" data-annual="S/ 958.800 / año" style="display: none;"></p>
+                        </div>
+                        <ul class="list-unstyled feature-list mt-3 mb-4">
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Todo lo del plan Básico</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Clases grupales limitadas</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Área de pesas libres</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>2 sesiones de entrenamiento personal</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Análisis corporal mensual</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Nutricionista consulta inicial</li>
+                        </ul>
+                        <div class="mt-auto">
+                            <a href="#" class="btn btn-custom-orange w-100 btn-select-plan" data-plan="Premium">Seleccionar Plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="text-center">
+                            <img th:src="@{/images/plan3.webp}" alt="Icono Elite" class="plan-icon mb-3">
+                            <h3 class="card-title">Elite</h3>
+                            <p class="text-muted">Experiencia VIP con servicios exclusivos</p>
+                            <div class="price-container my-3">
+                                <span class="price-currency">S/</span>
+                                <span class="price-amount" data-monthly="129.900" data-annual="1.299.900">129.900</span>
+                                <span class="price-period" data-monthly="/ mes" data-annual="/ año">/ mes</span>
+                            </div>
+                            <p class="price-old text-muted" data-annual="S/ 1.558.800 / año" style="display: none;"></p>
+                        </div>
+                        <ul class="list-unstyled feature-list mt-3 mb-4">
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Todo lo del plan Premium</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Entrenamiento personal ilimitado</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Acceso a zona VIP</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Seguimiento nutricional completo</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Masajes deportivos mensuales</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Invitaciones a eventos especiales</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i>Estacionamiento gratis</li>
+                        </ul>
+                        <div class="mt-auto">
+                            <a href="#" class="btn btn-outline-secondary w-100 btn-select-plan" data-plan="Elite">Seleccionar Plan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div> 
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-secondary px-4" th:onclick="|location.href='@{/inicio}'|">Volver</button>
+        </div>
+
+
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/JavaScript/planes.js}"></script>
+    
+</body>
+</html>
