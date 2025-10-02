@@ -49,39 +49,45 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Miembros">
+                        <a href="/registro" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Registrar Usuario">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Registrar Usuario</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Personal">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Miembros</span>
+                            <span class="sidebar-text ml-3 hidden">Personal</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Reportes de Ingresos">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Reportes de Ingresos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
+                        <a href="/incidencias" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <span class="sidebar-text ml-3 hidden">Incidencias</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
+                        <a th:href="${param.usuario != null} ? @{/cliente/pagos(usuario=${param.usuario})} : @{/pagos}" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                             <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
+                        <a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Programar Entrenamientos">
+                        <a href="/evaluaciones" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Evaluaciones">
+                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/entrenamientos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Entrenamientos">
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Programar Entrenamientos</span>
+                            <span class="sidebar-text ml-3 hidden">Entrenamientos</span>
                         </a>
                     </li>
                     <li>
@@ -141,13 +147,42 @@
 
                     <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                           <div class="flex border-b">
-                               <a th:href="@{/pagos/suscripciones}" 
+                           <!-- Tabs: variante cliente si viene param.usuario (sin Suscripciones) -->
+                           <div class="flex border-b" th:if="${param.usuario != null}">
+                               <a th:href="@{/cliente/pagos(usuario=${param.usuario})}"
+                                  class="px-4 py-2 border-b-2 border-orange-500 text-orange-500 font-semibold">Pagos</a>
+                           </div>
+                           <!-- Tabs: variante admin (sin usuario) -->
+                           <div class="flex border-b" th:if="${param.usuario == null}">
+                               <a th:href="@{/pagos/suscripciones}"
                                   class="px-4 py-2 border-b-2 border-orange-500 text-orange-500 font-semibold">Suscripciones</a>
-                               <a th:href="@{/pagos}" 
+                               <a th:href="@{/pagos}"
                                   class="px-4 py-2 text-gray-500 hover:text-orange-500">Pagos</a>
                            </div>
-                           <form th:action="@{/pagos/suscripciones}" method="get" class="flex items-center gap-4 w-full md:w-auto">
+
+                           <!-- Formulario filtros: cliente -->
+                           <form th:if="${param.usuario != null}" th:action="@{/cliente/pagos/suscripciones}" method="get" class="flex items-center gap-4 w-full md:w-auto">
+                               <input type="hidden" name="usuario" th:value="${param.usuario}">
+                               <input type="text" name="buscar" th:value="${buscarActual}" 
+                                      placeholder="Buscar suscripciones..." 
+                                      class="w-full md:w-auto px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                               <select name="estado" th:value="${estadoActual}" 
+                                       onchange="this.form.submit()"
+                                       class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                   <option value="todas" th:selected="${estadoActual == 'todas'}">Todos los estados</option>
+                                   <option value="Activa" th:selected="${estadoActual == 'Activa'}">Activa</option>
+                                   <option value="Cancelada" th:selected="${estadoActual == 'Cancelada'}">Cancelada</option>
+                                   <option value="Pausada" th:selected="${estadoActual == 'Pausada'}">Pausada</option>
+                               </select>
+                               <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                   </svg>
+                               </button>
+                           </form>
+
+                           <!-- Formulario filtros: admin -->
+                           <form th:if="${param.usuario == null}" th:action="@{/pagos/suscripciones}" method="get" class="flex items-center gap-4 w-full md:w-auto">
                                <input type="text" name="buscar" th:value="${buscarActual}" 
                                       placeholder="Buscar suscripciones..." 
                                       class="w-full md:w-auto px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">

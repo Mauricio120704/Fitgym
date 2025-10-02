@@ -2,16 +2,29 @@ package com.integradorii.gimnasiov1.repository;
 
 import com.integradorii.gimnasiov1.model.Pago;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-@Repository
 public interface PagoRepository extends JpaRepository<Pago, Long> {
-    
-    List<Pago> findByEstado(String estado);
-    
-    List<Pago> findByOrderByFechaDesc();
-    
-    Pago findByCodigoPago(String codigoPago);
+
+    @Query("select p from Pago p join p.deportista d where d.email = :email order by p.fecha desc")
+    List<Pago> findByEmail(@Param("email") String email);
+
+    @Query("select p from Pago p join p.deportista d where d.email = :email and (:estado = 'todos' or p.estado = :estado) and (" +
+            " (:buscar is null or :buscar = '' or lower(p.planServicio) like lower(concat('%', :buscar, '%')) or " +
+            "  lower(p.metodoPago) like lower(concat('%', :buscar, '%')) or lower(p.codigoPago) like lower(concat('%', :buscar, '%')) )" +
+            ") order by p.fecha desc")
+    List<Pago> searchByEmail(@Param("email") String email, @Param("estado") String estado, @Param("buscar") String buscar);
+
+    @Query("select coalesce(sum(p.monto),0) from Pago p join p.deportista d where d.email = :email and p.estado = 'Completado' and function('date_part','year', p.fecha) = function('date_part','year', current_date)")
+    Double totalAnioCompletado(@Param("email") String email);
+
+    // Admin search over all pagos
+    @Query("select p from Pago p where (:estado = 'todos' or p.estado = :estado) and (" +
+            " (:buscar is null or :buscar = '' or lower(p.planServicio) like lower(concat('%', :buscar, '%')) or " +
+            "  lower(p.metodoPago) like lower(concat('%', :buscar, '%')) or lower(p.codigoPago) like lower(concat('%', :buscar, '%')) )" +
+            ") order by p.fecha desc")
+    List<Pago> searchAdmin(@Param("estado") String estado, @Param("buscar") String buscar);
 }

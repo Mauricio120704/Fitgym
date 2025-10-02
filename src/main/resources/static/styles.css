@@ -1,9 +1,0 @@
-/* Importa las directivas base de Tailwind CSS */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Aquí puedes agregar estilos personalizados adicionales si los necesitas */
-body {
-    background-color: #f8fafc; /* Color de fondo similar a la imagen */
-}

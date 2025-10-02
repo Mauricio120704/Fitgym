@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrenamientos - FitGym</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+    <style>
+        :root { --sidebar-width: 5rem; }
+        #sidebar { width: var(--sidebar-width) !important; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
+            <div class="p-4 border-b flex justify-center items-center">
+                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
+                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="mt-4">
+                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
+                <ul class="mt-2">
+                    <li><a href="/inicio" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Inicio</span>
+                    </a></li>
+                    <li><a href="/registro" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Registrar Usuario">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Registrar Usuario</span>
+                    </a></li>
+                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Personal">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Personal</span>
+                    </a></li>
+                    <li><a href="/incidencias" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Incidencias</span>
+                    </a></li>
+                    <li><a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
+                    </a></li>
+                    <li><a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
+                    </a></li>
+                    <li><a href="/evaluaciones" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Evaluaciones">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
+                    </a></li>
+                    <li><a href="/entrenamientos" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Entrenamientos">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Entrenamientos</span>
+                    </a></li>
+                    <li><a href="/perfil" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Mi Perfil">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Mi Perfil</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Planificador de Entrenamientos</div>
+                </div>
+                <a href="/evaluaciones" class="text-blue-600 hover:text-blue-800 font-semibold">
+                    Volver al Perfil
+                </a>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Planificador de Entrenamientos</h1>
+                    <p class="text-gray-600">Organiza tu rutina semanal de entrenamiento personal</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-2 mb-6">
+                    <button onclick="switchTab('calendar')" id="tab-calendar" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold">
+                        Vista Calendario
+                    </button>
+                    <button onclick="switchTab('manage')" id="tab-manage" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">
+                        Gestionar Rutina
+                    </button>
+                </div>
+
+                <!-- Vista Calendario -->
+                <div id="calendar-view" class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold">📅 <span th:text="${rutina != null ? rutina.nombre : 'Rutina Semanal'}">Rutina Semanal</span></h2>
+                            <p class="text-gray-600 text-sm" th:text="${rutina != null ? rutina.descripcion : 'Mi rutina de entrenamiento personal'}">Mi rutina de entrenamiento personal</p>
+                        </div>
+                        <span th:if="${rutina != null && rutina.activa}" class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold">Activa</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="calendar-grid">
+                        <div class="border rounded-lg p-3" data-day="Domingo">
+                            <div class="font-bold text-center mb-2">Domingo</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                        <div class="border rounded-lg p-3" data-day="Lunes">
+                            <div class="font-bold text-center mb-2">Lunes</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                        <div class="border rounded-lg p-3" data-day="Martes">
+                            <div class="font-bold text-center mb-2">Martes</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                        <div class="border rounded-lg p-3" data-day="Miércoles">
+                            <div class="font-bold text-center mb-2">Miércoles</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                        <div class="border rounded-lg p-3" data-day="Jueves">
+                            <div class="font-bold text-center mb-2">Jueves</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                        <div class="border rounded-lg p-3" data-day="Viernes">
+                            <div class="font-bold text-center mb-2">Viernes</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                        <div class="border rounded-lg p-3" data-day="Sábado">
+                            <div class="font-bold text-center mb-2">Sábado</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista Gestionar Rutina -->
+                <div id="manage-view" class="hidden">
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold">Información de la Rutina</h3>
+                            <button class="text-blue-600 hover:text-blue-800">✏️ Editar</button>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="text-sm text-gray-600">Nombre</div>
+                                <div class="font-semibold" th:text="${rutina != null ? rutina.nombre : 'Rutina Semanal'}">Rutina Semanal</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600">Descripción</div>
+                                <div class="font-semibold" th:text="${rutina != null ? rutina.descripcion : 'Mi rutina de entrenamiento personal'}">Mi rutina de entrenamiento personal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow mb-6">
+                        <h3 class="text-lg font-bold mb-2">Tipos de Entrenamiento</h3>
+                        <p class="text-gray-600 text-sm mb-4">Estos son los tipos de entrenamiento que puedes agregar a tu rutina</p>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                <div class="text-4xl mb-2">💪</div>
+                                <div class="font-semibold">Fuerza</div>
+                                <div class="h-1 bg-red-500 rounded mt-2"></div>
+                            </div>
+                            <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                <div class="text-4xl mb-2">🏃</div>
+                                <div class="font-semibold">Cardio</div>
+                                <div class="h-1 bg-orange-500 rounded mt-2"></div>
+                            </div>
+                            <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                <div class="text-4xl mb-2">🧘</div>
+                                <div class="font-semibold">Yoga</div>
+                                <div class="h-1 bg-green-500 rounded mt-2"></div>
+                            </div>
+                            <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                <div class="text-4xl mb-2">🤸</div>
+                                <div class="font-semibold">Pilates</div>
+                                <div class="h-1 bg-cyan-500 rounded mt-2"></div>
+                            </div>
+                            <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                <div class="text-4xl mb-2">⚡</div>
+                                <div class="font-semibold">Funcional</div>
+                                <div class="h-1 bg-purple-500 rounded mt-2"></div>
+                            </div>
+                            <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                <div class="text-4xl mb-2">🤲</div>
+                                <div class="font-semibold">Flexibilidad</div>
+                                <div class="h-1 bg-gray-400 rounded mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-bold mb-2">Entrenamientos Programados</h3>
+                        <p class="text-gray-600 text-sm mb-4">Gestiona los entrenamientos de tu rutina semanal</p>
+                        
+                        <button onclick="openModal()" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition mb-4">
+                            ➕ Agregar Entrenamiento
+                        </button>
+
+                        <div class="space-y-3" id="lista-entrenamientos"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Agregar Entrenamiento</h2>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <p class="text-gray-600 mb-6">Configura un nuevo entrenamiento en tu rutina semanal</p>
+
+            <form id="formEntrenamiento" onsubmit="guardarEntrenamiento(event)">
+                <input type="hidden" id="entrenamientoId" name="id" />
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Tipo de Entrenamiento</label>
+                    <select id="tipo" name="tipo" class="w-full border rounded-lg px-4 py-2" required>
+                        <option value="">Selecciona el tipo</option>
+                        <option value="Fuerza">💪 Fuerza</option>
+                        <option value="Cardio">🏃 Cardio</option>
+                        <option value="Yoga">🧘 Yoga</option>
+                        <option value="Pilates">🤸 Pilates</option>
+                        <option value="Funcional">⚡ Funcional</option>
+                        <option value="Flexibilidad">🤲 Flexibilidad</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Día de la Semana</label>
+                    <select id="diaSemana" name="diaSemana" class="w-full border rounded-lg px-4 py-2" required>
+                        <option value="">Selecciona el día</option>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Hora de Inicio</label>
+                        <input type="time" id="horaInicio" name="horaInicio" value="09:00" class="w-full border rounded-lg px-4 py-2" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Duración (min)</label>
+                        <input type="number" id="duracion" name="duracion" value="60" min="15" max="180" class="w-full border rounded-lg px-4 py-2" required>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold mb-2">Notas (Opcional)</label>
+                    <textarea id="notas" name="notas" class="w-full border rounded-lg px-4 py-2" rows="3" placeholder="Ej: Enfocarse en piernas, usar pesas ligeras..."></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="flex-1 bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script th:inline="javascript">
+        // Datos iniciales desde el modelo para JS
+        const entrenamientosData = /*[[${entrenamientos}]]*/ [];
+    </script>
+    <script>
+        function switchTab(tab) {
+            const calendarView = document.getElementById('calendar-view');
+            const manageView = document.getElementById('manage-view');
+            const tabCalendar = document.getElementById('tab-calendar');
+            const tabManage = document.getElementById('tab-manage');
+
+            if (tab === 'calendar') {
+                calendarView.classList.remove('hidden');
+                manageView.classList.add('hidden');
+                tabCalendar.classList.add('bg-blue-600', 'text-white');
+                tabCalendar.classList.remove('bg-gray-200', 'text-gray-700');
+                tabManage.classList.remove('bg-blue-600', 'text-white');
+                tabManage.classList.add('bg-gray-200', 'text-gray-700');
+            } else {
+                calendarView.classList.add('hidden');
+                manageView.classList.remove('hidden');
+                tabManage.classList.add('bg-blue-600', 'text-white');
+                tabManage.classList.remove('bg-gray-200', 'text-gray-700');
+                tabCalendar.classList.remove('bg-blue-600', 'text-white');
+                tabCalendar.classList.add('bg-gray-200', 'text-gray-700');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('formEntrenamiento').reset();
+            document.getElementById('entrenamientoId').value = '';
+        }
+
+        function guardarEntrenamiento(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const params = new URLSearchParams(formData);
+            const id = document.getElementById('entrenamientoId').value;
+            const url = id ? `/entrenamientos/${id}` : '/entrenamientos/agregar';
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar estructura local y re-renderizar calendario y lista
+                    if (id) {
+                        const idx = entrenamientosData.findIndex(e => String(e.id) === String(id));
+                        if (idx >= 0) entrenamientosData[idx] = data.entrenamiento;
+                    } else {
+                        entrenamientosData.push(data.entrenamiento);
+                    }
+                    renderCalendar();
+                    renderList();
+                    closeModal();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al guardar el entrenamiento');
+            });
+        }
+
+        function eliminarEntrenamiento(button) {
+            const id = button.getAttribute('data-id');
+            
+            if (confirm('¿Estás seguro de eliminar este entrenamiento?')) {
+                fetch('/entrenamientos/eliminar/' + id, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const idx = entrenamientosData.findIndex(e => String(e.id) === String(id));
+                        if (idx >= 0) entrenamientosData.splice(idx, 1);
+                        renderCalendar();
+                        renderList();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar el entrenamiento');
+                });
+            }
+        }
+
+        function editarEntrenamiento(btn) {
+            const id = btn.getAttribute('data-id');
+            const e = entrenamientosData.find(x => String(x.id) === String(id));
+            if (!e) return;
+            document.getElementById('entrenamientoId').value = e.id;
+            document.getElementById('tipo').value = e.tipo;
+            document.getElementById('diaSemana').value = e.diaSemana;
+            document.getElementById('horaInicio').value = e.horaInicio;
+            document.getElementById('duracion').value = e.duracion;
+            document.getElementById('notas').value = e.notas || '';
+            openModal();
+        }
+
+        function renderCalendar() {
+            // Limpia columnas
+            document.querySelectorAll('#calendar-grid [data-day]').forEach(col => {
+                const list = col.querySelector('.day-events');
+                if (list) list.innerHTML = '';
+            });
+            // Pinta eventos
+            entrenamientosData.forEach(e => {
+                const col = document.querySelector(`#calendar-grid [data-day="${e.diaSemana}"] .day-events`);
+                if (!col) return;
+                const card = document.createElement('div');
+                card.className = 'bg-blue-50 border border-blue-200 p-2 rounded shadow-sm';
+                card.innerHTML = `
+                    <div class="font-semibold text-sm">${e.emoji || ''} ${e.tipo}</div>
+                    <div class="text-xs text-gray-600">⏰ ${e.horaInicio} • ${e.duracion}min</div>
+                    <div class="text-xs text-gray-500 mt-1 truncate">${e.notas || ''}</div>
+                `;
+                col.appendChild(card);
+            });
+        }
+
+        function renderList() {
+            const list = document.getElementById('lista-entrenamientos');
+            if (!list) return;
+            list.innerHTML = '';
+            if (!entrenamientosData || entrenamientosData.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'text-center text-gray-500 py-8';
+                empty.textContent = 'No hay entrenamientos programados';
+                list.appendChild(empty);
+                return;
+            }
+            entrenamientosData.forEach(e => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center p-4 border rounded-lg';
+                row.innerHTML = `
+                    <div>
+                        <div class="font-semibold">
+                            <span>${e.emoji || ''}</span>
+                            <span>${e.tipo}</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span>${e.diaSemana}</span> • 
+                            <span>${e.horaInicio}</span> • 
+                            <span>${e.duracion}</span> min
+                        </div>
+                        <div class="text-sm text-gray-500">${e.notas || ''}</div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" class="text-blue-600 hover:text-blue-800" data-id="${e.id}" onclick="editarEntrenamiento(this)">✏️</button>
+                        <button type="button" class="text-red-500 hover:text-red-700" data-id="${e.id}" onclick="eliminarEntrenamiento(this)">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        // Inicializa calendario con datos del servidor
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalendar();
+            renderList();
+        });
+    </script>
+</body>
+</html>

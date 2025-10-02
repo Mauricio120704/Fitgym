@@ -14,7 +14,6 @@
         <p class="checkout-subtitle">Completa tu pago de forma segura</p>
 
         <div class="row">
-            <!-- Resumen del Pedido -->
             <div class="col-lg-5 mb-4">
                 <div class="card">
                     <div class="card-header">
@@ -48,7 +47,6 @@
                 </div>
             </div>
 
-            <!-- Información de Pago -->
             <div class="col-lg-7">
                 <div class="card">
                     <div class="card-header">
@@ -58,7 +56,11 @@
                     <div class="card-body">
                         <p class="text-muted mb-4">Ingresa los datos de tu tarjeta de crédito o débito</p>
                         
-                        <form>
+                        <form action="/checkout/pagar" method="post">
+                            <input type="hidden" name="usuario" th:value="${usuario}">
+                            <input type="hidden" name="plan" th:value="${planNombre}">
+                            <input type="hidden" name="periodo" th:value="${periodo}">
+                            <input type="hidden" name="precio" th:value="${precio}">
                             <div class="mb-3">
                                 <label for="cardName" class="form-label">Nombre del Titular</label>
                                 <input type="text" class="form-control" id="cardName" 

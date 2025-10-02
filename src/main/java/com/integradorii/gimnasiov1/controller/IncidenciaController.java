@@ -1,99 +1,174 @@
 package com.integradorii.gimnasiov1.controller;
 
+import com.integradorii.gimnasiov1.dto.IncidenciaViewDTO;
 import com.integradorii.gimnasiov1.model.Incidencia;
 import com.integradorii.gimnasiov1.repository.IncidenciaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.integradorii.gimnasiov1.repository.PersonaRepository;
+import com.integradorii.gimnasiov1.service.IncidenciaViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/incidencias")
 public class IncidenciaController {
+    private final IncidenciaRepository incidenciaRepository;
+    private final PersonaRepository personaRepository;
+    private final IncidenciaViewService incidenciaViewService;
 
-    @Autowired
-    private IncidenciaRepository incidenciaRepository;
+    public IncidenciaController(IncidenciaRepository incidenciaRepository,
+                               PersonaRepository personaRepository,
+                               IncidenciaViewService incidenciaViewService) {
+        this.incidenciaRepository = incidenciaRepository;
+        this.personaRepository = personaRepository;
+        this.incidenciaViewService = incidenciaViewService;
+    }
 
-    @GetMapping
-    public String listarIncidencias(
-            @RequestParam(required = false) String estado,
-            @RequestParam(required = false) String prioridad,
+    @GetMapping("/incidencias")
+    public String listar(
+            @RequestParam(required = false, defaultValue = "todos") String estado,
+            @RequestParam(required = false, defaultValue = "todas") String prioridad,
             @RequestParam(required = false) String buscar,
             Model model) {
-        
-        // Obtener todas las incidencias de la base de datos
-        List<Incidencia> todasIncidencias = incidenciaRepository.findAll();
-        
-        // Aplicar filtros
-        List<Incidencia> incidenciasFiltradas = todasIncidencias;
-        
-        if (estado != null && !estado.isEmpty() && !"todos".equals(estado)) {
-            incidenciasFiltradas = incidenciasFiltradas.stream()
-                    .filter(i -> estado.equalsIgnoreCase(i.getEstado()))
-                    .collect(Collectors.toList());
-        }
-        
-        if (prioridad != null && !prioridad.isEmpty() && !"todas".equals(prioridad)) {
-            incidenciasFiltradas = incidenciasFiltradas.stream()
-                    .filter(i -> prioridad.equalsIgnoreCase(i.getPrioridad()))
-                    .collect(Collectors.toList());
-        }
-        
-        if (buscar != null && !buscar.trim().isEmpty()) {
-            String buscarLower = buscar.toLowerCase().trim();
-            incidenciasFiltradas = incidenciasFiltradas.stream()
-                    .filter(i -> 
-                        i.getTitulo().toLowerCase().contains(buscarLower) ||
-                        i.getDescripcion().toLowerCase().contains(buscarLower) ||
-                        i.getReportadoPor().toLowerCase().contains(buscarLower)
-                    )
-                    .collect(Collectors.toList());
-        }
-        
-        // Calcular estadísticas
-        long totalIncidencias = todasIncidencias.size();
-        long abiertas = todasIncidencias.stream()
-                .filter(i -> "ABIERTO".equals(i.getEstado()))
-                .count();
-        long resueltas = todasIncidencias.stream()
-                .filter(i -> "RESUELTO".equals(i.getEstado()))
-                .count();
-        
-        model.addAttribute("incidencias", incidenciasFiltradas);
-        model.addAttribute("totalIncidencias", totalIncidencias);
+
+        // Mapear valores UI -> BD
+        String estadoDb = null;
+        if ("ABIERTO".equalsIgnoreCase(estado)) estadoDb = "Abierta";
+        else if ("RESUELTO".equalsIgnoreCase(estado)) estadoDb = "Resuelto";
+
+        String prioridadDb = null;
+        if ("ALTA".equalsIgnoreCase(prioridad)) prioridadDb = "Alta";
+        else if ("MEDIA".equalsIgnoreCase(prioridad)) prioridadDb = "Media";
+        else if ("BAJA".equalsIgnoreCase(prioridad)) prioridadDb = "Baja";
+
+        List<Incidencia> list = incidenciaRepository.findFiltered(
+                estado == null ? "todos" : estado,
+                estadoDb,
+                prioridad == null ? "todas" : prioridad,
+                prioridadDb,
+                buscar == null ? "" : buscar.trim());
+
+        // Mapear a DTOs mediante el servicio
+        List<IncidenciaViewDTO> viewList = list.stream()
+                .map(incidenciaViewService::toView)
+                .collect(Collectors.toList());
+
+        long totalInc = incidenciaRepository.total();
+        long abiertas = incidenciaRepository.abiertas();
+        long resueltas = incidenciaRepository.resueltas();
+
+        model.addAttribute("incidencias", viewList);
+        model.addAttribute("totalIncidencias", totalInc);
         model.addAttribute("abiertas", abiertas);
         model.addAttribute("resueltas", resueltas);
-        model.addAttribute("estadoActual", estado != null ? estado : "todos");
-        model.addAttribute("prioridadActual", prioridad != null ? prioridad : "todas");
-        model.addAttribute("buscarActual", buscar != null ? buscar : "");
-        
+        model.addAttribute("buscarActual", buscar == null ? "" : buscar);
+        model.addAttribute("estadoActual", estado == null ? "todos" : estado);
+        model.addAttribute("prioridadActual", prioridad == null ? "todas" : prioridad);
+
         return "incidencias";
     }
-    
-    @PostMapping("/crear")
-    @ResponseBody
-    public Incidencia crearIncidencia(@RequestBody Incidencia incidencia) {
-        // Guardar en la base de datos
-        return incidenciaRepository.save(incidencia);
+
+    @PostMapping({"/incidencias", "/incidencias/crear"})
+    public String crear(
+            @RequestParam String titulo,
+            @RequestParam String descripcion,
+            @RequestParam(required = false) String reportado,
+            @RequestParam(required = false) String asignado,
+            @RequestParam String prioridad,
+            @RequestParam(required = false) String imagenes
+    ) {
+        Incidencia i = new Incidencia();
+        i.setTitulo(titulo);
+        // Empaquetar imágenes y fallbacks de nombres en la descripción
+        StringBuilder descBuilder = new StringBuilder(descripcion == null ? "" : descripcion);
+        if (reportado != null && !reportado.isBlank()) {
+            descBuilder.append("\n__REPORTADO__=").append(reportado.trim());
+        }
+        if (asignado != null && !asignado.isBlank()) {
+            descBuilder.append("\n__ASIGNADO__=").append(asignado.trim());
+        }
+        if (imagenes != null && !imagenes.isBlank()) {
+            descBuilder.append("\n\n__IMGS__=").append(imagenes);
+        }
+        String descToSave = descBuilder.toString();
+        i.setDescripcion(descToSave);
+        i.setCategoria("General");
+        // prioridad UI -> BD capitalizada
+        String pr = "Media";
+        if ("ALTA".equalsIgnoreCase(prioridad)) pr = "Alta"; else if ("BAJA".equalsIgnoreCase(prioridad)) pr = "Baja";
+        i.setPrioridad(pr);
+        i.setEstado("Abierta");
+        i.setFechaReporte(OffsetDateTime.now(ZoneId.systemDefault()));
+        i.setUltimaActualizacion(OffsetDateTime.now(ZoneId.systemDefault()));
+
+        // Intentar resolver personas por email (si se enviara email), o dejar null
+        if (reportado != null && !reportado.isBlank() && reportado.contains("@")) {
+            personaRepository.findByEmail(reportado.trim()).ifPresent(i::setReportadoPor);
+        }
+        if (asignado != null && !asignado.isBlank() && asignado.contains("@")) {
+            personaRepository.findByEmail(asignado.trim()).ifPresent(i::setAsignadoA);
+        }
+
+        incidenciaRepository.save(i);
+        return "redirect:/incidencias";
     }
-    
-    @PutMapping("/{id}/estado")
+
+    @RequestMapping(value = "/incidencias/{id}/estado", method = {RequestMethod.POST, RequestMethod.PUT})
     @ResponseBody
-    public Incidencia actualizarEstado(@PathVariable Long id, @RequestBody String nuevoEstado) {
-        Incidencia incidencia = incidenciaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Incidencia no encontrada"));
-        // Remover comillas del JSON string si existen
-        String estado = nuevoEstado.replace("\"", "");
-        incidencia.setEstado(estado);
-        return incidenciaRepository.save(incidencia);
+    public Map<String, Object> actualizarEstado(@PathVariable Long id, @RequestBody(required = false) String body,
+                                                @RequestParam(required = false) String estado) {
+        // estado puede venir en body JSON simple ("RESUELTO") o como parámetro
+        String nuevoEstado = estado;
+        if ((nuevoEstado == null || nuevoEstado.isBlank()) && body != null) {
+            nuevoEstado = body.replace("\"", "").trim();
+        }
+
+        Map<String, Object> resp = new HashMap<>();
+        Incidencia i = incidenciaRepository.findById(id).orElse(null);
+        if (i == null) {
+            resp.put("success", false);
+            resp.put("message", "Incidencia no encontrada");
+            return resp;
+        }
+
+        if ("RESUELTO".equalsIgnoreCase(nuevoEstado)) {
+            i.setEstado("Resuelto");
+            i.setFechaCierre(OffsetDateTime.now(ZoneId.systemDefault()));
+        } else {
+            i.setEstado("Abierta");
+            i.setFechaCierre(null);
+        }
+        i.setUltimaActualizacion(OffsetDateTime.now(ZoneId.systemDefault()));
+        incidenciaRepository.save(i);
+
+        resp.put("success", true);
+        resp.put("estado", i.getEstado());
+        return resp;
     }
-    
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    public void eliminarIncidencia(@PathVariable Long id) {
+
+    @PostMapping("/incidencias/{id}/eliminar")
+    public String eliminar(@PathVariable Long id) {
         incidenciaRepository.deleteById(id);
+        return "redirect:/incidencias";
+    }
+
+    // Sugerencias de personas para autocompletar "Reportado por"
+    @GetMapping(path = "/personas/sugerencias", produces = "application/json")
+    @ResponseBody
+    public List<Map<String, String>> sugerencias(@RequestParam String term) {
+        String q = term == null ? "" : term.trim();
+        if (q.isEmpty()) return Collections.emptyList();
+        return personaRepository.searchPersonal(q).stream().limit(10).map(p -> {
+            Map<String, String> m = new HashMap<>();
+            String nombre = (p.getNombre() == null ? "" : p.getNombre());
+            String apellido = (p.getApellido() == null ? "" : (" " + p.getApellido()));
+            m.put("nombreCompleto", (nombre + apellido).trim());
+            m.put("email", p.getEmail());
+            return m;
+        }).toList();
     }
 }

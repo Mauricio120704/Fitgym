@@ -53,9 +53,13 @@
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         <span class="sidebar-text ml-3 hidden">Inicio</span>
                     </a></li>
-                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Miembros">
+                    <li><a href="/registro" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Registrar Usuario">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Registrar Usuario</span>
+                    </a></li>
+                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Personal">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Miembros</span>
+                        <span class="sidebar-text ml-3 hidden">Personal</span>
                     </a></li>
                     <li><a href="/incidencias" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Incidencias">
                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -68,6 +72,14 @@
                     <li><a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
+                    </a></li>
+                    <li><a href="/evaluaciones" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Evaluaciones">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
+                    </a></li>
+                    <li><a href="/entrenamientos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Entrenamientos">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Entrenamientos</span>
                     </a></li>
                     <li><a href="/perfil" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Mi Perfil">
                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -175,7 +187,7 @@
                                     <p class="text-sm text-gray-700 mb-3" th:text="${inc.descripcion}">Descripción completa</p>
                                     
                                     <!-- Imágenes si existen -->
-                                    <div th:if="${inc.imagenes != null}" class="mt-3">
+                                    <div th:if="${inc.imagenes != null and !#strings.isEmpty(inc.imagenes)}" class="mt-3">
                                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2" th:attr="data-imagenes=${inc.imagenes}">
                                             <!-- Las imágenes se cargarán dinámicamente con JavaScript -->
                                         </div>
@@ -183,8 +195,8 @@
                                     
                                     <div class="flex gap-4 text-sm text-gray-600 mt-3">
                                         <span><strong>Reportado por:</strong> <span th:text="${inc.reportadoPor}">Usuario</span></span>
-                                        <span><strong>Asignado a:</strong> <span th:text="${inc.asignadoA ?: 'Sin asignar'}">Asignado</span></span>
-                                        <span><strong>Fecha:</strong> <span th:text="${#temporals.format(inc.fechaCreacion, 'dd/MM/yyyy HH:mm')}">28/01/2025 10:30</span></span>
+                                        <span><strong>Asignado a:</strong> <span th:text="${inc.asignadoA != null ? inc.asignadoA : 'Sin asignar'}">Asignado</span></span>
+                                        <span><strong>Fecha:</strong> <span th:text="${inc.fechaReporte != null ? #temporals.format(inc.fechaReporte, 'dd/MM/yyyy HH:mm') : 'N/A'}">28/01/2025 10:30</span></span>
                                     </div>
                                 </div>
                                 
@@ -226,26 +238,26 @@
                     </svg>
                 </button>
             </div>
-            <form id="form-nueva-incidencia" class="p-6 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
+            <form id="form-nueva-incidencia" th:action="@{/incidencias}" method="post" class="p-6 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Título *</label>
-                    <input type="text" id="inc-titulo" required
+                    <input type="text" id="inc-titulo" name="titulo" required
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción *</label>
-                    <textarea id="inc-descripcion" rows="4" required
+                    <textarea id="inc-descripcion" name="descripcion" rows="4" required
                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Reportado por *</label>
-                        <input type="text" id="inc-reportado" required
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Reportado por (email o nombre) *</label>
+                        <input type="text" id="inc-reportado" name="reportado" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Asignado a</label>
-                        <select id="inc-asignado"
+                        <select id="inc-asignado" name="asignado"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                             <option value="">Sin asignar</option>
                             <option value="Mantenimiento">Mantenimiento</option>
@@ -260,7 +272,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Prioridad *</label>
-                    <select id="inc-prioridad" required
+                    <select id="inc-prioridad" name="prioridad" required
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                         <option value="BAJA">Baja</option>
                         <option value="MEDIA" selected>Media</option>
@@ -272,6 +284,7 @@
                     <input type="file" id="inc-imagen" accept="image/*" multiple
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
                     <p class="text-xs text-gray-500 mt-1">Puedes seleccionar múltiples imágenes. Formatos: JPG, PNG, GIF (máx. 5MB cada una)</p>
+                    <input type="hidden" name="imagenes" id="inc-imagenes">
                 </div>
                 <div id="preview-container" class="hidden">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Vista previa (<span id="image-count">0</span> imágenes)</label>
@@ -282,7 +295,7 @@
                 <button type="button" id="modal-cancel" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                     Cancelar
                 </button>
-                <button type="button" id="modal-save" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                <button type="submit" form="form-nueva-incidencia" id="modal-save" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
                     Guardar Incidencia
                 </button>
             </div>
@@ -537,49 +550,7 @@
             counter.textContent = `${lightboxIndex + 1} / ${lightboxGallery.length}`;
         }
 
-        // Guardar incidencia
-        if (modalSave) {
-            modalSave.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Validar formulario
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                
-                const nuevaIncidencia = {
-                    titulo: document.getElementById('inc-titulo').value,
-                    descripcion: document.getElementById('inc-descripcion').value,
-                    reportadoPor: document.getElementById('inc-reportado').value,
-                    asignadoA: document.getElementById('inc-asignado').value || 'Sin asignar',
-                    prioridad: document.getElementById('inc-prioridad').value,
-                    estado: 'ABIERTO',
-                    imagenUrl: imagenesDataUrls.length > 0 ? imagenesDataUrls[0] : null,
-                    imagenes: imagenesDataUrls.length > 0 ? JSON.stringify(imagenesDataUrls) : null
-                };
-
-                // Guardar en la base de datos
-                fetch('/incidencias/crear', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(nuevaIncidencia)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Incidencia guardada:', data);
-                    closeModal();
-                    // Recargar la página para mostrar la nueva incidencia
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al guardar la incidencia');
-                });
-            });
-        }
+        // Guardar incidencia (se maneja en el submit del form más abajo)
         
         // ========= Cargar imágenes dinámicamente =========
         document.addEventListener('DOMContentLoaded', () => {
@@ -644,18 +615,8 @@
                 const titulo = e.target.dataset.titulo;
                 
                 if (confirm(`¿Estás seguro de eliminar la incidencia "${titulo}"?\n\nEsta acción no se puede deshacer.`)) {
-                    fetch(`/incidencias/${incidenciaId}`, {
-                        method: 'DELETE'
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            console.log('Incidencia eliminada');
-                            // Recargar la página
-                            window.location.reload();
-                        } else {
-                            throw new Error('Error al eliminar');
-                        }
-                    })
+                    fetch(`/incidencias/${incidenciaId}/eliminar`, { method: 'POST' })
+                    .then(() => window.location.reload())
                     .catch(error => {
                         console.error('Error:', error);
                         alert('Error al eliminar la incidencia');
@@ -731,6 +692,96 @@
                 }
             }
         });
+    </script>
+
+    <script>
+        // Envío AJAX confiable del formulario de "Nueva Incidencia"
+        (function() {
+            const form = document.getElementById('form-nueva-incidencia');
+            const saveBtn = document.getElementById('modal-save');
+            const modal = document.getElementById('modal-nueva-incidencia');
+            if (!form || !saveBtn) return;
+
+            // No agregamos handler de click para evitar doble envío; usamos solo el submit del form
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Incluir imágenes en el hidden antes de serializar
+                const hiddenImgs = document.getElementById('inc-imagenes');
+                if (hiddenImgs) {
+                    hiddenImgs.value = imagenesDataUrls.length > 0 ? JSON.stringify(imagenesDataUrls) : '';
+                }
+                const fd = new FormData(form);
+                const params = new URLSearchParams(fd);
+                fetch('/incidencias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                })
+                .then(resp => {
+                    // Spring normalmente responde 302 -> GET /incidencias
+                    if (!resp.ok && resp.status !== 302) throw new Error('Error al crear incidencia');
+                    if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+                    // Refrescar lista
+                    window.location.href = '/incidencias';
+                })
+                .catch(err => {
+                    console.error('Fallo creando incidencia', err);
+                    alert('No se pudo crear la incidencia. Intenta nuevamente.');
+                });
+            });
+        })();
+    </script>
+
+    <script>
+        // Autocompletado para "Reportado por" (consume /personas/sugerencias)
+        (function() {
+            const input = document.getElementById('inc-reportado');
+            if (!input) return;
+            const wrapper = input.parentElement;
+            if (!wrapper) return;
+            wrapper.style.position = 'relative';
+
+            const box = document.createElement('div');
+            box.id = 'sugerencias-reportado';
+            box.className = 'absolute bg-white border border-gray-300 rounded-md shadow z-50 w-full max-h-60 overflow-auto hidden';
+            wrapper.appendChild(box);
+
+            let debounceTimer = null;
+            function render(items) {
+                box.innerHTML = '';
+                if (!items || items.length === 0) { box.classList.add('hidden'); return; }
+                items.forEach(p => {
+                    const opt = document.createElement('div');
+                    opt.className = 'px-3 py-2 hover:bg-gray-100 cursor-pointer';
+                    opt.textContent = `${p.nombreCompleto} <${p.email}>`;
+                    opt.addEventListener('click', () => {
+                        // Coloco SOLO el email para que el backend resuelva Persona por email
+                        input.value = p.email || '';
+                        box.classList.add('hidden');
+                    });
+                    box.appendChild(opt);
+                });
+                box.classList.remove('hidden');
+            }
+
+            input.addEventListener('input', () => {
+                const q = input.value.trim();
+                clearTimeout(debounceTimer);
+                if (q.length < 2) { box.classList.add('hidden'); return; }
+                debounceTimer = setTimeout(() => {
+                    fetch(`/personas/sugerencias?term=${encodeURIComponent(q)}`)
+                        .then(r => r.ok ? r.json() : [])
+                        .then(render)
+                        .catch(() => box.classList.add('hidden'));
+                }, 250);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target === input || box.contains(e.target)) return;
+                box.classList.add('hidden');
+            });
+        })();
     </script>
 </body>
 </html>

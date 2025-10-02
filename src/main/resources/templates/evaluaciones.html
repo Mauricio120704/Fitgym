@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluaciones - FitGym</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+    <style>
+        :root { --sidebar-width: 5rem; }
+        #sidebar { width: var(--sidebar-width) !important; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
+            <div class="p-4 border-b flex justify-center items-center">
+                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
+                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <nav class="mt-4">
+                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
+                <ul class="mt-2">
+                    <li><a href="/inicio" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Inicio</span>
+                    </a></li>
+                    <li><a href="/registro" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Registrar Usuario">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Registrar Usuario</span>
+                    </a></li>
+                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Personal">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Personal</span>
+                    </a></li>
+                    <li><a href="/incidencias" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Incidencias</span>
+                    </a></li>
+                    <li><a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
+                    </a></li>
+                    <li><a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
+                    </a></li>
+                    <li><a href="/evaluaciones" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Evaluaciones">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
+                    </a></li>
+                    <li><a href="/entrenamientos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Entrenamientos">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Entrenamientos</span>
+                    </a></li>
+                    <li><a href="/perfil" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Mi Perfil">
+                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span class="sidebar-text ml-3 hidden">Mi Perfil</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Evaluaciones Físicas</div>
+                </div>
+                <a href="/entrenamientos" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                    Nueva Reserva
+                </a>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <!-- Estadísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow text-center">
+                        <div class="text-3xl font-bold text-gray-800">12</div>
+                        <div class="text-gray-600 text-sm">Este mes</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow text-center">
+                        <div class="text-3xl font-bold text-gray-800">45</div>
+                        <div class="text-gray-600 text-sm">Total clases</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow text-center">
+                        <div class="text-3xl font-bold text-gray-800">5</div>
+                        <div class="text-gray-600 text-sm">Días seguidos</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow text-center">
+                        <div class="text-lg font-bold text-gray-800">Yoga Flow</div>
+                        <div class="text-gray-600 text-sm">Favorita</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Rutina Semanal -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-2">🔥 Tu Rutina Semanal</h2>
+                        <p class="text-gray-600 text-sm mb-4">Entrenamientos programados esta semana</p>
+                        
+                        <div class="flex justify-around mb-6">
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-orange-500">3</div>
+                                <div class="text-gray-600 text-sm">Esta semana</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-4xl font-bold text-orange-500">180</div>
+                                <div class="text-gray-600 text-sm">Min totales</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">💪</span>
+                                    <div>
+                                        <div class="font-semibold">Fuerza - Piernas</div>
+                                        <div class="text-sm text-gray-600">Lunes 07:00 • 60 min</div>
+                                    </div>
+                                </div>
+                                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">Hoy</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">🏃</span>
+                                    <div>
+                                        <div class="font-semibold">Cardio - HIIT</div>
+                                        <div class="text-sm text-gray-600">Miércoles 18:00 • 45 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">🧘</span>
+                                    <div>
+                                        <div class="font-semibold">Yoga - Relajación</div>
+                                        <div class="text-sm text-gray-600">Viernes 09:00 • 75 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="window.location.href='/entrenamientos'" class="w-full mt-4 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
+                            🔧 Gestionar Entrenamientos
+                        </button>
+                    </div>
+
+                    <!-- Progreso del Mes -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold mb-2">⚡ Progreso del Mes</h2>
+                        <p class="text-gray-600 text-sm mb-4">Tu rendimiento en diciembre</p>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold">💪 Fuerza</span>
+                                    <span class="text-gray-600">8 sesiones</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold">🏃 Cardio</span>
+                                    <span class="text-gray-600">6 sesiones</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-semibold">🧘 Flexibilidad</span>
+                                    <span class="text-gray-600">4 sesiones</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="text-5xl font-bold text-orange-500">18</div>
+                            <p class="text-gray-600 mt-2">Entrenamientos completados</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Evaluaciones -->
+                <div class="bg-white p-6 rounded-lg shadow mt-6">
+                    <h2 class="text-xl font-bold mb-4">Historial de Evaluaciones Físicas</h2>
+                    
+                    <div class="bg-gray-100 p-8 rounded-lg text-center mb-6">
+                        <span class="text-4xl">📈</span>
+                        <p class="text-gray-600 mt-2">Gráfico de evolución física</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div th:if="${evaluaciones.empty}" class="text-center text-gray-500 py-8">
+                            No hay evaluaciones registradas
+                        </div>
+                        <div th:each="evaluacion : ${evaluaciones}" class="border rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="font-semibold text-gray-700" th:text="${#temporals.format(evaluacion.fecha, 'dd MMMM yyyy')}">15 Septiembre 2025</div>
+                                <button onclick="eliminarEvaluacion(this)" th:attr="data-id=${evaluacion.id}" class="text-red-500 hover:text-red-700 text-sm">🗑️ Eliminar</button>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800"><span th:text="${evaluacion.peso}">72.5</span>kg</div>
+                                    <div class="text-sm text-gray-600">Peso</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800"><span th:text="${evaluacion.grasaCorporal}">15.2</span>%</div>
+                                    <div class="text-sm text-gray-600">Grasa</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800"><span th:text="${evaluacion.masaMuscular}">58.1</span>kg</div>
+                                    <div class="text-sm text-gray-600">Músculo</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-gray-800" th:text="${evaluacion.imc}">22.8</div>
+                                    <div class="text-sm text-gray-600">IMC</div>
+                                </div>
+                            </div>
+                            <div th:if="${evaluacion.notas != null && !evaluacion.notas.isEmpty()}" class="mt-3 text-sm text-gray-600 italic">
+                                <span th:text="${evaluacion.notas}">Notas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script>
+        function eliminarEvaluacion(button) {
+            const id = button.getAttribute('data-id');
+            
+            if (confirm('¿Estás seguro de eliminar esta evaluación?')) {
+                fetch('/evaluaciones/eliminar/' + id, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Evaluación eliminada exitosamente');
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al eliminar la evaluación');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

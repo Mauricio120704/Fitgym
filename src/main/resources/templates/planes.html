@@ -55,7 +55,15 @@
                             <li><i class="fas fa-check-circle text-success me-2"></i>App móvil básica</li>
                         </ul>
                         <div class="mt-auto">
-                            <a href="#" class="btn btn-outline-secondary w-100 btn-select-plan" data-plan="Básico">Seleccionar Plan</a>
+                            <a th:href="@{/checkout(
+                                 plan=${'Básico'},
+                                 periodo=${'mensual'},
+                                 precio=${'49.900'},
+                                 usuario=${#strings.defaultString(usuario, param.usuario)}
+                               )}"
+                               class="btn btn-outline-secondary w-100">
+                                Seleccionar Plan
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -86,7 +94,15 @@
                             <li><i class="fas fa-check-circle text-success me-2"></i>Nutricionista consulta inicial</li>
                         </ul>
                         <div class="mt-auto">
-                            <a href="#" class="btn btn-custom-orange w-100 btn-select-plan" data-plan="Premium">Seleccionar Plan</a>
+                            <a th:href="@{/checkout(
+                                 plan=${'Premium'},
+                                 periodo=${'mensual'},
+                                 precio=${'79.900'},
+                                 usuario=${#strings.defaultString(usuario, param.usuario)}
+                               )}"
+                               class="btn btn-custom-orange w-100">
+                                Seleccionar Plan
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -117,7 +133,15 @@
                             <li><i class="fas fa-check-circle text-success me-2"></i>Estacionamiento gratis</li>
                         </ul>
                         <div class="mt-auto">
-                            <a href="#" class="btn btn-outline-secondary w-100 btn-select-plan" data-plan="Elite">Seleccionar Plan</a>
+                            <a th:href="@{/checkout(
+                                 plan=${'Elite'},
+                                 periodo=${'mensual'},
+                                 precio=${'129.900'},
+                                 usuario=${#strings.defaultString(usuario, param.usuario)}
+                               )}"
+                               class="btn btn-outline-secondary w-100">
+                                Seleccionar Plan
+                            </a>
                         </div>
                     </div>
                 </div>
