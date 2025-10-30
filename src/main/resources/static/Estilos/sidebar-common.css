@@ -1,0 +1,7 @@
+:root {
+    --sidebar-width: 5rem;
+}
+
+#sidebar {
+    width: var(--sidebar-width) !important;
+}

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Contraseña - FitGym</title>
+    <link rel="stylesheet" href="/Estilos/recuperacion.css" />
+    <style>
+        .password-requirements {
+            background-color: #f0f7ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .password-requirements ul {
+            margin: 10px 0 0 0;
+            padding-left: 20px;
+        }
+        .password-requirements li {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        .requirement-met {
+            color: #4CAF50;
+        }
+        .requirement-not-met {
+            color: #999;
+        }
+        .password-strength {
+            height: 4px;
+            background-color: #e0e0e0;
+            border-radius: 2px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            transition: width 0.3s, background-color 0.3s;
+            width: 0%;
+        }
+        .strength-weak { background-color: #f44336; }
+        .strength-medium { background-color: #ff9800; }
+        .strength-strong { background-color: #4CAF50; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="icon"></div>
+    <h2>Establecer Nueva Contraseña</h2>
+    <p>Ingresa tu nueva contraseña. Asegúrate de que sea segura y fácil de recordar.</p>
+
+    <form id="nuevaContrasenaForm">
+        <input type="hidden" id="email" th:value="${param.email}" />
+        <input type="hidden" id="codigo" th:value="${param.codigo}" />
+
+        <div class="password-requirements">
+            <strong>Requisitos de la contraseña:</strong>
+            <ul id="requirements">
+                <li id="req-length" class="requirement-not-met">Al menos 6 caracteres</li>
+                <li id="req-match" class="requirement-not-met">Las contraseñas coinciden</li>
+            </ul>
+        </div>
+
+        <label for="nuevaContrasena">Nueva Contraseña</label>
+        <input type="password" id="nuevaContrasena" placeholder="Ingresa tu nueva contraseña" required />
+        
+        <div class="password-strength">
+            <div class="password-strength-bar" id="strengthBar"></div>
+        </div>
+        <small id="strengthText" style="color: #666;"></small>
+
+        <label for="confirmarContrasena">Confirmar Contraseña</label>
+        <input type="password" id="confirmarContrasena" placeholder="Confirma tu nueva contraseña" required />
+
+        <button type="submit" id="submitBtn">Restablecer Contraseña</button>
+    </form>
+
+    <a th:href="@{/login}" class="back-link">Volver al inicio de sesión</a>
+</div>
+
+<script>
+    const nuevaContrasenaInput = document.getElementById('nuevaContrasena');
+    const confirmarContrasenaInput = document.getElementById('confirmarContrasena');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const form = document.getElementById('nuevaContrasenaForm');
+    
+    // Validación en tiempo real
+    function validatePassword() {
+        const password = nuevaContrasenaInput.value;
+        const confirm = confirmarContrasenaInput.value;
+        
+        // Requisito de longitud
+        const reqLength = document.getElementById('req-length');
+        if (password.length >= 6) {
+            reqLength.className = 'requirement-met';
+        } else {
+            reqLength.className = 'requirement-not-met';
+        }
+        
+        // Requisito de coincidencia
+        const reqMatch = document.getElementById('req-match');
+        if (password.length > 0 && confirm.length > 0 && password === confirm) {
+            reqMatch.className = 'requirement-met';
+        } else {
+            reqMatch.className = 'requirement-not-met';
+        }
+        
+        // Mostrar fuerza de contraseña
+        if (password.length > 0) {
+            let strength = 0;
+            if (password.length >= 6) strength += 33;
+            if (password.length >= 8) strength += 17;
+            if (/[A-Z]/.test(password)) strength += 17;
+            if (/[0-9]/.test(password)) strength += 17;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 16;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength < 50) {
+                strengthBar.className = 'password-strength-bar strength-weak';
+                strengthText.textContent = 'Débil';
+                strengthText.style.color = '#f44336';
+            } else if (strength < 80) {
+                strengthBar.className = 'password-strength-bar strength-medium';
+                strengthText.textContent = 'Media';
+                strengthText.style.color = '#ff9800';
+            } else {
+                strengthBar.className = 'password-strength-bar strength-strong';
+                strengthText.textContent = 'Fuerte';
+                strengthText.style.color = '#4CAF50';
+            }
+        } else {
+            strengthBar.style.width = '0%';
+            strengthText.textContent = '';
+        }
+    }
+    
+    nuevaContrasenaInput.addEventListener('input', validatePassword);
+    confirmarContrasenaInput.addEventListener('input', validatePassword);
+    
+    // Enviar formulario
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const codigo = document.getElementById('codigo').value;
+        const nuevaContrasena = nuevaContrasenaInput.value;
+        const confirmarContrasena = confirmarContrasenaInput.value;
+        
+        // Validaciones del lado del cliente
+        if (nuevaContrasena.length < 6) {
+            mostrarMensaje('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
+        }
+        
+        if (nuevaContrasena !== confirmarContrasena) {
+            mostrarMensaje('Las contraseñas no coinciden', 'error');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Restableciendo...';
+        
+        try {
+            const response = await fetch('/password-recovery/restablecer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    email: email,
+                    codigo: codigo,
+                    nuevaContrasena: nuevaContrasena,
+                    confirmarContrasena: confirmarContrasena
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarMensaje(data.message, 'success');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            } else {
+                mostrarMensaje(data.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Restablecer Contraseña';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al restablecer la contraseña. Por favor intenta de nuevo', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Restablecer Contraseña';
+        }
+    });
+    
+    // Función para mostrar mensajes
+    function mostrarMensaje(mensaje, tipo) {
+        // Eliminar mensajes anteriores
+        const mensajesAnteriores = document.querySelectorAll('.mensaje-flotante');
+        mensajesAnteriores.forEach(m => m.remove());
+        
+        const mensajeDiv = document.createElement('div');
+        mensajeDiv.className = 'mensaje-flotante';
+        mensajeDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        
+        if (tipo === 'success') {
+            mensajeDiv.style.backgroundColor = '#4CAF50';
+        } else {
+            mensajeDiv.style.backgroundColor = '#f44336';
+        }
+        
+        mensajeDiv.textContent = mensaje;
+        document.body.appendChild(mensajeDiv);
+        
+        setTimeout(() => {
+            mensajeDiv.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => mensajeDiv.remove(), 300);
+        }, 5000);
+    }
+    
+    // Agregar animaciones CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>

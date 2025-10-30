@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Deportista</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside th:replace="fragments/sidebar :: sidebar('mis-deportistas')"></aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Perfil del Deportista</div>
+                </div>
+                <a th:href="@{/entrenador/mis-deportistas}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                    Volver al Listado
+                </a>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="max-w-6xl mx-auto">
+                    
+                    <!-- Información Personal -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <div class="flex items-center mb-6">
+                            <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                                <span th:text="${#strings.substring(deportista.nombre, 0, 1) + #strings.substring(deportista.apellido, 0, 1)}"></span>
+                            </div>
+                            <div class="ml-6">
+                                <h2 class="text-2xl font-bold text-gray-900" th:text="${deportista.nombreCompleto}"></h2>
+                                <p class="text-gray-600">DNI: <span th:text="${deportista.dni}"></span></p>
+                                <span th:if="${deportista.membresiaActiva}" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    Membresía Activa
+                                </span>
+                                <span th:unless="${deportista.membresiaActiva}" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                    Membresía Inactiva
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Email</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.email}"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Teléfono</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.telefono != null ? deportista.telefono : 'No registrado'}"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Fecha de Nacimiento</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.fechaNacimiento != null ? #temporals.format(deportista.fechaNacimiento, 'dd/MM/yyyy') : 'No registrado'}"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Género</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.genero != null ? deportista.genero : 'No registrado'}"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Fecha de Registro</p>
+                                <p class="font-semibold text-gray-900" th:text="${#temporals.format(deportista.fechaRegistro, 'dd/MM/yyyy')}"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Dirección</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.direccion != null ? deportista.direccion : 'No registrado'}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto de Emergencia -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="h-5 w-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            Contacto de Emergencia
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Nombre del Contacto</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.emergenciaContacto != null ? deportista.emergenciaContacto : 'No registrado'}"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Teléfono de Emergencia</p>
+                                <p class="font-semibold text-gray-900" th:text="${deportista.emergenciaTelefono != null ? deportista.emergenciaTelefono : 'No registrado'}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Progreso Físico (Placeholder) -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="h-5 w-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Progreso Físico
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-gray-600">No hay datos de progreso físico registrados</p>
+                            <p class="text-sm text-gray-500 mt-2">Esta sección mostrará evaluaciones físicas, medidas corporales y evolución del deportista</p>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Objetivos (Placeholder) -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="h-5 w-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Objetivos
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-gray-600">No hay objetivos definidos</p>
+                            <p class="text-sm text-gray-500 mt-2">Aquí se mostrarán los objetivos del deportista y su progreso</p>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Rutinas (Placeholder) -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="h-5 w-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            </svg>
+                            Rutinas Asignadas
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-gray-600">No hay rutinas asignadas</p>
+                            <p class="text-sm text-gray-500 mt-2">Esta sección mostrará las rutinas de entrenamiento asignadas al deportista</p>
+                        </div>
+                    </div>
+
+                    <!-- Notas del Entrenador -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <svg class="h-5 w-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Notas del Entrenador
+                        </h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <textarea class="w-full h-32 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                      placeholder="Escribe notas sobre el progreso, observaciones o recomendaciones para este deportista..."></textarea>
+                            <div class="mt-4 flex justify-end">
+                                <button class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
+                                    Guardar Notas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>

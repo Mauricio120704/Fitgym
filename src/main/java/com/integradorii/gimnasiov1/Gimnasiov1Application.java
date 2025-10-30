@@ -1,3 +1,4 @@
+
 package com.integradorii.gimnasiov1;
 
 import org.springframework.boot.SpringApplication;
@@ -11,3 +12,4 @@ public class Gimnasiov1Application {
 	}
 
 }
+ 

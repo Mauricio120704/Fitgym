@@ -1,0 +1,97 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
+}
+
+.card-custom {
+    border: none;
+    border-radius: 15px;
+    background-color: white;
+    max-width: 450px;
+    width: 100%;
+    margin: 20px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-right: none;
+    min-width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-control {
+    border-left: none;
+    padding: 10px;
+    height: 45px;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.btn-outline-secondary {
+    border-color: #ced4da;
+    border-left: none;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 0 15px;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.btn-primary {
+    background-color: #ff6b35;
+    border: none;
+    padding: 10px 0;
+    font-weight: 500;
+    height: 45px;
+}
+
+.btn-primary:hover {
+    background-color: #e65c2e;
+}
+
+.titulo-custom {
+    color: #333;
+    font-weight: 700;
+    margin: 20px 0;
+}
+
+.registro-link {
+    margin-top: 20px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.registro-link a {
+    color: #ff6b35;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.registro-link a:hover {
+    text-decoration: underline;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.invalid-feedback {
+    display: block;
+    margin-top: 5px;
+}
+
+.alert {
+    border-radius: 8px;
+    margin-bottom: 20px;
+}

@@ -71,7 +71,7 @@
 
 
             <div class="col-lg-4 mb-4">
-                <div class="card h-100 card-popular shadow">
+                <div class="card h-100 card-popular shadow plan-card" data-plan="Premium">
                     <div class="popular-badge">Más Popular</div>
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="text-center">
@@ -100,7 +100,7 @@
                                  precio=${'79.900'},
                                  usuario=${#strings.defaultString(usuario, param.usuario)}
                                )}"
-                               class="btn btn-custom-orange w-100">
+                               class="btn btn-custom-orange w-100 btn-select-plan">
                                 Seleccionar Plan
                             </a>
                         </div>
@@ -150,7 +150,7 @@
 
         </div> 
         <div class="text-center mt-4">
-            <button class="btn btn-outline-secondary px-4" th:onclick="|location.href='@{/inicio}'|">Volver</button>
+            <a th:href="@{/inicio}" class="btn btn-outline-secondary px-4">Volver</a>
         </div>
 
 

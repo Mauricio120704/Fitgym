@@ -1,0 +1,11 @@
+/* Limitar descripción a 1.5 líneas con puntos suspensivos */
+.incident-summary {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: 2.25em; /* 1.5 líneas: 1.5 * line-height */
+}

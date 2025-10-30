@@ -1,0 +1,17 @@
+/* Estilos para la página de miembros/personal */
+
+/* Estilos adicionales si son necesarios */
+.miembros-container {
+    width: 100%;
+}
+
+/* Badge de estado */
+.badge-activo {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-inactivo {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}

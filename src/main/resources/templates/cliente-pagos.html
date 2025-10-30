@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pagos - FitGym</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Incluir sidebar dinámico -->
+        <div th:replace="~{fragments/sidebar :: sidebar('pagos')}"></div>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Historial de Pagos</div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="max-w-6xl mx-auto">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Mis Pagos</h2>
+                        <p class="text-gray-600 mb-6">Aquí podrás ver el historial de todos tus pagos realizados.</p>
+                        
+                        <!-- Contenido de pagos -->
+                        <div class="text-center py-12">
+                            <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                            </svg>
+                            <p class="text-gray-500">No hay pagos registrados aún</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>

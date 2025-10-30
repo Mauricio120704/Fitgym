@@ -5,8 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/miembros.css}">
+    <script defer th:src="@{/JavaScript/miembros-pagination.js}"></script>
+    <script defer th:src="@{/JavaScript/miembros.js}"></script>
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta http-equiv="Cache-Control" content="public, max-age=60">
+    <style>
+        #floating-add-btn {
+            position: fixed !important;
+            bottom: 2rem !important;
+            right: 2rem !important;
+            z-index: 9999 !important;
+            width: 4rem !important;
+            height: 4rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 9999px !important;
+            background-color: rgb(249, 115, 22) !important;
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+        
+        #floating-add-btn:hover {
+            transform: scale(1.1) !important;
+        }
+    </style>
     <script>
-        // Aplicar estado del sidebar INMEDIATAMENTE antes de renderizar
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
             if (expanded) {
@@ -16,90 +43,12 @@
             }
         })();
     </script>
-    <style>
-        :root {
-            --sidebar-width: 5rem;
-        }
-        #sidebar {
-            width: var(--sidebar-width) !important;
-        }
-    </style>
 </head>
+    
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen bg-gray-200">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
-            <div class="p-4 border-b flex justify-center items-center">
-                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
-                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <nav class="mt-4">
-                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
-                <ul class="mt-2">
-                    <li>
-                        <a href="/inicio" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Inicio</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/registro" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Registrar Usuario">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Registrar Usuario</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/miembros" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Personal">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Personal</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/incidencias" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
-                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Incidencias</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
-                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/evaluaciones" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Evaluaciones">
-                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/entrenamientos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Entrenamientos">
-                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Entrenamientos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/perfil" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Mi Perfil">
-                           <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            <span class="sidebar-text ml-3 hidden">Mi Perfil</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+        <!-- Sidebar (fragmento común) -->
+        <aside th:replace="fragments/sidebar :: sidebar('miembros')"></aside>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -115,28 +64,8 @@
                 <div></div>
             </header>
 
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-                <div class="container mx-auto">
-                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Personal del Gimnasio</h1>
-                    <p class="text-gray-600 mb-6">Gestiona la información de todo el personal del gimnasio</p>
-
-                    <!-- Estadísticas -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-sm font-medium text-gray-500">Total de Personal</h3>
-                            <p class="text-2xl font-bold text-gray-800 mt-2" th:text="${totalMiembros}">0</p>
-                            <p class="text-sm text-gray-500 mt-1">Registrados en el sistema</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-sm font-medium text-gray-500">Personal Activo</h3>
-                            <p class="text-2xl font-bold text-green-500 mt-2" th:text="${totalActivos}">0</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-sm font-medium text-gray-500">Personal Inactivo</h3>
-                            <p class="text-2xl font-bold text-red-500 mt-2" th:text="${totalInactivos}">0</p>
-                        </div>
-                    </div>
-
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+    
                     <!-- Tabla de Miembros -->
                     <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
@@ -181,12 +110,12 @@
                             <button type="button" id="btn-guardar-rol-activo" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Aplicar</button>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
+                        <div class="overflow-x-auto rounded-lg border border-gray-200">
+                            <table class="w-full text-left bg-white">
                                 <thead>
-                                    <tr class="text-xs text-gray-500 uppercase bg-gray-50">
-                                        <th class="px-4 py-3">ID</th>
-                                        <th class="px-4 py-3">Nombre Completo</th>
+                                    <tr class="text-xs text-gray-500 uppercase bg-gray-50 border-b">
+                                        <th class="px-4 py-3 font-semibold">ID</th>
+                                        <th class="px-4 py-3 font-semibold">Nombre Completo</th>
                                         <th class="px-4 py-3">Rol</th>
                                         <th class="px-4 py-3">DNI</th>
                                         <th class="px-4 py-3">Email</th>
@@ -209,7 +138,7 @@
                                     <tr th:each="miembro : ${miembros}" class="border-b hover:bg-gray-50">
                                         <td class="px-4 py-3 font-medium" th:text="${miembro.id}">1</td>
                                         <td class="px-4 py-3">
-                                            <span th:text="${miembro.nombre} + ' ' + ${miembro.apellido}">Juan Pérez</span>
+                                            <span th:text="${miembro != null ? (miembro.nombre != null ? miembro.nombre : '') + ' ' + (miembro.apellido != null ? miembro.apellido : '') : ''}">Juan Pérez</span>
                                         </td>
                                         <td class="px-4 py-3">
                                             <span th:if="${miembro.rol != null and miembro.rol.codigo == 'ADMINISTRADOR'}" class="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-200 rounded-full">Administrador</span>
@@ -220,21 +149,40 @@
                                         <td class="px-4 py-3" th:text="${miembro.dni}">00000000</td>
                                         <td class="px-4 py-3" th:text="${miembro.email}">juan@email.com</td>
                                         <td class="px-4 py-3" th:text="${miembro.telefono}">555-0101</td>
-                                        <td class="px-4 py-3" th:text="${miembro.fechaRegistro}">2024-01-15</td>
+                                        <td class="px-4 py-3" th:text="${#temporals.format(miembro.fechaRegistro, 'yyyy-MM-dd')}">2024-01-15</td>
                                         <td class="px-4 py-3">
-                                            <span th:if="${miembro.membresiaActiva}" class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Activo</span>
-                                            <span th:unless="${miembro.membresiaActiva}" class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Inactivo</span>
+                                            <span th:if="${miembro.activo}" class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full inline-flex items-center gap-1">
+                                                <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                                                Activo
+                                            </span>
+                                            <span th:unless="${miembro.activo}" class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full inline-flex items-center gap-1">
+                                                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                                                Inactivo
+                                            </span>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <div class="flex gap-2">
-                                                <a th:href="@{/miembros/editar/{id}(id=${miembro.id})}" class="text-blue-600 hover:text-blue-800">
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            <div class="flex items-center gap-2">
+                                                <a th:href="@{/miembros/editar/{id}(id=${miembro.id})}" 
+                                                   class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-600 hover:bg-blue-600 hover:text-white rounded transition-all duration-200"
+                                                   title="Editar">
+                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                    Editar
                                                 </a>
-                                                <a th:href="@{/miembros/eliminar/{id}(id=${miembro.id})}" 
-                                                   onclick="return confirm('¿Estás seguro de eliminar este personal?')" 
-                                                   class="text-red-600 hover:text-red-800">
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                </a>
+                                                <form th:action="@{/miembros/eliminar/{id}(id=${miembro.id})}" method="post" class="inline-block">
+                                                    <!-- Render CSRF token only if available to avoid Thymeleaf errors -->
+                                                    <input type="hidden" name="_csrf" th:if="${_csrf != null}" th:value="${_csrf.token}" />
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center px-3 py-1 bg-red-100 text-red-600 hover:bg-red-600 hover:text-white rounded transition-all duration-200"
+                                                            onclick="return confirm('¿Estás seguro de que deseas eliminar este miembro?')"
+                                                            title="Eliminar">
+                                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                        Eliminar
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -248,8 +196,8 @@
     </div>
 
     <!-- Botón Flotante para Nuevo Personal -->
-    <a href="/miembros/nuevo" class="fixed bottom-8 right-8 bg-orange-500 hover:bg-orange-600 text-white rounded-full p-4 shadow-lg transition duration-300 transform hover:scale-110 z-50">
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="/miembros/nuevo" id="floating-add-btn" title="Agregar personal">
+        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
     </a>

@@ -18,7 +18,7 @@ public class Clase {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "entrenador_id")
-    private Persona entrenador;
+    private Usuario entrenador;
 
     @Column(nullable = false)
     private Integer capacidad;
@@ -38,8 +38,8 @@ public class Clase {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-    public Persona getEntrenador() { return entrenador; }
-    public void setEntrenador(Persona entrenador) { this.entrenador = entrenador; }
+    public Usuario getEntrenador() { return entrenador; }
+    public void setEntrenador(Usuario entrenador) { this.entrenador = entrenador; }
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
     public OffsetDateTime getFecha() { return fecha; }

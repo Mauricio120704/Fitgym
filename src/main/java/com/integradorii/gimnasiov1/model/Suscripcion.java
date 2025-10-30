@@ -1,6 +1,7 @@
 package com.integradorii.gimnasiov1.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
@@ -10,16 +11,18 @@ public class Suscripcion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "deportista_id", nullable = false)
     private Persona deportista;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
 
-    @Column(nullable = false, length = 20)
-    private String estado; // Activa / Cancelada / Pausada
+    @Column(nullable = false, length = 255)
+    private String estado = "Activa"; // Activa / Cancelada / Pausada
 
     @Column(name = "fecha_inicio")
     private LocalDate fechaInicio;

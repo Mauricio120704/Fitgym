@@ -6,176 +6,15 @@
     <title>Registro - FitGym</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-    <script>
-        (function() {
-            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
-            if (expanded) {
-                document.documentElement.style.setProperty('--sidebar-width', '16rem');
-            } else {
-                document.documentElement.style.setProperty('--sidebar-width', '5rem');
-            }
-        })();
-    </script>
-    <style>
-        :root { --sidebar-width: 5rem; }
-        #sidebar { width: var(--sidebar-width) !important; }
-        
-        .form-card {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-body { padding: 2rem; }
-        .card-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; }
-        .card-subtitle { color: #6b7280; margin-bottom: 1.5rem; }
-        
-        .form-label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
-        .form-control {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .input-group {
-            display: flex;
-            margin-bottom: 1rem;
-        }
-        .input-group-text {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0.75rem;
-            background-color: #f3f4f6;
-            border: 1px solid #d1d5db;
-            border-right: none;
-            border-radius: 0.375rem 0 0 0.375rem;
-        }
-        .input-group .form-control {
-            border-radius: 0 0.375rem 0.375rem 0;
-        }
-        
-        .row { display: flex; gap: 1rem; margin-bottom: 1rem; }
-        .col-md-6 { flex: 1; }
-        .mb-3 { margin-bottom: 1rem; }
-        .mb-4 { margin-bottom: 1.5rem; }
-        
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-        .btn-custom-orange {
-            background-color: #f97316;
-            color: white;
-        }
-        .btn-custom-orange:hover {
-            background-color: #ea580c;
-        }
-        .btn-outline-secondary {
-            background-color: white;
-            color: #6b7280;
-            border: 1px solid #d1d5db;
-        }
-        .btn-outline-secondary:hover {
-            background-color: #f3f4f6;
-        }
-        .w-100 { width: 100%; }
-        
-        .d-grid { display: flex; }
-        .gap-3 { gap: 1rem; }
-        .d-md-flex { display: flex; }
-        .justify-content-md-between { justify-content: space-between; }
-        
-        .text-center { text-align: center; }
-        .text-muted { color: #6b7280; }
-    </style>
+    <link href="/Estilos/registro-styles.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen bg-gray-200">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="w-20 bg-white shadow-md absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30">
-            <div class="p-4 border-b flex justify-center items-center">
-                <h2 class="sidebar-title text-xl font-bold text-gray-800 hidden">Sistema de Gestión</h2>
-                <svg class="sidebar-icon h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-                <button id="close-sidebar" class="md:hidden text-gray-600 hover:text-gray-800 absolute right-2">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="card-header">
+                <h1 class="card-title">Registro de Deportista</h1>
+                <p class="card-subtitle">Crea tu cuenta para acceder a todos nuestros servicios</p>
             </div>
-            <nav class="mt-4">
-                <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
-                <ul class="mt-2">
-                    <li><a href="/inicio" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Inicio">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Inicio</span>
-                    </a></li>
-                    <li><a href="/registro" class="flex items-center justify-center py-3 text-blue-600 bg-blue-100 font-semibold" title="Registrar Usuario">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Registrar Usuario</span>
-                    </a></li>
-                    <!-- Enlace a Personal (administrativo) oculto en flujo público de registro de deportistas -->
-                    <!--
-                    <li><a href="/miembros" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Personal">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Personal</span>
-                    </a></li>
-                    -->
-                    <li><a href="/incidencias" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Incidencias">
-                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Incidencias</span>
-                    </a></li>
-                    <li><a href="/pagos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Historial de Pagos">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Historial de Pagos</span>
-                    </a></li>
-                    <li><a href="/clases" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Cupos de Clases">
-                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Cupos de Clases</span>
-                    </a></li>
-                    <li><a href="/evaluaciones" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Evaluaciones">
-                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
-                    </a></li>
-                    <li><a href="/entrenamientos" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Entrenamientos">
-                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Entrenamientos</span>
-                    </a></li>
-                    <li><a href="/perfil" class="flex items-center justify-center py-3 text-gray-700 hover:bg-gray-200" title="Mi Perfil">
-                       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                        <span class="sidebar-text ml-3 hidden">Mi Perfil</span>
-                    </a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
-                <div class="flex items-center gap-4">
-                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                    <div class="text-xl font-semibold text-gray-800">Registro de Deportista</div>
-                </div>
-                <div></div>
-            </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
         <div class="form-card">
@@ -190,7 +29,7 @@
                 </div>
 
 
-                <form action="/registro" method="post">
+                <form action="/registro" method="post" th:object="${usuario}">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="firstName" class="form-label">Nombre</label>
@@ -238,17 +77,22 @@
                     <div class="mb-3">
                         <label for="password" class="form-label">Contraseña</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                            <span class="input-group-text password-toggle" data-target="password" style="cursor: pointer" title="Mostrar/Ocultar contraseña"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></span>
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
-
 
                     <div class="mb-4">
                         <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="confirmPassword" placeholder="Repite tu contraseña" required minlength="6">
-                            <span class="input-group-text password-toggle" data-target="confirmPassword" style="cursor: pointer" title="Mostrar/Ocultar contraseña"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i></span>
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña" required minlength="6">
+                            <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -260,26 +104,59 @@
                 </form>
             </div>
         </div>
-            </main>
+        </div>
+        
+        <div class="login-link">
+            ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
         </div>
     </div>
-    <script th:src="@{/sidebar.js}"></script>
+
     <script>
-        // Toggle de visibilidad de contraseñas
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.password-toggle').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const targetId = btn.getAttribute('data-target');
-                    const input = document.getElementById(targetId);
-                    const icon = btn.querySelector('i');
-                    if (!input) return;
-                    const isPassword = input.getAttribute('type') === 'password';
-                    input.setAttribute('type', isPassword ? 'text' : 'password');
-                    // Cambiar icono
-                    icon.classList.toggle('fa-eye');
-                    icon.classList.toggle('fa-eye-slash');
+        // Función para alternar la visibilidad de la contraseña
+        function togglePasswordVisibility(inputId, buttonId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleButton = document.getElementById(buttonId);
+            
+            if (passwordInput && toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // Cambiar el ícono
+                    const icon = toggleButton.querySelector('i');
+                    if (type === 'password') {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
                 });
-            });
+            }
+        }
+
+        // Inicializar cuando el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el toggle de visibilidad para ambos campos de contraseña
+            togglePasswordVisibility('password', 'togglePassword');
+            togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword');
+            
+            // Validación de coincidencia de contraseñas
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            if (password && confirmPassword) {
+                function validatePassword() {
+                    if (password.value !== confirmPassword.value) {
+                        confirmPassword.setCustomValidity('Las contraseñas no coinciden');
+                    } else {
+                        confirmPassword.setCustomValidity('');
+                    }
+                }
+                
+                password.addEventListener('change', validatePassword);
+                confirmPassword.addEventListener('keyup', validatePassword);
+            }
         });
     </script>
 </body>

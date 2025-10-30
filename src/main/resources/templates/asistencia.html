@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia de Deportistas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+  <style>
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .status-active {
+            background-color: #DCFCE7;
+            color: #16A34A;
+        }
+        .status-inactive {
+            background-color: #FEE2E2;
+            color: #DC2626;
+        }
+  </style>
+  <script>
+    (function() {
+        const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+        if (expanded) {
+            document.documentElement.style.setProperty('--sidebar-width', '16rem');
+        } else {
+            document.documentElement.style.setProperty('--sidebar-width', '5rem');
+        }
+    })();
+  </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar('asistencia')}"></div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+              <div class="flex items-center gap-4">
+                <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                  </svg>
+                </button>
+                <div class="text-xl font-semibold text-gray-800">Asistencia de Deportistas</div>
+              </div>
+              <div></div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="card">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-4">Registrar Asistencia</h2>
+                        <div class="flex">
+                            <input type="text" id="dniInput"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Ingrese DNI del deportista"
+                                   onkeypress="if(event.key === 'Enter') buscarSocio()">
+                            <button onclick="buscarSocio()"
+                                    class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                Buscar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resultados de la búsqueda -->
+                    <div id="resultado" class="hidden">
+                        <div class="flex items-center space-x-6 p-4 bg-gray-50 rounded-lg">
+                            <div class="w-24 h-24 bg-gray-200 rounded-full overflow-hidden">
+                                <img id="fotoSocio" src="" alt="Foto" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 id="nombreCompleto" class="text-xl font-semibold"></h3>
+                                        <p id="tipoMembresia" class="text-gray-600"></p>
+                                    </div>
+                                    <span id="estadoMembresia" class="status-badge"></span>
+                                </div>
+                                <p id="diasRestantes" class="text-sm text-gray-500 mt-2"></p>
+                            </div>
+                        </div>
+
+                        <div id="infoIngreso" class="mt-4"></div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <button id="btnRegistrar"
+                                    class="w-full py-2 px-4 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2">
+                                Cargando...
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje de error -->
+                    <div id="mensajeError" class="hidden mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded"></div>
+                </div>
+
+                <!-- Historial de asistencias -->
+                <div class="card mt-6">
+                    <h2 class="text-xl font-semibold mb-4">Últimos registros</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left">Nombre</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left">DNI</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left">Fecha y Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historialAsistencias">
+                                <tr>
+                                    <td colspan="3" class="py-4 text-center text-gray-500">No hay registros recientes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/JavaScript/asistencia.js}"></script>
+</body>
+</html>

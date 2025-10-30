@@ -1,22 +1,26 @@
 package com.integradorii.gimnasiov1.controller;
 
-import com.integradorii.gimnasiov1.model.Pago;
-import com.integradorii.gimnasiov1.model.Persona;
-import com.integradorii.gimnasiov1.model.Plan;
-import com.integradorii.gimnasiov1.model.Suscripcion;
-import com.integradorii.gimnasiov1.repository.PagoRepository;
-import com.integradorii.gimnasiov1.repository.PersonaRepository;
-import com.integradorii.gimnasiov1.repository.PlanRepository;
-import com.integradorii.gimnasiov1.repository.SuscripcionRepository;
+import com.integradorii.gimnasiov1.model.*;
+import com.integradorii.gimnasiov1.repository.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Controlador de Checkout - Proceso de pago de membresías
+ * Ruta: /checkout | Acceso: Público (para nuevos registros)
+ * Tablas: personas, planes, suscripciones, pagos
+ * Proceso transaccional: crea/actualiza suscripción y registra pago
+ */
 @Controller
+@RequestMapping("/checkout")
 public class CheckoutController {
 
     private final PersonaRepository personaRepository;
@@ -25,65 +29,161 @@ public class CheckoutController {
     private final PagoRepository pagoRepository;
 
     public CheckoutController(PersonaRepository personaRepository,
-                              PlanRepository planRepository,
-                              SuscripcionRepository suscripcionRepository,
-                              PagoRepository pagoRepository) {
+                            PlanRepository planRepository,
+                            SuscripcionRepository suscripcionRepository,
+                            PagoRepository pagoRepository) {
         this.personaRepository = personaRepository;
         this.planRepository = planRepository;
         this.suscripcionRepository = suscripcionRepository;
         this.pagoRepository = pagoRepository;
     }
 
-    @PostMapping("/checkout/pagar")
-    public String pagar(@RequestParam String usuario,
-                        @RequestParam String plan,
-                        @RequestParam String periodo,
-                        @RequestParam String precio) {
-        // 1) Persona
-        Persona p = personaRepository.findByEmail(usuario).orElse(null);
-        if (p == null) {
-            // Si por alguna razón no existe, no interrumpimos: redirigir a registro
-            return "redirect:/registro";
+    /**
+     * GET /checkout - Muestra página de pago
+     * Parámetros: plan, periodo (mensual/anual), precio, usuario (email)
+     * Calcula ahorro si es plan anual
+     */
+    @GetMapping
+    public String mostrarCheckout(
+            @RequestParam String plan,
+            @RequestParam String periodo,
+            @RequestParam String precio,
+            @RequestParam(required = false) String usuario,
+            Model model) {
+        
+        model.addAttribute("planNombre", plan);
+        model.addAttribute("periodo", periodo);
+        model.addAttribute("precio", precio);
+        model.addAttribute("usuario", usuario);
+        
+        // Calcular el ahorro si es anual
+        if ("anual".equalsIgnoreCase(periodo)) {
+            double precioMensual = parsePrecio(precio) / 12;
+            double ahorroMensual = 0;
+            
+            // Ajustar según el plan
+            switch (plan.toLowerCase()) {
+                case "básico":
+                    ahorroMensual = 49.90 - precioMensual;
+                    break;
+                case "premium":
+                    ahorroMensual = 79.90 - precioMensual;
+                    break;
+                case "elite":
+                    ahorroMensual = 129.90 - precioMensual;
+                    break;
+            }
+            
+            model.addAttribute("ahorroAnual", String.format("%.2f", ahorroMensual * 12));
         }
-
-        // 2) Plan (buscar por nombre, crear si no existe)
-        Plan planEntity = planRepository.findByNombre(plan).orElseGet(() -> {
-            Plan np = new Plan();
-            np.setNombre(plan);
-            // precio puede venir con separadores, normalizar
-            np.setPrecio(parsePrecio(precio));
-            np.setFrecuencia(capitalize(periodo));
-            return planRepository.save(np);
-        });
-
-        // 3) Suscripción Activa
-        Suscripcion s = new Suscripcion();
-        s.setDeportista(p);
-        s.setPlan(planEntity);
-        s.setEstado("Activa");
-        s.setFechaInicio(LocalDate.now());
-        s.setProximoPago(calcularProximoPago(periodo));
-        suscripcionRepository.save(s);
-
-        // 4) Pago Completado
-        Pago pago = new Pago();
-        pago.setCodigoPago(generarCodigo());
-        pago.setDeportista(p);
-        pago.setFecha(LocalDate.now());
-        pago.setMetodoPago("Tarjeta de Crédito");
-        pago.setMonto(parsePrecio(precio));
-        pago.setEstado("Completado");
-        pago.setPlanServicio(planEntity.getNombre());
-        pagoRepository.save(pago);
-
-        // 5) Redirigir al perfil del usuario registrado
-        return "redirect:/perfil?usuario=" + usuario;
+        
+        return "checkout";
     }
 
-    private String generarCodigo() {
+    /**
+     * POST /checkout/pagar - Procesa pago de membresía
+     * Transaccional: crea/actualiza suscripción, registra pago, activa membresía
+     * Rollback automático si falla cualquier paso
+     */
+    @PostMapping("/pagar")
+    @Transactional
+    public String pagar(@RequestParam String usuario,
+                       @RequestParam String plan,
+                       @RequestParam String periodo,
+                       @RequestParam String precio,
+                       @RequestParam String nombreTitular,
+                       @RequestParam String numeroTarjeta,
+                       @RequestParam String fechaExpiracion,
+                       @RequestParam String cvv,
+                       Model model) {
+        try {
+            // Paso 1: Verificar que el deportista existe
+            Persona persona = personaRepository.findByEmail(usuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + usuario));
+
+            // Paso 2: Buscar plan existente o crear nuevo
+            Plan planEntity = planRepository.findByNombre(plan)
+                .orElseGet(() -> {
+                    Plan nuevoPlan = new Plan();
+                    nuevoPlan.setNombre(plan);
+                    nuevoPlan.setPrecio(parsePrecio(precio));
+                    nuevoPlan.setFrecuencia(periodo.equalsIgnoreCase("anual") ? "Anual" : "Mensual");
+                    return planRepository.save(nuevoPlan);
+                });
+
+            // Paso 3: Crear o actualizar suscripción
+            Optional<Suscripcion> suscripcionExistente = suscripcionRepository.findActiveByDeportistaId(persona.getId());
+            Suscripcion suscripcion;
+            
+            if (suscripcionExistente.isPresent()) {
+                // Actualizar suscripción existente
+                suscripcion = suscripcionExistente.get();
+                suscripcion.setPlan(planEntity);
+                suscripcion.setEstado("Activa");
+            } else {
+                // Crear nueva suscripción
+                suscripcion = new Suscripcion();
+                suscripcion.setDeportista(persona);
+                suscripcion.setPlan(planEntity);
+                suscripcion.setEstado("Activa");
+                suscripcion.setFechaInicio(LocalDate.now());
+            }
+            
+            // Actualizar fechas
+            suscripcion.setFechaFin(calcularFechaFin(periodo));
+            suscripcion.setProximoPago(calcularProximoPago(periodo));
+            
+            try {
+                // Guardar la suscripción
+                suscripcion = suscripcionRepository.save(suscripcion);
+                System.out.println("Suscripción guardada con ID: " + suscripcion.getId());
+            } catch (Exception e) {
+                System.err.println("Error al guardar la suscripción: " + e.getMessage());
+                throw new RuntimeException("Error al guardar la suscripción: " + e.getMessage(), e);
+            }
+
+            // Paso 4: Registrar pago en historial
+            Pago pago = new Pago();
+            pago.setCodigoPago(generarCodigoPago());
+            pago.setDeportista(persona);
+            pago.setFecha(LocalDate.now());
+            pago.setMetodoPago("Tarjeta de Crédito");
+            pago.setMonto(parsePrecio(precio));
+            pago.setEstado("Completado");
+            pago.setPlanServicio(plan);
+            pagoRepository.save(pago);
+
+            // Paso 5: Activar membresía del deportista
+            persona.setMembresiaActiva(true);
+            personaRepository.save(persona);
+
+            // Paso 6: Redirigir a login con mensaje de éxito
+            return "redirect:/login?registroExitoso=true&mensaje=¡Pago+procesado+correctamente!+Ya+puedes+iniciar+sesión.";
+            
+        } catch (Exception e) {
+            // En caso de error, hacer rollback completo de la transacción
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            
+            // Registrar el error
+            System.err.println("Error al procesar el pago: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Devolver a la página de checkout con el error
+            model.addAttribute("error", "Error al procesar el pago. Por favor, verifica tus datos e inténtalo nuevamente.");
+            model.addAttribute("planNombre", plan);
+            model.addAttribute("periodo", periodo);
+            model.addAttribute("precio", precio);
+            model.addAttribute("usuario", usuario);
+            return "checkout";
+        }
+    }
+
+    // Genera código único para el pago (formato: PAY-XXXXXXXX)
+    private String generarCodigoPago() {
         return "PAY-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
     }
 
+    // Convierte string de precio (ej: "S/ 49.90") a Double
     private Double parsePrecio(String precio) {
         try {
             String norm = precio.replace("S/", "").replace(" ", "").replace(",", "");
@@ -93,16 +193,23 @@ public class CheckoutController {
         }
     }
 
-    private String capitalize(String s) {
-        if (s == null || s.isBlank()) return "";
-        String lower = s.toLowerCase(Locale.ROOT);
-        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+    // Calcula fecha de fin de suscripción según periodo
+    private LocalDate calcularFechaFin(String periodo) {
+        LocalDate hoy = LocalDate.now();
+        if ("anual".equalsIgnoreCase(periodo)) {
+            return hoy.plusYears(1);
+        } else {
+            return hoy.plusMonths(1);
+        }
     }
 
+    // Calcula fecha del próximo pago según periodo
     private LocalDate calcularProximoPago(String periodo) {
-        if (periodo != null && periodo.toLowerCase(Locale.ROOT).contains("anual")) {
-            return LocalDate.now().plusYears(1);
+        LocalDate hoy = LocalDate.now();
+        if ("anual".equalsIgnoreCase(periodo)) {
+            return hoy.plusYears(1);
+        } else {
+            return hoy.plusMonths(1);
         }
-        return LocalDate.now().plusMonths(1);
     }
 }

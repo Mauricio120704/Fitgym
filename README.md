@@ -13,6 +13,16 @@ Sistema web completo para la gestión de miembros y pagos de un gimnasio, desarr
 - ✅ Fecha de registro automática
 - ✅ Estadísticas en tiempo real
 
+### 👥 Gestión de Invitados (NUEVO)
+- ✅ Registro de invitados asociados a miembros
+- ✅ Generación automática de código de pase (INV-XXXXXXXX)
+- ✅ Búsqueda de miembros para registrar invitados
+- ✅ Historial de invitados por miembro
+- ✅ Filtros por estado (ACTIVO/FINALIZADO/CANCELADO)
+- ✅ Registro de entrada y salida
+- ✅ Control de acceso temporal
+- ✅ Auditoría completa de invitaciones
+
 ### 💰 Historial de Pagos
 - ✅ Visualización de todos los pagos
 - ✅ Filtros por estado (Completado/Pendiente/Fallido)
@@ -122,6 +132,11 @@ gimnasiov1/
 | `/miembros/{id}` | POST | Actualizar miembro |
 | `/miembros/eliminar/{id}` | GET | Eliminar miembro |
 | `/pagos` | GET | Historial de pagos |
+| `/admin/invitados` | GET | Lista de miembros para invitados |
+| `/admin/invitados/registrar/{personaId}` | GET | Formulario registrar invitado |
+| `/admin/invitados/registrar/{personaId}` | POST | Guardar invitado |
+| `/admin/invitados/persona/{personaId}` | GET | Historial de invitados |
+| `/admin/invitados/{id}/registrar-salida` | POST | Registrar salida de invitado |
 
 ## 🎯 Funcionalidades Destacadas
 
@@ -168,6 +183,19 @@ Desarrollado como proyecto integrador para la universidad.
 ## 📄 Licencia
 
 Este proyecto es de uso académico.
+
+## 📚 Documentación Adicional
+
+### Módulo de Invitados
+- **[RESUMEN_INVITADOS.md](RESUMEN_INVITADOS.md)** - Resumen ejecutivo completo
+- **[INVITADOS_IMPLEMENTATION.md](INVITADOS_IMPLEMENTATION.md)** - Documentación técnica detallada
+- **[INSTALACION_INVITADOS.md](INSTALACION_INVITADOS.md)** - Guía de instalación paso a paso
+- **[CASOS_USO_INVITADOS.md](CASOS_USO_INVITADOS.md)** - Casos de uso y escenarios de prueba
+
+### Otros Módulos
+- **[FUNCIONALIDADES.md](FUNCIONALIDADES.md)** - Listado completo de funcionalidades
+- **[RECLAMOS_IMPLEMENTATION.md](RECLAMOS_IMPLEMENTATION.md)** - Módulo de reclamos
+- **[VERIFICACION_EMAIL_IMPLEMENTATION.md](VERIFICACION_EMAIL_IMPLEMENTATION.md)** - Sistema de verificación de email
 
 ---
 

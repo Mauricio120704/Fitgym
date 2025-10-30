@@ -2,9 +2,9 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.dto.ClaseViewDTO;
 import com.integradorii.gimnasiov1.model.Clase;
-import com.integradorii.gimnasiov1.model.Persona;
+import com.integradorii.gimnasiov1.model.Usuario;
 import com.integradorii.gimnasiov1.repository.ClaseRepository;
-import com.integradorii.gimnasiov1.repository.PersonaRepository;
+import com.integradorii.gimnasiov1.repository.UsuarioRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
 import com.integradorii.gimnasiov1.service.ClaseViewService;
 import org.springframework.stereotype.Controller;
@@ -15,29 +15,96 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador de Clases - Gestión de clases grupales
+ * Ruta: /clases | Acceso: ADMIN, RECEPCIONISTA, ENTRENADOR
+ * Tablas: clases, reserva_clase, usuarios (entrenadores)
+ * CRUD completo + API REST JSON
+ */
 @Controller
 public class ClasesController {
 
     private final ClaseRepository claseRepository;
     private final ReservaClaseRepository reservaClaseRepository;
-    private final PersonaRepository personaRepository;
+    private final UsuarioRepository usuarioRepository;
     private final ClaseViewService claseViewService;
 
     public ClasesController(ClaseRepository claseRepository,
                             ReservaClaseRepository reservaClaseRepository,
-                            PersonaRepository personaRepository,
+                            UsuarioRepository usuarioRepository,
                             ClaseViewService claseViewService) {
         this.claseRepository = claseRepository;
         this.reservaClaseRepository = reservaClaseRepository;
-        this.personaRepository = personaRepository;
+        this.usuarioRepository = usuarioRepository;
         this.claseViewService = claseViewService;
     }
 
+    /**
+     * GET /clases - Lista todas las clases con estadísticas
+     * Permite búsqueda por nombre/descripción
+     * Muestra: total clases, clases llenas, total cupos
+     */
     @GetMapping("/clases")
-    public String listar(@RequestParam(required = false) String buscar, Model model) {
-        List<Clase> clases = (buscar == null || buscar.isBlank())
-                ? claseRepository.findAllByOrderByFechaAsc()
-                : claseRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseOrderByFechaAsc(buscar.trim(), buscar.trim());
+    public String listar(@RequestParam(required = false) String buscar,
+                         @RequestParam(defaultValue = "todos") String periodo,
+                         @RequestParam(required = false) String fechaInicio,
+                         Model model) {
+        // Calcular rango de fechas según el periodo
+        LocalDate hoy = LocalDate.now();
+        LocalDate inicio = null;
+        LocalDate fin = null;
+
+        // Manejar el caso donde se proporciona una fecha de inicio
+        if (fechaInicio != null && !fechaInicio.isEmpty()) {
+            try {
+                inicio = LocalDate.parse(fechaInicio);
+                if (periodo.equals("semana")) {
+                    fin = inicio.plusDays(6);
+                }
+            } catch (Exception e) {
+                // Si hay un error al parsear la fecha, usar la fecha actual
+                inicio = hoy;
+                fin = hoy;
+            }
+        }
+
+        // Si no se proporcionó fecha de inicio o hubo un error, calcular según el período
+        if (inicio == null) {
+            switch (periodo) {
+                case "hoy":
+                    inicio = hoy;
+                    fin = hoy;
+                    break;
+                case "semana":
+                    inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                    fin = inicio.plusDays(6);
+                    break;
+                case "mes":
+                    inicio = hoy.withDayOfMonth(1);
+                    fin = hoy.withDayOfMonth(hoy.lengthOfMonth());
+                    break;
+                case "todos":
+                default:
+                    // No se establecen fechas para mostrar todas las clases
+                    break;
+            }
+        }
+
+        List<Clase> clases;
+        if (inicio != null && fin != null) {
+            OffsetDateTime inicioOdt = inicio.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+            OffsetDateTime finOdt = fin.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+            
+            clases = (buscar == null || buscar.isBlank())
+                    ? claseRepository.findByFechaBetweenOrderByFechaAsc(inicioOdt, finOdt)
+                    : claseRepository.findByFechaBetweenAndTipoLike(inicioOdt, finOdt, buscar.trim());
+        } else {
+            // Para el caso de "todos", no aplicamos filtro de fecha
+            clases = (buscar == null || buscar.isBlank())
+                    ? claseRepository.findAllByOrderByFechaAsc()
+                    : claseRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseOrderByFechaAsc(
+                            buscar.trim(), buscar.trim());
+        }
 
         // Mapear a DTOs para la vista
         List<ClaseViewDTO> view = clases.stream().map(claseViewService::toView).collect(Collectors.toList());
@@ -53,9 +120,30 @@ public class ClasesController {
         model.addAttribute("clasesLlenas", clasesLlenas);
         model.addAttribute("totalCupos", totalCupos);
         model.addAttribute("buscarActual", buscar == null ? "" : buscar);
+        // Pasar el período actual a la vista
+        model.addAttribute("periodo", periodo == null ? "semana" : periodo);
+        
+        // Pasar fechas de la semana actual para navegación
+        if (periodo != null && periodo.equals("semana") && inicio != null) {
+            model.addAttribute("fechaInicio", inicio);
+            model.addAttribute("fechaFin", fin);
+            model.addAttribute("siguienteSemana", inicio.plusWeeks(1));
+            model.addAttribute("semanaAnterior", inicio.minusWeeks(1));
+        } else {
+            // Valores por defecto para evitar errores en la vista
+            model.addAttribute("fechaInicio", hoy);
+            model.addAttribute("fechaFin", hoy);
+            model.addAttribute("siguienteSemana", hoy.plusWeeks(1));
+            model.addAttribute("semanaAnterior", hoy.minusWeeks(1));
+        }
         return "clases";
     }
 
+    /**
+     * POST /clases/crear - API REST: Crea nueva clase
+     * Content-Type: application/json
+     * Body: {nombre, duracion, cuposPremium, cuposElite, fecha, hora, instructor}
+     */
     @PostMapping(value = "/clases/crear", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public Map<String, Object> crear(@RequestBody Map<String, Object> body) {
@@ -65,6 +153,10 @@ public class ClasesController {
         return toJson(c);
     }
 
+    /**
+     * PUT /clases/{id} - API REST: Actualiza clase existente
+     * Content-Type: application/json
+     */
     @PutMapping(value = "/clases/{id}", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public Map<String, Object> actualizar(@PathVariable Long id, @RequestBody Map<String, Object> body) {
@@ -74,6 +166,10 @@ public class ClasesController {
         return toJson(c);
     }
 
+    /**
+     * DELETE /clases/{id} - API REST: Elimina clase
+     * Elimina primero las reservas asociadas
+     */
     @DeleteMapping("/clases/{id}")
     @ResponseBody
     public void eliminar(@PathVariable Long id) {
@@ -81,6 +177,7 @@ public class ClasesController {
         claseRepository.deleteById(id);
     }
 
+    // Mapea datos del JSON al objeto Clase
     private void applyFromBody(Clase c, Map<String, Object> body) {
         c.setNombre(String.valueOf(body.getOrDefault("nombre", "")));
         c.setDescripcion(null);
@@ -96,14 +193,15 @@ public class ClasesController {
             c.setFecha(odt);
         }
         c.setEstado("Programada");
-        // Entrenador por nombre libre en UI; si quieres por email, ajustamos. Intento encontrar PERSONAL por nombre.
+        // Buscar entrenador por nombre y apellido en tabla usuarios
         String instructor = String.valueOf(body.getOrDefault("instructor", ""));
         if (!instructor.isBlank()) {
             String[] parts = instructor.trim().split(" ", 2);
             String nombre = parts[0];
             String apellido = parts.length > 1 ? parts[1] : "";
-            Persona entren = personaRepository.findByTipo("PERSONAL").stream()
-                    .filter(p -> p.getNombre().equalsIgnoreCase(nombre) && (apellido.isBlank() || p.getApellido().equalsIgnoreCase(apellido)))
+            // Buscar en tabla usuarios (rol ENTRENADOR)
+            Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
+                    .filter(u -> u.getNombre().equalsIgnoreCase(nombre) && (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
                     .findFirst().orElse(null);
             c.setEntrenador(entren);
         } else {
@@ -111,10 +209,12 @@ public class ClasesController {
         }
     }
 
+    // Convierte Object a int con valor por defecto
     private int parseInt(Object v, int def) {
         try { return v == null ? def : Integer.parseInt(String.valueOf(v)); } catch (Exception e) { return def; }
     }
 
+    // Convierte Clase a JSON para respuesta API
     private Map<String, Object> toJson(Clase c) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", c.getId());

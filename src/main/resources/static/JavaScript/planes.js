@@ -6,11 +6,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const pricePeriods = document.querySelectorAll('.price-period');
     const priceOlds = document.querySelectorAll('.price-old');
 
-    let currentPeriod = 'monthly';
+    // Obtener el usuario de la URL si existe
+    const urlParams = new URLSearchParams(window.location.search);
+    const usuario = urlParams.get('usuario') || '';
+
+    function updatePlanLinks(period) {
+        // Actualizar los enlaces de los botones de selección de plan
+        document.querySelectorAll('.plan-card').forEach(card => {
+            const planName = card.dataset.plan;
+            const price = card.querySelector(`.price-amount`).dataset[period];
+            const btn = card.querySelector('.btn-select-plan');
+            const periodo = period === 'monthly' ? 'mensual' : 'anual';
+            
+            // Actualizar el enlace con los parámetros correctos
+            btn.href = `/checkout?plan=${encodeURIComponent(planName)}&periodo=${periodo}&precio=${encodeURIComponent(price)}${usuario ? '&usuario=' + encodeURIComponent(usuario) : ''}`;
+        });
+    }
 
     function updatePrices(period) {
-        currentPeriod = period;
-        
         // Actualizar el estado del botón
         if (period === 'monthly') {
             monthlyBtn.classList.add('active');
@@ -20,12 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
             monthlyBtn.classList.remove('active');
         }
 
-
         // Actualizar los textos de precios
         priceAmounts.forEach(el => {
             el.innerText = el.dataset[period];
         });
-
 
         pricePeriods.forEach(el => {
             el.innerText = el.dataset[period];
@@ -40,29 +51,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 el.style.display = 'none';
             }
         });
+
+        // Actualizar los enlaces de los botones
+        updatePlanLinks(period);
     }
 
-
-    // Event Listeners para los botones
+    // Event Listeners para los botones de cambio de período
     monthlyBtn.addEventListener('click', () => updatePrices('monthly'));
     annualBtn.addEventListener('click', () => updatePrices('annual'));
 
-
     // Establecer el estado inicial al cargar la página
     updatePrices('monthly');
-    
-    
-    // Event Listeners para los botones de seleccionar plan
-    document.querySelectorAll('.btn-select-plan').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const planName = this.dataset.plan;
-            const priceElement = this.closest('.card').querySelector('.price-amount');
-            const price = priceElement.innerText;
-            const periodo = currentPeriod === 'monthly' ? 'mensual' : 'anual';
-            
-            // Redirigir al checkout con los parámetros
-            window.location.href = `/checkout?plan=${encodeURIComponent(planName)}&periodo=${periodo}&precio=${encodeURIComponent(price)}`;
-        });
-    });
 });

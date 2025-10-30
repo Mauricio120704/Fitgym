@@ -158,3 +158,65 @@ SELECT 'Fuerza', 'dia=Lunes;hora=07:00;dur=60;notas=Enfocado en piernas',
 WHERE NOT EXISTS (
   SELECT 1 FROM entrenamientos WHERE nombre='Fuerza' AND descripcion LIKE 'dia=Lunes;hora=07:00%'
 );
+
+-- =========================
+-- Promociones: DDL y datos semilla (PostgreSQL)
+-- =========================
+
+-- Tabla principal de promociones
+CREATE TABLE IF NOT EXISTS promociones (
+  id SERIAL PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL,
+  descripcion TEXT,
+  tipo VARCHAR(20) NOT NULL,
+  valor NUMERIC(12,2) NOT NULL,
+  max_usos INTEGER NOT NULL,
+  usados INTEGER NOT NULL DEFAULT 0,
+  fecha_inicio DATE NOT NULL,
+  fecha_fin DATE NOT NULL,
+  estado VARCHAR(15) NOT NULL,
+  creado_en TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Membresías aplicables por promoción
+CREATE TABLE IF NOT EXISTS promocion_membresias (
+  id SERIAL PRIMARY KEY,
+  promocion_id INTEGER NOT NULL REFERENCES promociones(id) ON DELETE CASCADE,
+  membresia VARCHAR(50) NOT NULL
+);
+
+-- Índices útiles
+CREATE INDEX IF NOT EXISTS idx_promociones_estado ON promociones(estado);
+CREATE INDEX IF NOT EXISTS idx_promociones_fechas ON promociones(fecha_inicio, fecha_fin);
+
+-- Datos semilla (no duplicar si ya existen por nombre)
+INSERT INTO promociones (nombre, descripcion, tipo, valor, max_usos, usados, fecha_inicio, fecha_fin, estado)
+SELECT 'Descuento Enero', 'Promoción especial de inicio de año para nuevos miembros', 'PERCENTAGE', 20.00, 30, 12,
+       DATE '2024-12-31', DATE '2025-01-30', 'EXPIRED'
+WHERE NOT EXISTS (SELECT 1 FROM promociones WHERE nombre='Descuento Enero');
+
+INSERT INTO promociones (nombre, descripcion, tipo, valor, max_usos, usados, fecha_inicio, fecha_fin, estado)
+SELECT 'Verano Fit', 'Descuento para membresías anuales durante el verano', 'AMOUNT', 500.00, 15, 4,
+       DATE '2025-11-30', DATE '2026-02-27', 'ACTIVE'
+WHERE NOT EXISTS (SELECT 1 FROM promociones WHERE nombre='Verano Fit');
+
+INSERT INTO promociones (nombre, descripcion, tipo, valor, max_usos, usados, fecha_inicio, fecha_fin, estado)
+SELECT 'Promo Black Friday', 'Oferta especial de Black Friday', 'PERCENTAGE', 30.00, 50, 0,
+       DATE '2024-11-25', DATE '2024-11-30', 'INACTIVE'
+WHERE NOT EXISTS (SELECT 1 FROM promociones WHERE nombre='Promo Black Friday');
+
+-- Membresías por promoción
+INSERT INTO promocion_membresias (promocion_id, membresia)
+SELECT p.id, m FROM promociones p, (VALUES ('Mensual'), ('Trimestral')) AS t(m)
+WHERE p.nombre='Descuento Enero'
+  AND NOT EXISTS (SELECT 1 FROM promocion_membresias pm WHERE pm.promocion_id=p.id);
+
+INSERT INTO promocion_membresias (promocion_id, membresia)
+SELECT p.id, 'Anual' FROM promociones p
+WHERE p.nombre='Verano Fit'
+  AND NOT EXISTS (SELECT 1 FROM promocion_membresias pm WHERE pm.promocion_id=p.id);
+
+INSERT INTO promocion_membresias (promocion_id, membresia)
+SELECT p.id, m FROM promociones p, (VALUES ('Mensual'), ('Trimestral'), ('Anual')) AS t(m)
+WHERE p.nombre='Promo Black Friday'
+  AND NOT EXISTS (SELECT 1 FROM promocion_membresias pm WHERE pm.promocion_id=p.id);

@@ -4,6 +4,7 @@ import com.integradorii.gimnasiov1.dto.IncidenciaViewDTO;
 import com.integradorii.gimnasiov1.model.Incidencia;
 import com.integradorii.gimnasiov1.repository.IncidenciaRepository;
 import com.integradorii.gimnasiov1.repository.PersonaRepository;
+import com.integradorii.gimnasiov1.repository.UsuarioRepository;
 import com.integradorii.gimnasiov1.service.IncidenciaViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,13 +19,16 @@ import java.util.stream.Collectors;
 public class IncidenciaController {
     private final IncidenciaRepository incidenciaRepository;
     private final PersonaRepository personaRepository;
+    private final UsuarioRepository usuarioRepository;
     private final IncidenciaViewService incidenciaViewService;
 
     public IncidenciaController(IncidenciaRepository incidenciaRepository,
                                PersonaRepository personaRepository,
+                               UsuarioRepository usuarioRepository,
                                IncidenciaViewService incidenciaViewService) {
         this.incidenciaRepository = incidenciaRepository;
         this.personaRepository = personaRepository;
+        this.usuarioRepository = usuarioRepository;
         this.incidenciaViewService = incidenciaViewService;
     }
 
@@ -97,7 +101,7 @@ public class IncidenciaController {
         String descToSave = descBuilder.toString();
         i.setDescripcion(descToSave);
         i.setCategoria("General");
-        // prioridad UI -> BD capitalizada
+
         String pr = "Media";
         if ("ALTA".equalsIgnoreCase(prioridad)) pr = "Alta"; else if ("BAJA".equalsIgnoreCase(prioridad)) pr = "Baja";
         i.setPrioridad(pr);
@@ -162,7 +166,8 @@ public class IncidenciaController {
     public List<Map<String, String>> sugerencias(@RequestParam String term) {
         String q = term == null ? "" : term.trim();
         if (q.isEmpty()) return Collections.emptyList();
-        return personaRepository.searchPersonal(q).stream().limit(10).map(p -> {
+        // Buscar en usuarios administrativos en lugar de personas
+        return usuarioRepository.searchUsuarios(q).stream().limit(10).map(p -> {
             Map<String, String> m = new HashMap<>();
             String nombre = (p.getNombre() == null ? "" : p.getNombre());
             String apellido = (p.getApellido() == null ? "" : (" " + p.getApellido()));

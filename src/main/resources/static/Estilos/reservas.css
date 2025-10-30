@@ -1,0 +1,302 @@
+* {
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f8f9fc;
+  color: #1e293b;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  background-color: #ff7b00;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2em;
+}
+
+#btnHistorial {
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+main {
+  display: flex;
+  gap: 40px;
+}
+
+.calendario, .reservas {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.calendario {
+  width: 30%;
+}
+
+.reservas {
+  width: 70%;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+.proximas ul {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.proximas li {
+  background-color: #f3f4f6;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+}
+
+.lista-clases {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.tarjeta {
+  background-color: #f9fafb;
+  border-radius: 10px;
+  padding: 15px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info {
+  flex: 1;
+}
+
+.nivel {
+  display: inline-block;
+  background-color: #d1fae5;
+  color: #065f46;
+  font-size: 0.8em;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: 8px;
+}
+
+.nivel.intermedio {
+  background-color: #fef9c3;
+  color: #92400e;
+}
+
+.datos {
+  font-size: 0.9em;
+  color: #475569;
+  margin-top: 5px;
+}
+
+.icono {
+  margin-right: 5px;
+}
+
+.boton-reservar {
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-contenido {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: left;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+#btnCancelar {
+  background-color: #e5e7eb;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#btnConfirmar {
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+
+
+/* ... (Todo tu CSS anterior sin cambios) ... */
+
+/* MODIFICADO: Renombramos .encabezado */
+.reservas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px; /* Ajustado */
+  flex-wrap: wrap; /* Para responsiveness */
+}
+
+/* AÑADIR: Estilo para el nuevo subtítulo de fecha */
+#subtituloClases {
+  color: #475569;
+  font-weight: 500;
+  font-size: 1.05em;
+  /* El flex-basis asegura que ocupe toda la línea si no cabe el filtro */
+  flex-basis: 100%; 
+  order: 1; /* Aparece debajo del h2 */
+  margin-bottom: 5px;
+}
+
+/* MODIFICADO: Ajuste para el filtro */
+.reservas-header > select {
+  order: 2; /* Aparece al final */
+}
+
+/* MODIFICADO: Ajuste para el h2 de reservas */
+.reservas > h2 {
+  margin-bottom: 5px;
+}
+
+/* --- AÑADIR: ESTILOS PARA FLATPICKR --- */
+
+/* Contenedor principal del calendario */
+.flatpickr-calendar {
+  box-shadow: none;
+  border: none;
+  width: 100%; /* Ocupa todo el espacio de la sección .calendario */
+  background: transparent;
+  font-family: "Inter", sans-serif;
+}
+
+/* Cabecera del mes (ej: "octubre 2025") */
+.flatpickr-month {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 1em;
+  fill: #1e293b; /* Color de las flechas */
+}
+
+/* Nombres de los días (lu, ma, mi...) */
+.flatpickr-weekday {
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.8em;
+  text-transform: capitalize;
+}
+
+/* Estilo de cada día (número) */
+.flatpickr-day {
+  color: #1e293b;
+  border: none;
+  font-weight: 500;
+}
+
+/* Quitar bordes al hacer hover */
+.flatpickr-day:hover,
+.flatpickr-day:focus {
+  background: #f3f4f6;
+  border-color: #f3f4f6;
+}
+
+/* Días que no son del mes actual */
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  color: #d1d5db;
+}
+
+/* Día seleccionado (¡El estilo clave!) */
+.flatpickr-day.selected {
+  background: #ff7b00;
+  border-color: #ff7b00;
+  color: white;
+}
+
+/* Día de "hoy" (le quitamos el estilo azul por defecto) */
+.flatpickr-day.today {
+  background: none;
+  border: 1px solid #ff7b00; /* Puedes ponerle un borde sutil */
+  color: #ff7b00;
+}
+.flatpickr-day.today.selected {
+  background: #ff7b00; /* Se asegura que si hoy está seleccionado, se vea naranja */
+  border-color: #ff7b00;
+  color: white;
+}
+
+

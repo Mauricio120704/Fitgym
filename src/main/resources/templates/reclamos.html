@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quejas y Reclamos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CDN (para maquetación y responsividad) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Sidebar CSS -->
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <!-- Archivo CSS personalizado -->
+    <link rel="stylesheet" th:href="@{/Estilos/reclamos.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Incluir sidebar dinámico -->
+        <div th:replace="~{fragments/sidebar :: sidebar('reclamos')}"></div>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Quejas y Reclamos</div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="container my-5">
+                    <h2 class="titulo-seccion">Quejas y Reclamos</h2>
+                    <p class="subtitulo-seccion">Envía tus inquietudes y nos pondremos en contacto contigo</p>
+
+                    <!-- ---------------- FORMULARIO DE RECLAMO ---------------- -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="form-title">
+                                <i class="bi bi-exclamation-circle text-danger"></i> Formulario de Reclamo
+                            </h5>
+
+                            <form id="formReclamo">
+                                <!-- Categoría -->
+                                <div class="mb-3">
+                                    <label for="categoria" class="form-label">Categoría</label>
+                                    <select class="form-select" id="categoria" required>
+                                        <option value="" selected>Selecciona una categoría</option>
+                                        <option>Atención al Cliente</option>
+                                        <option>Instalaciones y Equipamiento</option>
+                                        <option>Clases y Entrenamientos</option>
+                                        <option>Pagos y Membresías</option>
+                                        <option>Plataforma y Acceso Digital</option>
+                                        <option>Administración y Políticas</option>
+                                        <option>Experiencia General</option>
+                                    </select>
+                                </div>
+
+                                <!-- Asunto -->
+                                <div class="mb-3">
+                                    <label for="asunto" class="form-label">Asunto</label>
+                                    <input type="text" id="asunto" class="form-control" placeholder="Breve descripción del problema" required>
+                                </div>
+
+                                <!-- Descripción detallada -->
+                                <div class="mb-3">
+                                    <label for="descripcion" class="form-label">Descripción Detallada</label>
+                                    <textarea id="descripcion" rows="4" class="form-control" placeholder="Describe tu queja o reclamo en detalle..." required></textarea>
+                                </div>
+
+                                <!-- Prioridad -->
+                                <div class="mb-3">
+                                    <label for="prioridad" class="form-label">Prioridad</label>
+                                    <select class="form-select" id="prioridad">
+                                        <option value="Baja">Baja</option>
+                                        <option value="Normal" selected>Normal</option>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Crítica">Crítica</option>
+                                    </select>
+                                </div>
+
+                                <!-- Mensaje de respuesta -->
+                                <div id="mensajeRespuesta" class="alert" style="display: none;" role="alert"></div>
+
+                                <!-- Botón de envío -->
+                                <button type="submit" class="btn-enviar" id="btnEnviar">Enviar Reclamo</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- ---------------- RECLAMOS ANTERIORES ---------------- -->
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="form-title">Mis Reclamos Anteriores</h5>
+
+                            <div th:if="${reclamos != null and !reclamos.isEmpty()}">
+                                <div th:each="reclamo : ${reclamos}" class="reclamo-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="reclamo-id" th:text="'#' + ${reclamo.id}">#ID</span> - 
+                                        <span th:text="${reclamo.asunto}">Asunto del reclamo</span>
+                                        <div class="fecha-reclamo" th:text="${#temporals.format(reclamo.fechaCreacion, 'dd/MM/yyyy HH:mm')}">Fecha</div>
+                                    </div>
+                                    <span class="estado" 
+                                          th:classappend="${reclamo.estado == 'En proceso'} ? 'estado-proceso' : (${reclamo.estado == 'Resuelto'} ? 'estado-resuelto' : '')"
+                                          th:text="${reclamo.estado}">Estado</span>
+                                </div>
+                            </div>
+
+                            <div th:if="${reclamos == null or reclamos.isEmpty()}" class="text-center text-muted py-3">
+                                <p>No tienes reclamos registrados aún.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Archivo JS -->
+    <script th:src="@{/JavaScript/reclamos.js}"></script>
+    <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>

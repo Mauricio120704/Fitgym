@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Email - FitGym</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+    <link href="/Estilos/registro-styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-2xl w-full">
+            <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                
+                <!-- Resultado Exitoso -->
+                <div th:if="${success}" class="text-center">
+                    <!-- Header con icono de éxito -->
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 p-8">
+                        <div class="inline-block p-4 bg-white rounded-full mb-4">
+                            <i class="fas fa-check-circle text-green-500 text-6xl"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-white mb-2">¡Cuenta Verificada!</h1>
+                        <p class="text-green-100 text-lg">Tu email ha sido confirmado exitosamente</p>
+                    </div>
+
+                    <!-- Contenido -->
+                    <div class="p-8">
+                        <div class="bg-green-50 border-l-4 border-green-500 p-6 mb-6">
+                            <p class="text-green-800 text-lg" th:text="${success}">
+                                ¡Cuenta verificada con éxito! Ya puedes iniciar sesión
+                            </p>
+                        </div>
+
+                        <div class="mb-6">
+                            <p class="text-gray-700 text-lg mb-4">
+                                Tu cuenta ha sido activada correctamente. Ahora puedes acceder a todas las funcionalidades de FitGym.
+                            </p>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-900 mb-2">
+                                    <i class="fas fa-dumbbell mr-2"></i>¿Qué puedes hacer ahora?
+                                </h3>
+                                <ul class="text-left text-blue-800 space-y-2 ml-4">
+                                    <li><i class="fas fa-check mr-2 text-blue-600"></i>Reservar clases grupales</li>
+                                    <li><i class="fas fa-check mr-2 text-blue-600"></i>Consultar tus entrenamientos personalizados</li>
+                                    <li><i class="fas fa-check mr-2 text-blue-600"></i>Ver tu historial de evaluaciones</li>
+                                    <li><i class="fas fa-check mr-2 text-blue-600"></i>Gestionar tu perfil</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <a href="/login" class="inline-flex items-center px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition duration-200 shadow-lg transform hover:scale-105">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Iniciar Sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resultado con Error -->
+                <div th:if="${error}" class="text-center">
+                    <!-- Header con icono de error -->
+                    <div class="bg-gradient-to-r from-red-500 to-red-600 p-8">
+                        <div class="inline-block p-4 bg-white rounded-full mb-4">
+                            <i class="fas fa-exclamation-circle text-red-500 text-6xl"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-white mb-2">Verificación Fallida</h1>
+                        <p class="text-red-100 text-lg">No se pudo verificar tu cuenta</p>
+                    </div>
+
+                    <!-- Contenido -->
+                    <div class="p-8">
+                        <div class="bg-red-50 border-l-4 border-red-500 p-6 mb-6">
+                            <p class="text-red-800 text-lg font-semibold" th:text="${error}">
+                                Token inválido o expirado
+                            </p>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                                <i class="fas fa-question-circle mr-2 text-gray-600"></i>Posibles causas:
+                            </h3>
+                            <ul class="text-left text-gray-700 space-y-2">
+                                <li class="flex items-start">
+                                    <i class="fas fa-times-circle text-red-500 mt-1 mr-3 flex-shrink-0"></i>
+                                    <span>El enlace de verificación ha expirado (válido por 24 horas)</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-times-circle text-red-500 mt-1 mr-3 flex-shrink-0"></i>
+                                    <span>El enlace ya fue utilizado anteriormente</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-times-circle text-red-500 mt-1 mr-3 flex-shrink-0"></i>
+                                    <span>El enlace es inválido o está incompleto</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex items-start">
+                                <i class="fas fa-lightbulb text-yellow-600 mt-1 mr-3"></i>
+                                <div class="text-left">
+                                    <p class="text-yellow-800 font-semibold mb-2">Solución:</p>
+                                    <p class="text-yellow-800">
+                                        Puedes solicitar un nuevo enlace de verificación haciendo clic en el botón de abajo.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="/reenviar-verificacion" class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Reenviar Verificación
+                            </a>
+                            <a href="/registro" class="inline-flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Nuevo Registro
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Link para volver -->
+            <div class="text-center mt-6">
+                <a href="/" class="text-gray-600 hover:text-gray-800 transition duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

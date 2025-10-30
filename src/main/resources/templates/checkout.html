@@ -63,13 +63,13 @@
                             <input type="hidden" name="precio" th:value="${precio}">
                             <div class="mb-3">
                                 <label for="cardName" class="form-label">Nombre del Titular</label>
-                                <input type="text" class="form-control" id="cardName" 
+                                <input type="text" class="form-control" id="cardName" name="nombreTitular"
                                        placeholder="Rocío Cárdenas Quispe Mamani" required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="cardNumber" class="form-label">Número de Tarjeta</label>
-                                <input type="text" class="form-control" id="cardNumber" 
+                                <input type="text" class="form-control" id="cardNumber" name="numeroTarjeta"
                                        placeholder="1234 5678 8702 2243" 
                                        maxlength="19" required>
                             </div>
@@ -77,12 +77,12 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="expiryDate" class="form-label">Fecha de Vencimiento</label>
-                                    <input type="text" class="form-control" id="expiryDate" 
+                                    <input type="text" class="form-control" id="expiryDate" name="fechaExpiracion"
                                            placeholder="MM/AA" maxlength="5" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="cvv" class="form-label">Código CVV</label>
-                                    <input type="text" class="form-control" id="cvv" 
+                                    <input type="text" class="form-control" id="cvv" name="cvv"
                                            placeholder="123" maxlength="3" required>
                                 </div>
                             </div>
