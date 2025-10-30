@@ -44,6 +44,9 @@ public class ClaseViewService {
     long ocupadosPremium = Math.min(ocupados, cuposPremium);
     long ocupadosElite = 0L;
 
+    Long tipoClaseId = (c.getTipoClase() != null) ? c.getTipoClase().getId() : null;
+    String tipoClaseNombre = (c.getTipoClase() != null) ? c.getTipoClase().getNombre() : null;
+
     return new ClaseViewDTO(
             c.getId(),
             c.getNombre(),
@@ -54,7 +57,9 @@ public class ClaseViewService {
             cuposPremium,
             cuposElite,
             ocupadosPremium,
-            ocupadosElite
+            ocupadosElite,
+            tipoClaseId,
+            tipoClaseNombre
     );
     }
 }

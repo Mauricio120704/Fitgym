@@ -177,6 +177,8 @@
                                                         th:data-duracion="${clase.duracion}"
                                                         th:data-cupos-premium="${clase.cuposPremium}"
                                                         th:data-cupos-elite="${clase.cuposElite}"
+                                                        th:data-tipo-id="${clase.tipoClaseId}"
+                                                        th:data-tipo-nombre="${clase.tipoClaseNombre}"
                                                         title="Editar">
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -230,11 +232,6 @@
             <form id="form-nueva-clase" class="p-6 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre de la Clase *</label>
-                        <input type="text" id="clase-nombre" required placeholder="Ej: Yoga Matutino"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    </div>
-                    <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Instructor *</label>
                         <select id="clase-instructor" required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
@@ -244,6 +241,28 @@
                                     th:text="${inst.nombre + ' ' + inst.apellido}">
                             </option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Clase *</label>
+                        <div class="flex gap-2">
+                            <select id="clase-tipo" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option value="">Seleccionar tipo</option>
+                                <option value="nuevo">+ Agregar nuevo tipo</option>
+                                <option th:each="t : ${tiposClase}"
+                                        th:if="${!(#strings.equalsIgnoreCase(t.nombre, 'Otra'))}"
+                                        th:value="${t.id}"
+                                        th:text="${t.nombre}">
+                                </option>
+                            </select>
+                        </div>
+                        <div id="nuevo-tipo-wrapper" class="mt-2 hidden">
+                            <div class="flex gap-2">
+                                <input type="text" id="nuevo-tipo-nombre" placeholder="Nombre del nuevo tipo"
+                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <button type="button" id="crear-tipo-btn" class="px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900">Crear</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -315,6 +334,10 @@
         const modalCancel = document.getElementById('modal-cancel');
         const modalSave = document.getElementById('modal-save');
         const form = document.getElementById('form-nueva-clase');
+        const tipoSelect = document.getElementById('clase-tipo');
+        const nuevoTipoWrapper = document.getElementById('nuevo-tipo-wrapper');
+        const nuevoTipoNombre = document.getElementById('nuevo-tipo-nombre');
+        const crearTipoBtn = document.getElementById('crear-tipo-btn');
         let claseEditandoId = null;
 
         function openModal(editando = false) {
@@ -332,6 +355,12 @@
                 titulo.textContent = 'Configurar Nueva Clase';
                 btnGuardar.textContent = 'Guardar Clase';
             }
+            // Reset de Tipo de clase en apertura de modal
+            if (!editando && tipoSelect) {
+                tipoSelect.value = '';
+                if (nuevoTipoWrapper) { nuevoTipoWrapper.classList.add('hidden'); }
+                if (nuevoTipoNombre) { nuevoTipoNombre.value = ''; }
+            }
         }
 
         function closeModal() {
@@ -345,6 +374,44 @@
         if (btnNuevaClase) btnNuevaClase.addEventListener('click', openModal);
         if (modalClose) modalClose.addEventListener('click', closeModal);
         if (modalCancel) modalCancel.addEventListener('click', closeModal);
+
+        // Manejo de Tipo de Clase
+        if (tipoSelect) {
+            tipoSelect.addEventListener('change', () => {
+                if (tipoSelect.value === 'nuevo') {
+                    nuevoTipoWrapper.classList.remove('hidden');
+                    nuevoTipoNombre.focus();
+                } else {
+                    nuevoTipoWrapper.classList.add('hidden');
+                }
+            });
+        }
+        if (crearTipoBtn) {
+            crearTipoBtn.addEventListener('click', async () => {
+                const nombre = (nuevoTipoNombre?.value || '').trim();
+                if (!nombre) return;
+                try {
+                    const resp = await fetch('/clases/tipos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `nombre=${encodeURIComponent(nombre)}`
+                    });
+                    if (!resp.ok) throw new Error('Error al crear el tipo');
+                    const t = await resp.json();
+                    // Agregar opción y seleccionar
+                    const opt = document.createElement('option');
+                    opt.value = String(t.id);
+                    opt.textContent = t.nombre;
+                    tipoSelect.add(opt);
+                    tipoSelect.value = String(t.id);
+                    nuevoTipoNombre.value = '';
+                    nuevoTipoWrapper.classList.add('hidden');
+                } catch (e) {
+                    console.error(e);
+                    alert('No se pudo crear el tipo de clase');
+                }
+            });
+        }
 
         // Cerrar con ESC
         document.addEventListener('keydown', (e) => {
@@ -372,7 +439,6 @@
                 }
                 
                 const claseData = {
-                    nombre: document.getElementById('clase-nombre').value,
                     instructor: document.getElementById('clase-instructor').value,
                     fecha: document.getElementById('clase-fecha').value,
                     hora: document.getElementById('clase-hora').value,
@@ -381,7 +447,9 @@
                     cuposElite: parseInt(document.getElementById('clase-cupos-elite').value),
                     ocupadosPremium: 0,
                     ocupadosElite: 0,
-                    estado: 'ACTIVA'
+                    estado: 'ACTIVA',
+                    tipoClaseId: (tipoSelect && tipoSelect.value && tipoSelect.value !== 'nuevo') ? parseInt(tipoSelect.value) : null,
+                    tipoClaseNombre: (tipoSelect && tipoSelect.value === 'nuevo') ? (nuevoTipoNombre?.value || '').trim() : undefined
                 };
 
                 // Determinar si es crear o actualizar
@@ -415,7 +483,6 @@
                 claseEditandoId = btn.dataset.id;
                 
                 // Llenar el formulario con los datos
-                document.getElementById('clase-nombre').value = btn.dataset.nombre;
                 (function() {
                     const sel = document.getElementById('clase-instructor');
                     const value = btn.dataset.instructor || '';
@@ -437,6 +504,13 @@
                 document.getElementById('clase-duracion').value = btn.dataset.duracion;
                 document.getElementById('clase-cupos-premium').value = btn.dataset.cuposPremium;
                 document.getElementById('clase-cupos-elite').value = btn.dataset.cuposElite;
+                // Preseleccionar tipo de clase
+                if (tipoSelect) {
+                    const tid = btn.dataset.tipoId || '';
+                    if (tid) {
+                        tipoSelect.value = String(tid);
+                    }
+                }
                 
                 openModal(true);
             }

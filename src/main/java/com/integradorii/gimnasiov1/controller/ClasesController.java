@@ -2,8 +2,10 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.dto.ClaseViewDTO;
 import com.integradorii.gimnasiov1.model.Clase;
+import com.integradorii.gimnasiov1.model.TipoClase;
 import com.integradorii.gimnasiov1.model.Usuario;
 import com.integradorii.gimnasiov1.repository.ClaseRepository;
+import com.integradorii.gimnasiov1.repository.TipoClaseRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
 import com.integradorii.gimnasiov1.service.ClaseViewService;
@@ -28,15 +30,18 @@ public class ClasesController {
     private final ReservaClaseRepository reservaClaseRepository;
     private final UsuarioRepository usuarioRepository;
     private final ClaseViewService claseViewService;
+    private final TipoClaseRepository tipoClaseRepository;
 
     public ClasesController(ClaseRepository claseRepository,
                             ReservaClaseRepository reservaClaseRepository,
                             UsuarioRepository usuarioRepository,
-                            ClaseViewService claseViewService) {
+                            ClaseViewService claseViewService,
+                            TipoClaseRepository tipoClaseRepository) {
         this.claseRepository = claseRepository;
         this.reservaClaseRepository = reservaClaseRepository;
         this.usuarioRepository = usuarioRepository;
         this.claseViewService = claseViewService;
+        this.tipoClaseRepository = tipoClaseRepository;
     }
 
     /**
@@ -142,6 +147,8 @@ public class ClasesController {
             instructores.sort(Comparator.comparing(Usuario::getNombre).thenComparing(Usuario::getApellido));
         }
         model.addAttribute("instructores", instructores);
+        // Pasar tipos de clase activos para el selector
+        model.addAttribute("tiposClase", tipoClaseRepository.findByActivoTrueOrderByNombreAsc());
         return "clases";
     }
 
@@ -185,10 +192,34 @@ public class ClasesController {
 
     // Mapea datos del JSON al objeto Clase
 private void applyFromBody(Clase c, Map<String, Object> body) {
-    c.setNombre(String.valueOf(body.getOrDefault("nombre", "")));
     c.setDescripcion(null);
     c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
     c.setCapacidad(parseInt(body.get("cuposPremium"), 0) + parseInt(body.get("cuposElite"), 0));
+    // Tipo de clase (obligatorio en BD)
+    Long tipoId = null;
+    try { Object t = body.get("tipoClaseId"); if (t != null) tipoId = Long.parseLong(String.valueOf(t)); } catch (Exception ignored) {}
+    TipoClase tipo = null;
+    if (tipoId != null) {
+        tipo = tipoClaseRepository.findById(tipoId).orElse(null);
+    }
+    if (tipo == null) {
+        // fallback: si viene nombre de tipo nuevo
+        String tipoNombre = String.valueOf(body.getOrDefault("tipoClaseNombre", "")).trim();
+        if (!tipoNombre.isBlank()) {
+            tipo = tipoClaseRepository.findByNombreIgnoreCase(tipoNombre).orElseGet(() -> {
+                TipoClase nt = new TipoClase();
+                nt.setNombre(tipoNombre);
+                nt.setActivo(true);
+                return tipoClaseRepository.save(nt);
+            });
+        }
+    }
+    if (tipo == null) {
+        throw new IllegalArgumentException("Tipo de clase requerido");
+    }
+    c.setTipoClase(tipo);
+    // El nombre de la clase se deriva del tipo seleccionado
+    c.setNombre(tipo.getNombre());
     
     String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
     String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
