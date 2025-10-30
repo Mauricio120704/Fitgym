@@ -29,40 +29,42 @@
                 </div>
 
 
-                <form action="/registro" method="post" th:object="${usuario}">
+                <form id="registroForm" action="/registro" method="post" th:object="${usuario}" novalidate>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="firstName" class="form-label">Nombre</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
-                                <input type="text" class="form-control" id="firstName" name="nombre" placeholder="Tu nombre" required th:value="${nombre}">
+                                <input type="text" class="form-control" id="firstName" name="nombre" placeholder="Tu nombre" th:value="${nombre}">
                             </div>
+                            <div id="nombreError" class="text-red-500 text-sm mt-1 hidden">El nombre es obligatorio</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lastName" class="form-label">Apellido</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
-                                <input type="text" class="form-control" id="lastName" name="apellido" placeholder="Tu apellido" required th:value="${apellido}">
+                                <input type="text" class="form-control" id="lastName" name="apellido" placeholder="Tu apellido" th:value="${apellido}">
                             </div>
+                            <div id="apellidoError" class="text-red-500 text-sm mt-1 hidden">El apellido es obligatorio</div>
                         </div>
                     </div>
-
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <div class="input-group">
-                             <span class="input-group-text"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="tu@email.com" required th:value="${email}">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="tu@email.com" th:value="${email}">
                         </div>
+                        <div id="emailError" class="text-red-500 text-sm mt-1 hidden">El correo electrónico es obligatorio y debe ser válido</div>
                     </div>
-
 
                     <div class="mb-3">
                         <label for="dni" class="form-label">DNI</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-id-card" aria-hidden="true"></i></span>
-                            <input type="text" class="form-control" id="dni" name="dni" placeholder="DNI" required minlength="6" th:value="${dni}">
+                            <input type="text" class="form-control" id="dni" name="dni" placeholder="DNI" minlength="6" th:value="${dni}">
                         </div>
+                        <div id="dniError" class="text-red-500 text-sm mt-1 hidden">El DNI es obligatorio y debe tener al menos 6 caracteres</div>
                     </div>
 
                     <div class="mb-3">
@@ -73,27 +75,28 @@
                         </div>
                     </div>
 
-
                     <div class="mb-3">
                         <label for="password" class="form-label">Contraseña</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Mínimo 6 caracteres" minlength="6">
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
                                 <i class="fas fa-eye-slash"></i>
                             </button>
                         </div>
+                        <div id="passwordError" class="text-red-500 text-sm mt-1 hidden">La contraseña es obligatoria y debe tener al menos 6 caracteres</div>
                     </div>
 
                     <div class="mb-4">
                         <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña" required minlength="6">
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Repite tu contraseña">
                             <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
                                 <i class="fas fa-eye-slash"></i>
                             </button>
                         </div>
+                        <div id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden">Las contraseñas no coinciden</div>
                     </div>
 
 
@@ -135,27 +138,85 @@
             }
         }
 
+        // Función para mostrar u ocultar mensajes de error
+        function setError(elementId, message, show) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                if (show) {
+                    errorElement.textContent = message;
+                    errorElement.classList.remove('hidden');
+                } else {
+                    errorElement.classList.add('hidden');
+                }
+            }
+        }
+
+        // Validar un campo individual
+        function validateField(input, errorId, errorMessage, minLength = 0) {
+            const value = input.value.trim();
+            const isValid = value.length >= minLength;
+            
+            if (input.type === 'email') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                setError(errorId, errorMessage, !emailRegex.test(value) && value.length > 0);
+                return emailRegex.test(value);
+            }
+            
+            setError(errorId, errorMessage, !isValid && value.length > 0);
+            return isValid;
+        }
+
+        // Validar confirmación de contraseña
+        function validatePasswordConfirmation() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const passwordsMatch = password.value === confirmPassword.value;
+            
+            setError('confirmPasswordError', 'Las contraseñas no coinciden', !passwordsMatch && confirmPassword.value.length > 0);
+            return passwordsMatch;
+        }
+
         // Inicializar cuando el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar el toggle de visibilidad para ambos campos de contraseña
             togglePasswordVisibility('password', 'togglePassword');
             togglePasswordVisibility('confirmPassword', 'toggleConfirmPassword');
             
-            // Validación de coincidencia de contraseñas
+            // Elementos del formulario
+            const form = document.getElementById('registroForm');
+            const nombre = document.getElementById('firstName');
+            const apellido = document.getElementById('lastName');
+            const email = document.getElementById('email');
+            const dni = document.getElementById('dni');
             const password = document.getElementById('password');
             const confirmPassword = document.getElementById('confirmPassword');
             
-            if (password && confirmPassword) {
-                function validatePassword() {
-                    if (password.value !== confirmPassword.value) {
-                        confirmPassword.setCustomValidity('Las contraseñas no coinciden');
-                    } else {
-                        confirmPassword.setCustomValidity('');
+            // Validar campos al perder el foco
+            if (nombre) nombre.addEventListener('blur', () => validateField(nombre, 'nombreError', 'El nombre es obligatorio', 1));
+            if (apellido) apellido.addEventListener('blur', () => validateField(apellido, 'apellidoError', 'El apellido es obligatorio', 1));
+            if (email) email.addEventListener('blur', () => validateField(email, 'emailError', 'Ingresa un correo electrónico válido'));
+            if (dni) dni.addEventListener('blur', () => validateField(dni, 'dniError', 'El DNI debe tener al menos 6 caracteres', 6));
+            if (password) password.addEventListener('blur', () => validateField(password, 'passwordError', 'La contraseña debe tener al menos 6 caracteres', 6));
+            if (confirmPassword) confirmPassword.addEventListener('input', validatePasswordConfirmation);
+            
+            // Validar formulario al enviar
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    let isValid = true;
+                    
+                    // Validar campos obligatorios
+                    if (nombre && !validateField(nombre, 'nombreError', 'El nombre es obligatorio', 1)) isValid = false;
+                    if (apellido && !validateField(apellido, 'apellidoError', 'El apellido es obligatorio', 1)) isValid = false;
+                    if (email && !validateField(email, 'emailError', 'Ingresa un correo electrónico válido')) isValid = false;
+                    if (dni && !validateField(dni, 'dniError', 'El DNI debe tener al menos 6 caracteres', 6)) isValid = false;
+                    if (password && !validateField(password, 'passwordError', 'La contraseña debe tener al menos 6 caracteres', 6)) isValid = false;
+                    if (confirmPassword && !validatePasswordConfirmation()) isValid = false;
+                    
+                    if (!isValid) {
+                        event.preventDefault();
+                        event.stopPropagation();
                     }
-                }
-                
-                password.addEventListener('change', validatePassword);
-                confirmPassword.addEventListener('keyup', validatePassword);
+                });
             }
         });
     </script>

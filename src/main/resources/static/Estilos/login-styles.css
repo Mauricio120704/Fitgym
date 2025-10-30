@@ -87,8 +87,13 @@ body {
 }
 
 .invalid-feedback {
-    display: block;
+    display: none;
     margin-top: 5px;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback,
+.form-control.is-invalid ~ .invalid-feedback {
+    display: block;
 }
 
 .alert {
