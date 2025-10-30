@@ -184,36 +184,52 @@ public class ClasesController {
     }
 
     // Mapea datos del JSON al objeto Clase
-    private void applyFromBody(Clase c, Map<String, Object> body) {
-        c.setNombre(String.valueOf(body.getOrDefault("nombre", "")));
-        c.setDescripcion(null);
-        c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
-        c.setCapacidad(parseInt(body.get("cuposPremium"), 0) + parseInt(body.get("cuposElite"), 0));
-        String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
-        String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
-        if (!fechaStr.isBlank()) {
+private void applyFromBody(Clase c, Map<String, Object> body) {
+    c.setNombre(String.valueOf(body.getOrDefault("nombre", "")));
+    c.setDescripcion(null);
+    c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
+    c.setCapacidad(parseInt(body.get("cuposPremium"), 0) + parseInt(body.get("cuposElite"), 0));
+    
+    String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
+    String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
+    
+    if (!fechaStr.isBlank()) {
+        try {
+            // Parsear fecha y hora en la zona horaria local
             LocalDate ld = LocalDate.parse(fechaStr);
-            LocalTime lt = horaStr.isBlank() ? LocalTime.of(0,0) : LocalTime.parse(horaStr);
+            LocalTime lt = horaStr.isBlank() ? LocalTime.of(0, 0) : LocalTime.parse(horaStr);
+            
+            // Crear OffsetDateTime usando la zona horaria del sistema
             ZoneId zone = ZoneId.systemDefault();
-            OffsetDateTime odt = ld.atTime(lt).atZone(zone).toOffsetDateTime();
+            ZonedDateTime zdt = ZonedDateTime.of(ld, lt, zone);
+            OffsetDateTime odt = zdt.toOffsetDateTime();
+            
             c.setFecha(odt);
-        }
-        c.setEstado("Programada");
-        // Buscar entrenador por nombre y apellido en tabla usuarios
-        String instructor = String.valueOf(body.getOrDefault("instructor", ""));
-        if (!instructor.isBlank()) {
-            String[] parts = instructor.trim().split(" ", 2);
-            String nombre = parts[0];
-            String apellido = parts.length > 1 ? parts[1] : "";
-            // Buscar en tabla usuarios (rol ENTRENADOR)
-            Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
-                    .filter(u -> u.getNombre().equalsIgnoreCase(nombre) && (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
-                    .findFirst().orElse(null);
-            c.setEntrenador(entren);
-        } else {
-            c.setEntrenador(null);
+            System.out.println("Hora guardada (UTC): " + odt);
+            System.out.println("Hora local: " + zdt);
+        } catch (Exception e) {
+            System.err.println("Error al parsear fecha/hora: " + e.getMessage());
         }
     }
+    
+    c.setEstado("Programada");
+    
+    // Buscar entrenador por nombre y apellido en tabla usuarios
+    String instructor = String.valueOf(body.getOrDefault("instructor", ""));
+    if (!instructor.isBlank()) {
+        String[] parts = instructor.trim().split(" ", 2);
+        String nombre = parts[0];
+        String apellido = parts.length > 1 ? parts[1] : "";
+        // Buscar en tabla usuarios (rol ENTRENADOR)
+        Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
+                .filter(u -> u.getNombre().equalsIgnoreCase(nombre) && 
+                            (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
+                .findFirst().orElse(null);
+        c.setEntrenador(entren);
+    } else {
+        c.setEntrenador(null);
+    }
+}
 
     // Convierte Object a int con valor por defecto
     private int parseInt(Object v, int def) {

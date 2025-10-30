@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 public class ClaseViewService {
@@ -18,32 +20,41 @@ public class ClaseViewService {
     }
 
     public ClaseViewDTO toView(Clase c) {
-        String instructor = c.getEntrenador() != null
-                ? ((c.getEntrenador().getNombre() == null ? "" : c.getEntrenador().getNombre()) +
-                   (c.getEntrenador().getApellido() == null ? "" : (" " + c.getEntrenador().getApellido()))).trim()
-                : "";
+    String instructor = c.getEntrenador() != null
+            ? ((c.getEntrenador().getNombre() == null ? "" : c.getEntrenador().getNombre()) +
+               (c.getEntrenador().getApellido() == null ? "" : (" " + c.getEntrenador().getApellido()))).trim()
+            : "";
 
-        LocalDate fecha = c.getFecha() != null ? c.getFecha().toLocalDate() : null;
-        LocalTime hora = c.getFecha() != null ? c.getFecha().toLocalTime() : null;
+    // Convertir la fecha a la zona horaria del sistema
+    LocalDate fecha = null;
+    LocalTime hora = null;
+    
+    if (c.getFecha() != null) {
+        // Convertir a la zona horaria del sistema
+        ZonedDateTime zdt = c.getFecha().atZoneSameInstant(ZoneId.systemDefault());
+        fecha = zdt.toLocalDate();
+        hora = zdt.toLocalTime();
+        System.out.println("Hora convertida en toView: " + zdt);
+    }
 
-        int cuposPremium = c.getCapacidad();
-        int cuposElite = 0; // Por ahora UI separa pero BD no; mantenemos 0 para Elite
+    int cuposPremium = c.getCapacidad();
+    int cuposElite = 0;
 
-        long ocupados = c.getId() == null ? 0 : reservaClaseRepository.countOcupados(c.getId());
-        long ocupadosPremium = Math.min(ocupados, cuposPremium);
-        long ocupadosElite = 0;
+    long ocupados = c.getId() == null ? 0 : reservaClaseRepository.countOcupados(c.getId());
+    long ocupadosPremium = Math.min(ocupados, cuposPremium);
+    long ocupadosElite = 0L;
 
-        return new ClaseViewDTO(
-                c.getId(),
-                c.getNombre(),
-                instructor,
-                fecha,
-                hora,
-                c.getDuracionMinutos(),
-                cuposPremium,
-                cuposElite,
-                ocupadosPremium,
-                ocupadosElite
-        );
+    return new ClaseViewDTO(
+            c.getId(),
+            c.getNombre(),
+            instructor,
+            fecha,
+            hora,
+            c.getDuracionMinutos(),
+            cuposPremium,
+            cuposElite,
+            ocupadosPremium,
+            ocupadosElite
+    );
     }
 }
