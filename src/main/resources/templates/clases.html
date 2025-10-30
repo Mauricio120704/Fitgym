@@ -239,10 +239,10 @@
                         <select id="clase-instructor" required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                             <option value="">Seleccionar instructor</option>
-                            <option value="Ana García">Ana García</option>
-                            <option value="Carlos López">Carlos López</option>
-                            <option value="María Rodríguez">María Rodríguez</option>
-                            <option value="Pedro Martín">Pedro Martín</option>
+                            <option th:each="inst : ${instructores}"
+                                    th:value="${inst.nombre + ' ' + inst.apellido}"
+                                    th:text="${inst.nombre + ' ' + inst.apellido}">
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -416,7 +416,22 @@
                 
                 // Llenar el formulario con los datos
                 document.getElementById('clase-nombre').value = btn.dataset.nombre;
-                document.getElementById('clase-instructor').value = btn.dataset.instructor;
+                (function() {
+                    const sel = document.getElementById('clase-instructor');
+                    const value = btn.dataset.instructor || '';
+                    if (sel) {
+                        let exists = false;
+                        for (let i = 0; i < sel.options.length; i++) {
+                            if (sel.options[i].value === value) { exists = true; break; }
+                        }
+                        if (!exists && value) {
+                            const opt = new Option(value, value, true, true);
+                            sel.add(opt);
+                        } else {
+                            sel.value = value;
+                        }
+                    }
+                })();
                 document.getElementById('clase-fecha').value = btn.dataset.fecha;
                 document.getElementById('clase-hora').value = btn.dataset.hora;
                 document.getElementById('clase-duracion').value = btn.dataset.duracion;

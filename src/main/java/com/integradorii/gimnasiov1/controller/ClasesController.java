@@ -136,6 +136,12 @@ public class ClasesController {
             model.addAttribute("siguienteSemana", hoy.plusWeeks(1));
             model.addAttribute("semanaAnterior", hoy.minusWeeks(1));
         }
+        // Pasar instructores activos (rol ENTRENADOR) para poblar el selector en el modal
+        List<Usuario> instructores = usuarioRepository.findActiveEntrenadores();
+        if (instructores != null) {
+            instructores.sort(Comparator.comparing(Usuario::getNombre).thenComparing(Usuario::getApellido));
+        }
+        model.addAttribute("instructores", instructores);
         return "clases";
     }
 
