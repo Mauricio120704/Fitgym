@@ -1,5 +1,7 @@
 # 🏋️ Sistema de Gestión de Gimnasio
 
+Repositorio Fitgym del proyecto Integrador II 2025.
+
 Sistema web completo para la gestión de miembros y pagos de un gimnasio, desarrollado con Spring Boot y diseño moderno con Tailwind CSS.
 
 ## 📋 Características
