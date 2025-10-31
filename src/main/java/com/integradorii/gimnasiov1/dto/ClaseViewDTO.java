@@ -14,12 +14,15 @@ public class ClaseViewDTO {
     private Integer cuposElite;
     private Long ocupadosPremium;
     private Long ocupadosElite;
+    private Long tipoClaseId;
+    private String tipoClaseNombre;
 
     public ClaseViewDTO() {}
 
     public ClaseViewDTO(Long id, String nombre, String instructor, LocalDate fecha, LocalTime hora,
                          Integer duracion, Integer cuposPremium, Integer cuposElite,
-                         Long ocupadosPremium, Long ocupadosElite) {
+                         Long ocupadosPremium, Long ocupadosElite,
+                         Long tipoClaseId, String tipoClaseNombre) {
         this.id = id;
         this.nombre = nombre;
         this.instructor = instructor;
@@ -30,6 +33,8 @@ public class ClaseViewDTO {
         this.cuposElite = cuposElite;
         this.ocupadosPremium = ocupadosPremium;
         this.ocupadosElite = ocupadosElite;
+        this.tipoClaseId = tipoClaseId;
+        this.tipoClaseNombre = tipoClaseNombre;
     }
 
     public Long getId() { return id; }
@@ -52,4 +57,8 @@ public class ClaseViewDTO {
     public void setOcupadosPremium(Long ocupadosPremium) { this.ocupadosPremium = ocupadosPremium; }
     public Long getOcupadosElite() { return ocupadosElite; }
     public void setOcupadosElite(Long ocupadosElite) { this.ocupadosElite = ocupadosElite; }
+    public Long getTipoClaseId() { return tipoClaseId; }
+    public void setTipoClaseId(Long tipoClaseId) { this.tipoClaseId = tipoClaseId; }
+    public String getTipoClaseNombre() { return tipoClaseNombre; }
+    public void setTipoClaseNombre(String tipoClaseNombre) { this.tipoClaseNombre = tipoClaseNombre; }
 }

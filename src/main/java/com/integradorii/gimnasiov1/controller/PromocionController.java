@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -38,11 +39,13 @@ public class PromocionController {
      * Separa activas/expiradas de inactivas
      */
     @GetMapping("/promociones")
-    public String listarPromociones(@RequestParam(name = "q", required = false) String q, Model model) {
+    public String listarPromociones(@RequestParam(name = "q", required = false) String q,
+                                    @RequestParam(name = "estado", required = false) String estado,
+                                    Model model) {
         List<Promocion> activasYExpiradas;
         List<Promocion> inactivas;
         if (q != null && q.isBlank()) {
-            return "redirect:/promociones";
+            q = null; // Tratar búsqueda vacía como no aplicada para no perder el filtro de estado
         }
         if (q != null) {
             List<Promocion> filtradas = promocionRepository
@@ -61,8 +64,39 @@ public class PromocionController {
             );
             inactivas = promocionRepository.findByEstado(Promocion.Estado.INACTIVE);
         }
+
+        // Filtro por estado (ACTIVE, INACTIVE, EXPIRED)
+        if (estado != null && !estado.isBlank()) {
+            try {
+                Promocion.Estado estadoEnum = Promocion.Estado.valueOf(estado);
+                if (estadoEnum == Promocion.Estado.INACTIVE) {
+                    // Solo inactivas
+                    activasYExpiradas = Collections.emptyList();
+                    inactivas = inactivas.stream()
+                            .filter(p -> p.getEstado() == Promocion.Estado.INACTIVE)
+                            .collect(Collectors.toList());
+                } else {
+                    // Solo ACTIVE o EXPIRED en la lista de activas/expiradas
+                    inactivas = Collections.emptyList();
+                    Promocion.Estado finalEstado = estadoEnum;
+                    activasYExpiradas = activasYExpiradas.stream()
+                            .filter(p -> p.getEstado() == finalEstado)
+                            .collect(Collectors.toList());
+                }
+                model.addAttribute("estadoFiltro", estadoEnum.name());
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("estadoFiltro", "");
+            }
+        } else {
+            model.addAttribute("estadoFiltro", "");
+        }
+
         model.addAttribute("activas", activasYExpiradas);
         model.addAttribute("inactivas", inactivas);
+        
+        // Agregar la lista de estados al modelo
+        model.addAttribute("todosEstados", Promocion.Estado.values());
+        
         return "promociones";
     }
 

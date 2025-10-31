@@ -20,6 +20,10 @@ public class Clase {
     @JoinColumn(name = "entrenador_id")
     private Usuario entrenador;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_clase_id", nullable = false)
+    private TipoClase tipoClase;
+
     @Column(nullable = false)
     private Integer capacidad;
 
@@ -40,6 +44,8 @@ public class Clase {
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     public Usuario getEntrenador() { return entrenador; }
     public void setEntrenador(Usuario entrenador) { this.entrenador = entrenador; }
+    public TipoClase getTipoClase() { return tipoClase; }
+    public void setTipoClase(TipoClase tipoClase) { this.tipoClase = tipoClase; }
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
     public OffsetDateTime getFecha() { return fecha; }

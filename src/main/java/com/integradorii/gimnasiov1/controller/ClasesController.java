@@ -2,8 +2,10 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.dto.ClaseViewDTO;
 import com.integradorii.gimnasiov1.model.Clase;
+import com.integradorii.gimnasiov1.model.TipoClase;
 import com.integradorii.gimnasiov1.model.Usuario;
 import com.integradorii.gimnasiov1.repository.ClaseRepository;
+import com.integradorii.gimnasiov1.repository.TipoClaseRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
 import com.integradorii.gimnasiov1.service.ClaseViewService;
@@ -28,15 +30,18 @@ public class ClasesController {
     private final ReservaClaseRepository reservaClaseRepository;
     private final UsuarioRepository usuarioRepository;
     private final ClaseViewService claseViewService;
+    private final TipoClaseRepository tipoClaseRepository;
 
     public ClasesController(ClaseRepository claseRepository,
                             ReservaClaseRepository reservaClaseRepository,
                             UsuarioRepository usuarioRepository,
-                            ClaseViewService claseViewService) {
+                            ClaseViewService claseViewService,
+                            TipoClaseRepository tipoClaseRepository) {
         this.claseRepository = claseRepository;
         this.reservaClaseRepository = reservaClaseRepository;
         this.usuarioRepository = usuarioRepository;
         this.claseViewService = claseViewService;
+        this.tipoClaseRepository = tipoClaseRepository;
     }
 
     /**
@@ -136,6 +141,14 @@ public class ClasesController {
             model.addAttribute("siguienteSemana", hoy.plusWeeks(1));
             model.addAttribute("semanaAnterior", hoy.minusWeeks(1));
         }
+        // Pasar instructores activos (rol ENTRENADOR) para poblar el selector en el modal
+        List<Usuario> instructores = usuarioRepository.findActiveEntrenadores();
+        if (instructores != null) {
+            instructores.sort(Comparator.comparing(Usuario::getNombre).thenComparing(Usuario::getApellido));
+        }
+        model.addAttribute("instructores", instructores);
+        // Pasar tipos de clase activos para el selector
+        model.addAttribute("tiposClase", tipoClaseRepository.findByActivoTrueOrderByNombreAsc());
         return "clases";
     }
 
@@ -178,36 +191,76 @@ public class ClasesController {
     }
 
     // Mapea datos del JSON al objeto Clase
-    private void applyFromBody(Clase c, Map<String, Object> body) {
-        c.setNombre(String.valueOf(body.getOrDefault("nombre", "")));
-        c.setDescripcion(null);
-        c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
-        c.setCapacidad(parseInt(body.get("cuposPremium"), 0) + parseInt(body.get("cuposElite"), 0));
-        String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
-        String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
-        if (!fechaStr.isBlank()) {
-            LocalDate ld = LocalDate.parse(fechaStr);
-            LocalTime lt = horaStr.isBlank() ? LocalTime.of(0,0) : LocalTime.parse(horaStr);
-            ZoneId zone = ZoneId.systemDefault();
-            OffsetDateTime odt = ld.atTime(lt).atZone(zone).toOffsetDateTime();
-            c.setFecha(odt);
-        }
-        c.setEstado("Programada");
-        // Buscar entrenador por nombre y apellido en tabla usuarios
-        String instructor = String.valueOf(body.getOrDefault("instructor", ""));
-        if (!instructor.isBlank()) {
-            String[] parts = instructor.trim().split(" ", 2);
-            String nombre = parts[0];
-            String apellido = parts.length > 1 ? parts[1] : "";
-            // Buscar en tabla usuarios (rol ENTRENADOR)
-            Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
-                    .filter(u -> u.getNombre().equalsIgnoreCase(nombre) && (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
-                    .findFirst().orElse(null);
-            c.setEntrenador(entren);
-        } else {
-            c.setEntrenador(null);
+private void applyFromBody(Clase c, Map<String, Object> body) {
+    c.setDescripcion(null);
+    c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
+    c.setCapacidad(parseInt(body.get("cuposPremium"), 0) + parseInt(body.get("cuposElite"), 0));
+    // Tipo de clase (obligatorio en BD)
+    Long tipoId = null;
+    try { Object t = body.get("tipoClaseId"); if (t != null) tipoId = Long.parseLong(String.valueOf(t)); } catch (Exception ignored) {}
+    TipoClase tipo = null;
+    if (tipoId != null) {
+        tipo = tipoClaseRepository.findById(tipoId).orElse(null);
+    }
+    if (tipo == null) {
+        // fallback: si viene nombre de tipo nuevo
+        String tipoNombre = String.valueOf(body.getOrDefault("tipoClaseNombre", "")).trim();
+        if (!tipoNombre.isBlank()) {
+            tipo = tipoClaseRepository.findByNombreIgnoreCase(tipoNombre).orElseGet(() -> {
+                TipoClase nt = new TipoClase();
+                nt.setNombre(tipoNombre);
+                nt.setActivo(true);
+                return tipoClaseRepository.save(nt);
+            });
         }
     }
+    if (tipo == null) {
+        throw new IllegalArgumentException("Tipo de clase requerido");
+    }
+    c.setTipoClase(tipo);
+    // El nombre de la clase se deriva del tipo seleccionado
+    c.setNombre(tipo.getNombre());
+    
+    String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
+    String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
+    
+    if (!fechaStr.isBlank()) {
+        try {
+            // Parsear fecha y hora en la zona horaria local
+            LocalDate ld = LocalDate.parse(fechaStr);
+            LocalTime lt = horaStr.isBlank() ? LocalTime.of(0, 0) : LocalTime.parse(horaStr);
+            
+            // Crear OffsetDateTime usando la zona horaria del sistema
+            ZoneId zone = ZoneId.systemDefault();
+            ZonedDateTime zdt = ZonedDateTime.of(ld, lt, zone);
+            OffsetDateTime odt = zdt.toOffsetDateTime();
+            
+            c.setFecha(odt);
+            System.out.println("Hora guardada (UTC): " + odt);
+            System.out.println("Hora local: " + zdt);
+        } catch (Exception e) {
+            System.err.println("Error al parsear fecha/hora: " + e.getMessage());
+        }
+    }
+    
+    c.setEstado("Programada");
+    
+    // Buscar entrenador por nombre y apellido en tabla usuarios
+    String instructor = String.valueOf(body.getOrDefault("instructor", ""));
+    if (!instructor.isBlank()) {
+        String[] parts = instructor.trim().split(" ", 2);
+        String nombre = parts[0];
+        String apellido = parts.length > 1 ? parts[1] : "";
+        // Buscar en tabla usuarios (rol ENTRENADOR)
+        Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
+                .filter(u -> u.getNombre().equalsIgnoreCase(nombre) && 
+                            (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
+                .findFirst().orElse(null);
+        c.setEntrenador(entren);
+    } else {
+        c.setEntrenador(null);
+    }
+}
 
     // Convierte Object a int con valor por defecto
     private int parseInt(Object v, int def) {

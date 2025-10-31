@@ -242,11 +242,11 @@
                 
                 <!-- Selector de Estado -->
                 <div style="position: relative; min-width: 180px; flex-shrink: 0;">
-                    <select name="estado" class="form-select" style="width: 100%; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 9999px; border: 1px solid #d1d5db; background-color: #fff; font-size: 0.875rem; line-height: 1.25rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%236b7280%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px 12px; cursor: pointer;">
-                        <option value="">Todos los estados</option>
+                    <select name="estado" class="form-select" onchange="this.form.submit()" style="width: 100%; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 9999px; border: 1px solid #d1d5db; background-color: #fff; font-size: 0.875rem; line-height: 1.25rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%236b7280%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px 12px; cursor: pointer;">
+                        <option value="" th:selected="${estadoFiltro == null or estadoFiltro == ''}">Todos los estados</option>
                         <option th:each="estado : ${todosEstados}" 
                                 th:value="${estado.name()}"
-                                th:text="${estado.nombre}"
+                                th:text="${estado.name() == 'ACTIVE' ? 'Activa' : (estado.name() == 'INACTIVE' ? 'Inactiva' : 'Expirada')}"
                                 th:selected="${estadoFiltro != null && estadoFiltro == estado.name()}">
                         </option>
                     </select>
