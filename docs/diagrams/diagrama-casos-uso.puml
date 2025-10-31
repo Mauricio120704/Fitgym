@@ -1,0 +1,94 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+
+actor "Administrador" as Admin
+actor "Recepcionista" as Recep
+actor "Entrenador" as Coach
+actor "Miembro/Deportista" as Member
+
+rectangle "Sistema Gimnasio FitGym" {
+  package "Autenticación y Perfil" {
+    usecase "Iniciar sesión" as UC_Login
+    usecase "Gestionar perfil personal" as UC_Perfil
+  }
+  package "Gestión de Clientes y Operaciones" {
+    usecase "Gestionar miembros" as UC_Miembros
+    usecase "Gestionar incidencias" as UC_Incidencias
+    usecase "Gestionar clases" as UC_Clases
+    usecase "Consultar pagos y suscripciones" as UC_Pagos
+    usecase "Controlar asistencia" as UC_Asistencia
+    usecase "Gestionar lockers" as UC_Lockers
+    usecase "Monitorear capacidad" as UC_Monitoreo
+    usecase "Consultar dashboard operativo" as UC_Dashboard
+  }
+  package "Módulo Invitados" {
+    usecase "Buscar miembro para invitado" as UC_BuscarMiembro
+    usecase "Registrar invitado" as UC_RegistrarInvitado
+    usecase "Consultar invitados de miembro" as UC_ConsultarInvitados
+    usecase "Registrar salida de invitado" as UC_SalidaInvitado
+  }
+  package "Experiencia del Miembro" {
+    usecase "Reservar clases" as UC_Reservas
+    usecase "Consultar entrenamientos asignados" as UC_Entrenamientos
+    usecase "Consultar evaluaciones físicas" as UC_Evaluaciones
+    usecase "Registrar reclamo" as UC_Reclamos
+  }
+  package "Experiencia del Entrenador" {
+    usecase "Gestionar planes de entrenamiento" as UC_GestionEntrenamientos
+    usecase "Registrar evaluaciones físicas" as UC_GestionEvaluaciones
+    usecase "Consultar miembros asignados" as UC_MiembrosAsignados
+  }
+}
+
+Member --> UC_Login
+Member --> UC_Perfil
+Member --> UC_Reservas
+Member --> UC_Entrenamientos
+Member --> UC_Evaluaciones
+Member --> UC_Reclamos
+
+Admin --> UC_Login
+Admin --> UC_Miembros
+Admin --> UC_Incidencias
+Admin --> UC_Clases
+Admin --> UC_Pagos
+Admin --> UC_Asistencia
+Admin --> UC_Lockers
+Admin --> UC_Monitoreo
+Admin --> UC_Dashboard
+Admin --> UC_BuscarMiembro
+Admin --> UC_RegistrarInvitado
+Admin --> UC_ConsultarInvitados
+Admin --> UC_SalidaInvitado
+Admin --> UC_GestionEntrenamientos
+Admin --> UC_GestionEvaluaciones
+Admin --> UC_MiembrosAsignados
+
+Recep --> UC_Login
+Recep --> UC_Miembros
+Recep --> UC_Incidencias
+Recep --> UC_Clases
+Recep --> UC_Pagos
+Recep --> UC_Asistencia
+Recep --> UC_Lockers
+Recep --> UC_Monitoreo
+Recep --> UC_Dashboard
+Recep --> UC_BuscarMiembro
+Recep --> UC_RegistrarInvitado
+Recep --> UC_ConsultarInvitados
+Recep --> UC_SalidaInvitado
+
+Coach --> UC_Login
+Coach --> UC_Miembros
+Coach --> UC_Clases
+Coach --> UC_Pagos
+Coach --> UC_Dashboard
+Coach --> UC_GestionEntrenamientos
+Coach --> UC_GestionEvaluaciones
+Coach --> UC_MiembrosAsignados
+
+UC_RegistrarInvitado .> UC_BuscarMiembro : <<include>>
+UC_SalidaInvitado .> UC_ConsultarInvitados : <<include>>
+@enduml
