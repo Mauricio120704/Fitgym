@@ -47,6 +47,7 @@ public class PromocionController {
         if (q != null) {
             List<Promocion> filtradas = promocionRepository
                     .findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(q, q);
+            // Separar resultados buscando mantener juntas las promociones visibles en el tablero principal
             activasYExpiradas = filtradas.stream()
                     .filter(p -> p.getEstado() == Promocion.Estado.ACTIVE || p.getEstado() == Promocion.Estado.EXPIRED)
                     .collect(Collectors.toList());
@@ -97,6 +98,7 @@ public class PromocionController {
         }
 
         if (memberships != null) {
+            // Asociamos la promoción con cada membresía seleccionada
             for (String m : memberships) {
                 PromocionMembresia pm = new PromocionMembresia();
                 pm.setPromocion(p);
@@ -163,6 +165,7 @@ public class PromocionController {
             p.setEstado(Promocion.Estado.EXPIRED);
         }
         // Reemplazar membresías
+        // La asociación se limpia para evitar duplicados y luego se reconstruye desde la solicitud
         p.getMembresias().clear();
         if (memberships != null) {
             for (String m : memberships) {

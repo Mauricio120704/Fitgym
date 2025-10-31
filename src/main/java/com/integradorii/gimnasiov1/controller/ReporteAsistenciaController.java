@@ -19,6 +19,7 @@ public class ReporteAsistenciaController {
      */
     @GetMapping("/asistencia-clases")
     public String mostrarReporteAsistencia() {
+        // Devolvemos el nombre de la vista Thymeleaf que renderiza el reporte
         return "reportes/asistencia";
     }
 }

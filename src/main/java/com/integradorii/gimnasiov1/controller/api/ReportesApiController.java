@@ -32,8 +32,11 @@ public class ReportesApiController {
             @RequestParam(value = "tipo", required = false) String tipo
     ) {
         ZoneId zone = ZoneId.systemDefault();
+        // Normalizamos el rango de búsqueda a la zona horaria del servidor
         OffsetDateTime desde = inicio.atStartOfDay(zone).toOffsetDateTime();
+        // Sumamos un día para incluir todas las asistencias del día fin (intervalo [inicio, fin])
         OffsetDateTime hasta = fin.plusDays(1).atStartOfDay(zone).toOffsetDateTime(); // [inicio, fin]
+        // Delegamos la generación del reporte al servicio de dominio
         ReporteAsistenciaResponse resp = reporteAsistenciaService.generar(desde, hasta, tipo);
         return ResponseEntity.ok(resp);
     }

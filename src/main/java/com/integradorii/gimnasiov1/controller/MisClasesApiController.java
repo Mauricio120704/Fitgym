@@ -28,6 +28,7 @@ public class MisClasesApiController {
                                        Principal principal) {
         // Obtener el deportistaId del principal si no se proporciona
         if (deportistaId == null && principal != null) {
+            // Buscamos al usuario autenticado por email y usamos su ID como deportistaId
             deportistaId = personaRepository.findByEmail(principal.getName())
                     .map(p -> p.getId())
                     .orElse(null);
@@ -41,8 +42,10 @@ public class MisClasesApiController {
         try {
             // Delegar la lógica de negocio al servicio
             Map<String, Object> resultado = claseService.obtenerClasesDeportista(deportistaId);
+            // Respuesta 200 con las clases agrupadas que retorna el servicio
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
+            // Cualquier error inesperado se responde como 500 sin exponer detalles internos
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Error al obtener las clases del deportista"));
         }
