@@ -198,6 +198,58 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Controles de Paginación -->
+                        <div th:if="${totalPages > 1}" class="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200">
+                            <div class="flex items-center text-sm text-gray-700">
+                                <span>Mostrando</span>
+                                <span class="font-medium mx-1" th:text="${(currentPage * pageSize) + 1}">1</span>
+                                <span>a</span>
+                                <span class="font-medium mx-1" th:text="${(currentPage * pageSize) + #lists.size(clases)}">20</span>
+                                <span>de</span>
+                                <span class="font-medium mx-1" th:text="${totalElements}">100</span>
+                                <span>clases</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <!-- Botón Anterior -->
+                                <a th:if="${hasPrevious}" 
+                                   th:href="@{/clases(page=${currentPage - 1}, size=${pageSize}, periodo=${periodo}, buscar=${buscarActual}, fechaInicio=${fechaInicio != null ? #temporals.format(fechaInicio, 'yyyy-MM-dd') : null})}"
+                                   class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    Anterior
+                                </a>
+                                <span th:unless="${hasPrevious}" 
+                                      class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">
+                                    Anterior
+                                </span>
+                                
+                                <!-- Números de página -->
+                                <div class="flex gap-1">
+                                    <th:block th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+                                        <a th:if="${pageNum != currentPage}"
+                                           th:href="@{/clases(page=${pageNum}, size=${pageSize}, periodo=${periodo}, buscar=${buscarActual}, fechaInicio=${fechaInicio != null ? #temporals.format(fechaInicio, 'yyyy-MM-dd') : null})}"
+                                           th:text="${pageNum + 1}"
+                                           class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        </a>
+                                        <span th:if="${pageNum == currentPage}"
+                                              th:text="${pageNum + 1}"
+                                              class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-md">
+                                        </span>
+                                    </th:block>
+                                </div>
+                                
+                                <!-- Botón Siguiente -->
+                                <a th:if="${hasNext}" 
+                                   th:href="@{/clases(page=${currentPage + 1}, size=${pageSize}, periodo=${periodo}, buscar=${buscarActual}, fechaInicio=${fechaInicio != null ? #temporals.format(fechaInicio, 'yyyy-MM-dd') : null})}"
+                                   class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    Siguiente
+                                </a>
+                                <span th:unless="${hasNext}" 
+                                      class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">
+                                    Siguiente
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Información sobre Membresías -->

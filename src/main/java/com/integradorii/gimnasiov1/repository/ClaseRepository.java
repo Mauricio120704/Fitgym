@@ -1,6 +1,8 @@
 package com.integradorii.gimnasiov1.repository;
 
 import com.integradorii.gimnasiov1.model.Clase;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +23,15 @@ public interface ClaseRepository extends JpaRepository<Clase, Long> {
     List<Clase> findByFechaBetweenAndTipoLike(@Param("inicio") OffsetDateTime inicio,
                                               @Param("fin") OffsetDateTime fin,
                                               @Param("tipo") String tipo);
+
+    // Métodos paginados
+    Page<Clase> findAllByOrderByFechaAsc(Pageable pageable);
+    Page<Clase> findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseOrderByFechaAsc(String nombre, String descripcion, Pageable pageable);
+    Page<Clase> findByFechaBetweenOrderByFechaAsc(OffsetDateTime inicio, OffsetDateTime fin, Pageable pageable);
+    
+    @Query("select c from Clase c where c.fecha between :inicio and :fin and (lower(c.nombre) like lower(concat('%', :tipo, '%')) or lower(coalesce(c.descripcion,'')) like lower(concat('%', :tipo, '%'))) order by c.fecha asc")
+    Page<Clase> findByFechaBetweenAndTipoLike(@Param("inicio") OffsetDateTime inicio,
+                                              @Param("fin") OffsetDateTime fin,
+                                              @Param("tipo") String tipo,
+                                              Pageable pageable);
 }
