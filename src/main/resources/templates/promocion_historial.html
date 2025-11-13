@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historial de Promoción</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background:#f8f9fa; color:#111827; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
+    .header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+    .title { font-size:1.5rem; font-weight:700; }
+    .subtitle { color:#6b7280; }
+    .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.5rem .9rem; border-radius:10px; border:1px solid #e5e7eb; background:#fff; color:#374151; text-decoration:none; font-weight:600; }
+    .btn-danger { border:1px solid #fecaca; background:#fef2f2; color:#991b1b; }
+    .btn-danger:hover { background:#fee2e2; }
+    .btn:hover { background:#f9fafb; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:1rem; }
+    .timeline { display:flex; flex-direction:column; gap:.75rem; margin-top:1rem; }
+    .item { display:grid; grid-template-columns: 160px 1fr; gap:1rem; padding:.75rem; border:1px solid #f3f4f6; border-radius:10px; background:#fff; }
+    .when { color:#6b7280; font-size:.9rem; }
+    .badge { display:inline-flex; align-items:center; gap:.4rem; padding:.25rem .6rem; border-radius:999px; font-size:.75rem; font-weight:600; border:1px solid #e5e7eb; }
+    .badge-success { background:#ecfdf5; color:#065f46; border-color:#a7f3d0; }
+    .badge-info { background:#eff6ff; color:#1e40af; border-color:#bfdbfe; }
+    .badge-warning { background:#fffbeb; color:#92400e; border-color:#fde68a; }
+    .badge-emerald { background:#ecfdf5; color:#065f46; border-color:#a7f3d0; }
+    .badge-danger { background:#fef2f2; color:#991b1b; border-color:#fecaca; }
+    .row { display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; }
+    .muted { color:#6b7280; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:.85rem; }
+    @media (max-width:640px){ .item { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex min-h-screen w-full bg-gray-100">
+    <div th:replace="~{fragments/sidebar :: sidebar('promociones')}"></div>
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="sticky top-0 z-50 border-b bg-white shadow-sm">
+        <div class="flex items-center justify-between p-3">
+          <a th:href="@{/promociones}" class="btn">← Volver</a>
+        </div>
+      </header>
+      <main class="flex-1 overflow-auto p-4">
+        <div class="container">
+          <div class="header">
+            <div>
+              <div class="title" th:text="${promocion.nombre}">Nombre de Promoción</div>
+              <div class="subtitle">Historial de cambios y acciones</div>
+            </div>
+            <div>
+              <form th:action="@{'/promociones/' + ${promocion.id} + '/delete'}" method="post" onsubmit="return confirm('¿Eliminar esta promoción?');">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button class="btn btn-danger" type="submit">Eliminar</button>
+              </form>
+            </div>
+          </div>
+          <div class="card">
+            <div class="timeline">
+              <div class="item" th:each="h : ${historial}">
+                <div class="when" th:text="${#temporals.format(h.realizadoEn, 'dd MMM yyyy HH:mm')}" >01 Ene 2025 10:00</div>
+                <div>
+                  <div class="row">
+                    <span class="badge"
+                      th:classappend="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).CREAR} ? ' badge-success' :
+                                      (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).EDITAR} ? ' badge-info' :
+                                      (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).REACTIVAR} ? ' badge-emerald' :
+                                      (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).ELIMINAR} ? ' badge-danger' : ' badge-warning')))">
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).CREAR}">Creación</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).EDITAR}">Edición</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).REACTIVAR}">Reactivación</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).ELIMINAR}">Eliminación</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).TOGGLE}">Cambio de estado</span>
+                    </span>
+                    <span class="muted">Estado:</span>
+                    <span class="mono" th:text="${h.estadoAnterior != null ? (h.estadoAnterior.name() == 'ACTIVE' ? 'ACTIVA' : (h.estadoAnterior.name() == 'INACTIVE' ? 'INACTIVA' : 'EXPIRADA')) : '-'}">-</span>
+                    <span class="muted">→</span>
+                    <span class="mono" th:text="${h.estadoNuevo != null ? (h.estadoNuevo.name() == 'ACTIVE' ? 'ACTIVA' : (h.estadoNuevo.name() == 'INACTIVE' ? 'INACTIVA' : 'EXPIRADA')) : '-'}">-</span>
+                  </div>
+                  <div class="muted" th:if="${h.usuario != null}">Usuario: <span th:text="${h.usuario}">correo</span></div>
+                  <div class="muted" th:if="${h.detalle != null && !h.detalle.isEmpty()}" th:text="${h.detalle}">Detalle</div>
+                </div>
+              </div>
+              <div th:if="${#lists.isEmpty(historial)}" class="muted">Sin registros de historial.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>
