@@ -198,6 +198,39 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Paginación -->
+                        <div class="mt-4 flex items-center justify-between text-sm text-gray-600" th:if="${totalPages > 1}">
+                            <div>
+                                <span th:text="|Mostrando ${pageStart} - ${pageEnd} de ${totalClases} clases|">Mostrando 1 - 25 de 100 clases</span>
+                            </div>
+                            <div class="inline-flex items-center gap-1">
+                                <!-- Botón Anterior -->
+                                <a th:if="${currentPage > 0}"
+                                   th:href="@{/clases(page=${currentPage - 1}, periodo=${periodo}, buscar=${buscarActual}, fechaInicio=${#temporals.format(fechaInicio, 'yyyy-MM-dd')})}"
+                                   class="px-3 py-1 border border-gray-300 rounded-l-md bg-white hover:bg-gray-50">Anterior</a>
+                                <span th:if="${currentPage == 0}"
+                                      class="px-3 py-1 border border-gray-200 rounded-l-md bg-gray-100 text-gray-400 cursor-not-allowed">Anterior</span>
+
+                                <!-- Números de página -->
+                                <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                                    <a th:if="${i != currentPage}"
+                                       th:href="@{/clases(page=${i}, periodo=${periodo}, buscar=${buscarActual}, fechaInicio=${#temporals.format(fechaInicio, 'yyyy-MM-dd')})}"
+                                       th:text="${i + 1}"
+                                       class="px-3 py-1 border border-gray-300 bg-white hover:bg-gray-50"></a>
+                                    <span th:if="${i == currentPage}"
+                                          th:text="${i + 1}"
+                                          class="px-3 py-1 border border-orange-500 bg-orange-500 text-white"></span>
+                                </span>
+
+                                <!-- Botón Siguiente -->
+                                <a th:if="${currentPage < totalPages - 1}"
+                                   th:href="@{/clases(page=${currentPage + 1}, periodo=${periodo}, buscar=${buscarActual}, fechaInicio=${#temporals.format(fechaInicio, 'yyyy-MM-dd')})}"
+                                   class="px-3 py-1 border border-gray-300 rounded-r-md bg-white hover:bg-gray-50">Siguiente</a>
+                                <span th:if="${currentPage >= totalPages - 1}"
+                                      class="px-3 py-1 border border-gray-200 rounded-r-md bg-gray-100 text-gray-400 cursor-not-allowed">Siguiente</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Información sobre Membresías -->

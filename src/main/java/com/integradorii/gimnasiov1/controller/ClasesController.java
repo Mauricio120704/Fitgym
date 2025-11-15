@@ -53,6 +53,7 @@ public class ClasesController {
     public String listar(@RequestParam(required = false) String buscar,
                          @RequestParam(defaultValue = "todos") String periodo,
                          @RequestParam(required = false) String fechaInicio,
+                         @RequestParam(defaultValue = "0") int page,
                          Model model) {
         // Calcular rango de fechas según el periodo
         LocalDate hoy = LocalDate.now();
@@ -115,13 +116,36 @@ public class ClasesController {
         List<ClaseViewDTO> view = clases.stream().map(claseViewService::toView).collect(Collectors.toList());
 
         long totalClases = clases.size();
+
+        // Paginación simple en memoria: 25 clases por página
+        int pageSize = 25;
+        int totalPages = (int) Math.ceil(totalClases / (double) pageSize);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page < 0) {
+            page = 0;
+        }
+        if (page >= totalPages) {
+            page = totalPages - 1;
+        }
+        int fromIndex = page * pageSize;
+        int toIndex = (int) Math.min(fromIndex + pageSize, totalClases);
+        List<ClaseViewDTO> pageContent = view.subList(fromIndex, toIndex);
+
+        int pageStart = (totalClases == 0) ? 0 : fromIndex + 1;
+        int pageEnd = (totalClases == 0) ? 0 : toIndex;
         long clasesLlenas = view.stream()
                 .filter(v -> (v.getOcupadosPremium() + v.getOcupadosElite()) >= (v.getCuposPremium() + v.getCuposElite()))
                 .count();
         int totalCupos = view.stream().mapToInt(v -> v.getCuposPremium() + v.getCuposElite()).sum();
 
-        model.addAttribute("clases", view);
+        model.addAttribute("clases", pageContent);
         model.addAttribute("totalClases", totalClases);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageStart", pageStart);
+        model.addAttribute("pageEnd", pageEnd);
         model.addAttribute("clasesLlenas", clasesLlenas);
         model.addAttribute("totalCupos", totalCupos);
         model.addAttribute("buscarActual", buscar == null ? "" : buscar);
