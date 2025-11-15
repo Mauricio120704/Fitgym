@@ -28,6 +28,24 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.personaRepository = personaRepository;
         this.usuarioRepository = usuarioRepository;
     }
+    
+    private String canonicalRole(String codigo) {
+        if (codigo == null) return "USUARIO";
+        String c = codigo.trim().toUpperCase();
+        switch (c) {
+            case "ADMIN":
+            case "ADMINISTRADOR":
+                return "ADMINISTRADOR";
+            case "RECEP":
+            case "RECEPCIONISTA":
+                return "RECEPCIONISTA";
+            case "ENTRENADOR":
+            case "COACH":
+                return "ENTRENADOR";
+            default:
+                return c.isEmpty() ? "USUARIO" : c; // fallback: usar tal cual
+        }
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -46,10 +64,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
             List<GrantedAuthority> authorities = new ArrayList<>();
             
-            // Asignar rol basado en el rol de la base de datos
+            // Asignar rol basado en el rol de la base de datos (normalizado)
             if (usuario.getRol() != null) {
                 String rolCodigo = usuario.getRol().getCodigo();
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + rolCodigo));
+                String rolCanon = canonicalRole(rolCodigo);
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + rolCanon));
             } else {
                 authorities.add(new SimpleGrantedAuthority("ROLE_USUARIO"));
             }

@@ -1,0 +1,255 @@
+/* --- Variables Globales y Reseteo --- */
+:root {
+    --primary-color: #E67E22; /* Naranja similar al mockup */
+    --primary-color-light: #FADFC5;
+    --border-color: #E0E0E0;
+    --text-color: #333;
+    --text-color-light: #666;
+    --background-color: #F9F9F9;
+    --white: #FFFFFF;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --border-radius: 8px;
+}
+
+/* --- Contenedor Principal --- */
+.suspension-container {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    width: 100%;
+    padding: 24px;
+}
+
+.suspension-container h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.suspension-container p {
+    font-size: 16px;
+    color: var(--text-color-light);
+    margin-bottom: 24px;
+}
+
+.form-section {
+    margin-bottom: 24px;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+legend {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding: 0;
+}
+
+/* --- Tarjetas de Motivo --- */
+.reason-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reason-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    /* Se quitó cursor: pointer de aquí */
+}
+
+/* Oculta el radio button real */
+.reason-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Nueva label para el radio button */
+.custom-radio-label {
+    cursor: pointer;
+}
+
+/* Estilo para el "radio" customizado */
+.custom-radio {
+    width: 20px;  /* Reducido de 24px */
+    height: 20px; /* Reducido de 24px */
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    background-color: var(--white);
+}
+
+.custom-radio::after {
+    content: "";
+    width: 10px;  /* Reducido de 12px */
+    height: 10px; /* Reducido de 12px */
+    border-radius: 50%;
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+}
+
+.reason-card .icon {
+    font-size: 24px;
+    color: var(--text-color-light);
+    transition: color 0.2s ease;
+}
+
+.reason-text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Permite que el texto ocupe el espacio restante */
+}
+
+.reason-text strong {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.reason-text span {
+    font-size: 14px;
+    color: var(--text-color-light);
+}
+
+/* Estilo de la tarjeta seleccionada */
+.reason-card.selected {
+    border-color: var(--primary-color);
+    background-color: #FEF9F3; /* Un fondo naranja muy claro */
+}
+
+.reason-card.selected .icon {
+    color: var(--primary-color);
+}
+
+/* El estilo de selección se aplica cuando la tarjeta tiene la clase .selected */
+.reason-card.selected .custom-radio {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color); /* Fondo del círculo externo */
+}
+
+.reason-card.selected .custom-radio::after {
+    background-color: var(--white); /* Círculo interno blanco */
+}
+
+
+/* --- Campos de Fecha --- */
+.date-fields {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Para que ocupen el mismo espacio */
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.date-input-wrapper {
+    position: relative;
+}
+
+/* Estilo para inputs de fecha y textarea */
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    font-family: inherit;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+}
+
+input[type="date"] {
+    /* Alinea el texto del input de fecha */
+    text-align: left;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* --- Info de Impacto --- */
+.impact-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #F8F8F8;
+    border: 1px solid #F0F0F0;
+    border-radius: var(--border-radius);
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text-color-light);
+}
+
+.impact-info .icon {
+    font-size: 20px;
+}
+
+/* --- Botones de Acción --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.btn {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-cancel {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    color: var(--text-color-light);
+}
+
+.btn-cancel:hover {
+    background-color: #FBFBFB;
+}
+
+.btn-submit {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-submit:hover {
+    background-color: #D35400; /* Naranja más oscuro */
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+}
+
+/* Estado deshabilitado del botón */
+.btn-submit:disabled {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+    cursor: not-allowed;
+    box-shadow: none;
+}

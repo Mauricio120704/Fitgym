@@ -9,9 +9,6 @@ import com.integradorii.gimnasiov1.repository.TipoClaseRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
 import com.integradorii.gimnasiov1.service.ClaseViewService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -56,8 +53,6 @@ public class ClasesController {
     public String listar(@RequestParam(required = false) String buscar,
                          @RequestParam(defaultValue = "todos") String periodo,
                          @RequestParam(required = false) String fechaInicio,
-                         @RequestParam(defaultValue = "0") int page,
-                         @RequestParam(defaultValue = "20") int size,
                          Model model) {
         // Calcular rango de fechas según el periodo
         LocalDate hoy = LocalDate.now();
@@ -100,32 +95,26 @@ public class ClasesController {
             }
         }
 
-        // Crear Pageable para la paginación
-        Pageable pageable = PageRequest.of(page, size);
-        
-        Page<Clase> clasesPaginadas;
+        List<Clase> clases;
         if (inicio != null && fin != null) {
             OffsetDateTime inicioOdt = inicio.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
             OffsetDateTime finOdt = fin.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
             
-            clasesPaginadas = (buscar == null || buscar.isBlank())
-                    ? claseRepository.findByFechaBetweenOrderByFechaAsc(inicioOdt, finOdt, pageable)
-                    : claseRepository.findByFechaBetweenAndTipoLike(inicioOdt, finOdt, buscar.trim(), pageable);
+            clases = (buscar == null || buscar.isBlank())
+                    ? claseRepository.findByFechaBetweenOrderByFechaAsc(inicioOdt, finOdt)
+                    : claseRepository.findByFechaBetweenAndTipoLike(inicioOdt, finOdt, buscar.trim());
         } else {
             // Para el caso de "todos", no aplicamos filtro de fecha
-            clasesPaginadas = (buscar == null || buscar.isBlank())
-                    ? claseRepository.findAllByOrderByFechaAsc(pageable)
+            clases = (buscar == null || buscar.isBlank())
+                    ? claseRepository.findAllByOrderByFechaAsc()
                     : claseRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseOrderByFechaAsc(
-                            buscar.trim(), buscar.trim(), pageable);
+                            buscar.trim(), buscar.trim());
         }
-        
-        List<Clase> clases = clasesPaginadas.getContent();
 
         // Mapear a DTOs para la vista
         List<ClaseViewDTO> view = clases.stream().map(claseViewService::toView).collect(Collectors.toList());
 
-        long totalClasesEnPagina = clases.size();
-        long totalClases = clasesPaginadas.getTotalElements();
+        long totalClases = clases.size();
         long clasesLlenas = view.stream()
                 .filter(v -> (v.getOcupadosPremium() + v.getOcupadosElite()) >= (v.getCuposPremium() + v.getCuposElite()))
                 .count();
@@ -138,14 +127,6 @@ public class ClasesController {
         model.addAttribute("buscarActual", buscar == null ? "" : buscar);
         // Pasar el período actual a la vista
         model.addAttribute("periodo", periodo == null ? "semana" : periodo);
-        
-        // Información de paginación
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", clasesPaginadas.getTotalPages());
-        model.addAttribute("totalElements", clasesPaginadas.getTotalElements());
-        model.addAttribute("pageSize", size);
-        model.addAttribute("hasPrevious", clasesPaginadas.hasPrevious());
-        model.addAttribute("hasNext", clasesPaginadas.hasNext());
         
         // Pasar fechas de la semana actual para navegación
         if (periodo != null && periodo.equals("semana") && inicio != null) {

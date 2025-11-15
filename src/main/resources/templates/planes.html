@@ -34,7 +34,7 @@
 
         <div class="row">
             <div class="col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm plan-card" data-plan="Básico">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="text-center">
                             <img th:src="@{/images/plan1.0.png}" alt="Icono Básico" class="plan-icon mb-3">
@@ -61,7 +61,7 @@
                                  precio=${'49.900'},
                                  usuario=${#strings.defaultString(usuario, param.usuario)}
                                )}"
-                               class="btn btn-outline-secondary w-100">
+                               class="btn btn-outline-secondary w-100 btn-select-plan">
                                 Seleccionar Plan
                             </a>
                         </div>
@@ -110,7 +110,7 @@
 
 
             <div class="col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm plan-card" data-plan="Elite">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="text-center">
                             <img th:src="@{/images/plan3.webp}" alt="Icono Elite" class="plan-icon mb-3">
@@ -139,7 +139,7 @@
                                  precio=${'129.900'},
                                  usuario=${#strings.defaultString(usuario, param.usuario)}
                                )}"
-                               class="btn btn-outline-secondary w-100">
+                               class="btn btn-outline-secondary w-100 btn-select-plan">
                                 Seleccionar Plan
                             </a>
                         </div>
@@ -150,7 +150,8 @@
 
         </div> 
         <div class="text-center mt-4">
-            <a th:href="@{/inicio}" class="btn btn-outline-secondary px-4">Volver</a>
+            <a th:if="${usuario != null}" th:href="@{/perfil}" class="btn btn-outline-secondary px-4">Volver</a>
+            <a th:unless="${usuario != null}" th:href="@{/}" class="btn btn-outline-secondary px-4">Volver</a>
         </div>
 
 

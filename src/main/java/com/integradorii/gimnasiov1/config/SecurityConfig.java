@@ -157,7 +157,7 @@ public class SecurityConfig {
                 // - /evaluaciones: Ver evaluaciones físicas
                 // - /reclamos: Crear y ver reclamos
                 // - /reservas: Reservar clases
-                .requestMatchers("/perfil", "/cliente/**", "/entrenamientos", "/evaluaciones", "/reclamos", "/reservas", "/api/reservas/**").hasRole("CLIENTE")
+                .requestMatchers("/perfil", "/cliente/**", "/entrenamientos", "/evaluaciones", "/reclamos", "/reservas", "/suspension", "/api/reservas/**", "/deportista/comunidad", "/api/comunidad/**").hasRole("CLIENTE")
                 
                 // ===== RUTAS PARA TODO EL PERSONAL (ADMIN, RECEPCIONISTA, ENTRENADOR) =====
                 // - /miembros/**: Gestión de miembros

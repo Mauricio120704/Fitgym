@@ -49,11 +49,7 @@
                                 <p class="text-gray-600">Miembro <span th:text="${tipo}">Deportista</span></p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <a href="/reservas" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium">
-                                Nueva Reserva
-                            </a>
-                        </div>
+                        <div class="flex items-center gap-3"></div>
                     </div>
 
                     <!-- Contenido del Perfil -->
@@ -77,10 +73,31 @@
                                 <span class="info-value" th:text="${miembro.telefono}">555-0101</span>
                             </div>
                             <div class="info-item">
+                                <span class="info-label">Género</span>
+                                <span class="info-value" th:text="${miembro.genero} == null ? '—' : ${miembro.genero}">—</span>
+                            </div>
+                            <div class="info-item">
                                 <span class="info-label">Miembro desde</span>
                                 <span class="info-value" th:text="${miembro.fechaRegistro}">14 de enero, 2024</span>
                             </div>
-                            <a href="/configuracion" class="w-full px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-center block">
+                            <div class="info-item">
+                                <span class="info-label">Peso</span>
+                                <span class="info-value" th:text="${miembro.peso} == null ? '—' : ${#numbers.formatDecimal(miembro.peso, 1, 'COMMA', 2, 'POINT')} + ' kg'">—</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Altura</span>
+                                <span class="info-value" th:text="${miembro.altura} == null ? '—' : ${#numbers.formatDecimal(miembro.altura, 1, 'COMMA', 2, 'POINT')} + ' m'">—</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">IMC</span>
+                                <span class="info-value"
+                                      th:text="${miembro.peso} != null and ${miembro.altura} != null ? ${#numbers.formatDecimal(miembro.peso / (miembro.altura * miembro.altura), 1, 'COMMA', 2, 'POINT')} : '—'">—</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Descripción</span>
+                                <span class="info-value" th:text="${miembro.descripcion} == null or ${#strings.isEmpty(miembro.descripcion)} ? '—' : ${miembro.descripcion}">—</span>
+                            </div>
+                            <a href="/perfil/editar" class="w-full px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-center block">
                                 Editar Perfil
                             </a>
                         </section>
@@ -92,21 +109,51 @@
                                 Suscripción
                             </h2>
                             <div class="info-item">
-                                <span class="info-label">Estado de membresía</span>
+                                <span class="info-label">Estado</span>
                                 <span class="info-value">
-                                    <span th:text="${miembro.membresiaActiva} ? 'Activa' : 'Inactiva'">Activa</span>
+                                    <span th:text="${tieneSuscripcionActiva} ? 'Activa' : 'Inactiva'">Inactiva</span>
                                 </span>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">Rol en el sistema</span>
-                                <span class="info-value" th:text="${rolNombre}">Deportista</span>
+                            <!-- Detalles visibles solo cuando existe una suscripción activa -->
+                            <div class="info-item" th:if="${tieneSuscripcionActiva}">
+                                <span class="info-label">Plan</span>
+                                <span class="info-value"
+                                      th:text="${suscripcionNombrePlanLegible}">Plan Premium</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" th:if="${tieneSuscripcionActiva}">
+                                <span class="info-label">Fecha de inicio</span>
+                                <span class="info-value"
+                                      th:text="${suscripcionFechaInicioStr}">01/01/2025</span>
+                            </div>
+                            <div class="info-item" th:if="${tieneSuscripcionActiva}">
+                                <span class="info-label">Fecha de vencimiento</span>
+                                <span class="info-value"
+                                      th:text="${suscripcionFechaFinStr}">31/01/2025</span>
+                            </div>
+                            <div class="info-item" th:if="${tieneSuscripcionActiva}">
                                 <span class="info-label">Próximo pago</span>
-                                <span class="info-value">15 de enero, 2025</span>
+                                <span class="info-value"
+                                      th:text="${suscripcionProximoPagoStr}">31/01/2025</span>
                             </div>
-                            <button class="w-full px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
-                                Gestionar Suscripción
+                            <a th:if="${!tieneSuscripcionActiva}"
+                               th:href="@{/planes(usuario=${miembro.email})}"
+                               class="w-full px-6 py-3 mb-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-center block">
+                                Suscribirse a un plan
+                            </a>
+                            <button th:if="${tieneSuscripcionActiva}"
+                                    class="w-full px-6 py-3 mb-2 bg-gray-200 border border-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-medium"
+                                    disabled>
+                                Suscribirse a un plan
+                            </button>
+                            <a th:if="${tieneSuscripcionActiva}"
+                               th:href="@{/suspension}"
+                               class="w-full px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-center block">
+                                Solicitar suspensión temporal
+                            </a>
+                            <button th:if="${!tieneSuscripcionActiva}"
+                                    class="w-full px-6 py-3 bg-gray-200 border border-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-medium"
+                                    disabled>
+                                Solicitar suspensión temporal
                             </button>
                         </section>
                     </div>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suspensión de Membresía</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/suspension.css}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script>
+        (function(){
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            document.documentElement.style.setProperty('--sidebar-width', expanded ? '16rem' : '5rem');
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <div th:replace="~{fragments/sidebar :: sidebar('suspension')}"></div>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Suspensión de Membresía</div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="max-w-3xl mx-auto">
+                    <div class="suspension-container border border-gray-200 rounded-2xl shadow-sm p-6">
+                        <form id="suspensionForm" th:action="@{/suspension}" method="post">
+                            <h1>Suspensión Temporal de Membresía</h1>
+                            <p>Solicita una pausa en tu membresía para no perder los días pagados mientras no puedes asistir.</p>
+
+                            <div th:if="${error}" style="margin-bottom: 16px; padding: 10px 12px; border-radius: 6px; background-color: #ffecec; color: #c0392b; font-size: 14px;">
+                                <span th:text="${error}">Mensaje de error</span>
+                            </div>
+
+                            <fieldset class="form-section">
+                                <legend>Motivo de la Suspensión</legend>
+                                
+                                <div class="reason-options">
+                                    <div class="reason-card selected"> 
+                                        <input type="radio" name="motivo" value="viaje" id="motivo-viaje" checked>
+                                        <label for="motivo-viaje" class="custom-radio-label">
+                                            <div class="custom-radio"></div> 
+                                        </label>
+                                        <span class="material-symbols-outlined icon">flight_takeoff</span>
+                                        <div class="reason-text">
+                                            <strong>Viaje</strong>
+                                            <span>No estaré disponible por viaje</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="reason-card"> 
+                                        <input type="radio" name="motivo" value="salud" id="motivo-salud">
+                                        <label for="motivo-salud" class="custom-radio-label">
+                                            <div class="custom-radio"></div> 
+                                        </label>
+                                        <span class="material-symbols-outlined icon">health_and_safety</span>
+                                        <div class="reason-text">
+                                            <strong>Salud</strong>
+                                            <span>Necesito tiempo para recuperación</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="reason-card"> 
+                                        <input type="radio" name="motivo" value="otro" id="motivo-otro">
+                                        <label for="motivo-otro" class="custom-radio-label">
+                                            <div class="custom-radio"></div> 
+                                        </label>
+                                        <span class="material-symbols-outlined icon">edit_note</span>
+                                        <div class="reason-text">
+                                            <strong>Otro motivo</strong>
+                                            <span>Por favor, especifica en detalles</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <div class="date-fields form-section">
+                                <div class="form-group">
+                                    <label for="fecha-inicio">Fecha de Inicio</label>
+                                    <div class="date-input-wrapper">
+                                        <input type="date" id="fecha-inicio" name="fecha_inicio" value="2025-11-14" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="fecha-fin">Fecha de Fin</label>
+                                    <div class="date-input-wrapper">
+                                        <input type="date" id="fecha-fin" name="fecha_fin" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-section">
+                                <label for="detalles">Detalles Adicionales (Opcional)</label>
+                                <textarea id="detalles" name="detalles" placeholder="Proporciona más información sobre tu solicitud..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"></textarea>
+                            </div>
+
+                            <div id="impacto-suspension" class="impact-info form-section">
+                                <span class="material-symbols-outlined icon">info</span>
+                                <span>Selecciona las fechas para ver el impacto</span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-cancel">Cancelar</button>
+                                <button type="submit" id="btn-submit" class="btn btn-submit" disabled>Solicitar Suspensión</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/JavaScript/suspension.js}"></script>
+</body>
+</html>

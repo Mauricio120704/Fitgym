@@ -2,6 +2,8 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.model.*;
 import com.integradorii.gimnasiov1.repository.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -95,8 +97,26 @@ public class CheckoutController {
                        @RequestParam String numeroTarjeta,
                        @RequestParam String fechaExpiracion,
                        @RequestParam String cvv,
-                       Model model) {
+                       Model model,
+                       @AuthenticationPrincipal UserDetails userDetails) {
         try {
+            // Validación básica de datos de tarjeta (además de los required del formulario)
+            String numeroNormalizado = numeroTarjeta != null ? numeroTarjeta.replaceAll("\\s+", "") : "";
+            boolean datosInvalidos =
+                    nombreTitular == null || nombreTitular.isBlank() ||
+                    numeroNormalizado.length() < 13 || numeroNormalizado.length() > 19 ||
+                    fechaExpiracion == null || !fechaExpiracion.matches("\\d{2}/\\d{2}") ||
+                    cvv == null || !cvv.matches("\\d{3}");
+
+            if (datosInvalidos) {
+                model.addAttribute("error", "Datos de tarjeta inválidos. Por favor, verifica la información ingresada.");
+                model.addAttribute("planNombre", plan);
+                model.addAttribute("periodo", periodo);
+                model.addAttribute("precio", precio);
+                model.addAttribute("usuario", usuario);
+                return "checkout";
+            }
+
             // Paso 1: Verificar que el deportista existe
             Persona persona = personaRepository.findByEmail(usuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + usuario));
@@ -157,8 +177,19 @@ public class CheckoutController {
             persona.setMembresiaActiva(true);
             personaRepository.save(persona);
 
-            // Paso 6: Redirigir a login con mensaje de éxito
-            return "redirect:/login?registroExitoso=true&mensaje=¡Pago+procesado+correctamente!+Ya+puedes+iniciar+sesión.";
+            // Paso 6: Redirigir según contexto
+            boolean esDeportistaAutenticado =
+                    userDetails != null &&
+                    userDetails.getUsername() != null &&
+                    userDetails.getUsername().equalsIgnoreCase(usuario);
+
+            if (esDeportistaAutenticado) {
+                // Si el deportista ya está autenticado (flujo desde su perfil), volver a su perfil
+                return "redirect:/perfil";
+            } else {
+                // Flujo original para nuevos registros: volver a login con mensaje
+                return "redirect:/login?registroExitoso=true&mensaje=¡Pago+procesado+correctamente!+Ya+puedes+iniciar+sesión.";
+            }
             
         } catch (Exception e) {
             // En caso de error, hacer rollback completo de la transacción

@@ -36,7 +36,7 @@ public class Persona {
     private LocalDate fechaNacimiento;
 
     @Column(name = "membresia_activa")
-    private Boolean membresiaActiva = Boolean.TRUE;
+    private Boolean membresiaActiva = Boolean.FALSE;
 
     @Column(name = "activo")
     private Boolean activo = Boolean.FALSE; // Inactivo hasta verificar email
@@ -46,6 +46,9 @@ public class Persona {
 
     @Column(nullable = false, length = 255, name = "contraseña")
     private String contraseña;
+
+    @Column(name = "perfil_visible")
+    private Boolean perfilVisible = Boolean.TRUE;
 
     @Column(length = 10)
     private String genero; // M, F, Otro
@@ -58,6 +61,22 @@ public class Persona {
 
     @Column(length = 30)
     private String emergenciaTelefono; // Teléfono del contacto de emergencia
+
+    // Datos físicos opcionales y privacidad
+    @Column(name = "peso")
+    private Double peso; // en kg
+
+    @Column(name = "altura")
+    private Double altura; // en metros
+
+    @Column(name = "mostrar_peso")
+    private Boolean mostrarPeso = Boolean.TRUE;
+
+    @Column(name = "mostrar_altura")
+    private Boolean mostrarAltura = Boolean.TRUE;
+
+    @Column(name = "descripcion", length = 500)
+    private String descripcion;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -106,6 +125,20 @@ public class Persona {
     
     public Boolean getEmailVerificado() { return emailVerificado; }
     public void setEmailVerificado(Boolean emailVerificado) { this.emailVerificado = emailVerificado; }
+    
+    public Boolean getPerfilVisible() { return perfilVisible; }
+    public void setPerfilVisible(Boolean perfilVisible) { this.perfilVisible = perfilVisible; }
+    
+    public Double getPeso() { return peso; }
+    public void setPeso(Double peso) { this.peso = peso; }
+    public Double getAltura() { return altura; }
+    public void setAltura(Double altura) { this.altura = altura; }
+    public Boolean getMostrarPeso() { return mostrarPeso; }
+    public void setMostrarPeso(Boolean mostrarPeso) { this.mostrarPeso = mostrarPeso; }
+    public Boolean getMostrarAltura() { return mostrarAltura; }
+    public void setMostrarAltura(Boolean mostrarAltura) { this.mostrarAltura = mostrarAltura; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     
     // Helper method
     public String getNombreCompleto() {

@@ -55,7 +55,7 @@ public class HomeController {
 
     // GET /inicio - Dashboard general (redirección automática desde login)
     @GetMapping("/inicio")
-    public String inicio() { return "dashboard"; }
+    public String inicio() { return "index"; }
 
     /**
      * GET /login - Página de inicio de sesión
@@ -412,7 +412,8 @@ public class HomeController {
             p.setTelefono(dto.getTelefono());
             p.setDni(dto.getDni());
             p.setFechaRegistro(LocalDate.now());
-            p.setMembresiaActiva(Boolean.TRUE);
+            // La membresía inicia como INACTIVA hasta que el deportista contrate un plan
+            p.setMembresiaActiva(Boolean.FALSE);
             
             // Cuenta inactiva hasta verificar email
             p.setActivo(Boolean.FALSE);

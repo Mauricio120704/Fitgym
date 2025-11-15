@@ -51,6 +51,16 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
      * Obtener solo deportistas con membresía activa
      */
     List<Persona> findByMembresiaActivaTrue();
+
+    /**
+     * Obtener deportistas visibles en comunidad
+     */
+    List<Persona> findByPerfilVisibleTrue();
+
+    /**
+     * Obtener deportistas visibles en comunidad excluyendo por email
+     */
+    List<Persona> findByPerfilVisibleTrueAndEmailNot(String email);
     
     /**
      * Buscar deportistas por nombre, apellido o DNI (para búsqueda simple)
