@@ -36,6 +36,22 @@
                     </button>
                     <div class="text-xl font-semibold text-gray-800">Mi Perfil</div>
                 </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <button id="notif-bell" class="relative text-gray-600 hover:text-gray-800 focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0h6z"></path>
+                            </svg>
+                            <span id="notif-badge" class="hidden absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 min-w-[1.25rem] h-4 text-[0.65rem] font-semibold leading-none text-white bg-red-500 rounded-full"></span>
+                        </button>
+                        <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-40">
+                            <div class="px-4 py-2 text-sm font-semibold text-gray-700 border-b">Notificaciones</div>
+                            <div id="notif-dropdown-body" class="max-h-80 overflow-y-auto text-sm text-gray-700">
+                                <p class="px-4 py-3 text-gray-500 text-sm">Cargando notificaciones...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -156,12 +172,215 @@
                                 Solicitar suspensión temporal
                             </button>
                         </section>
+
+                        <!-- Notificaciones -->
+                        <section class="profile-card">
+                            <h2 class="card-title">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 3.5-1.5 5-2 5h16c-.5 0-2-1.5-2-5z"></path><path d="M13.73 21a2 2 0 01-3.46 0"></path></svg>
+                                Notificaciones
+                            </h2>
+                            <div id="notificaciones-container" class="space-y-3 text-sm text-gray-700">
+                                <p class="text-gray-500 text-sm">Cargando notificaciones...</p>
+                            </div>
+                        </section>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var container = document.getElementById('notificaciones-container');
+            var bell = document.getElementById('notif-bell');
+            var dropdown = document.getElementById('notif-dropdown');
+            var dropdownBody = document.getElementById('notif-dropdown-body');
+            var badge = document.getElementById('notif-badge');
+            var storageKey = 'fitgym_notif_leidas';
+            var readMap = {};
+            var unreadCount = 0;
+
+            function loadRead() {
+                try {
+                    var raw = localStorage.getItem(storageKey);
+                    if (!raw) {
+                        return;
+                    }
+                    var arr = JSON.parse(raw);
+                    if (Array.isArray(arr)) {
+                        arr.forEach(function (id) {
+                            if (typeof id === 'string') {
+                                readMap[id] = true;
+                            }
+                        });
+                    }
+                } catch (e) {}
+            }
+
+            function saveRead() {
+                try {
+                    var ids = Object.keys(readMap);
+                    localStorage.setItem(storageKey, JSON.stringify(ids));
+                } catch (e) {}
+            }
+
+            function updateBadge() {
+                if (!badge) {
+                    return;
+                }
+                if (unreadCount <= 0) {
+                    badge.classList.add('hidden');
+                    badge.textContent = '';
+                } else {
+                    badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+                    badge.classList.remove('hidden');
+                }
+            }
+
+            function markAsRead(id) {
+                if (!id) {
+                    return;
+                }
+                if (!readMap[id]) {
+                    readMap[id] = true;
+                    if (unreadCount > 0) {
+                        unreadCount--;
+                    }
+                    saveRead();
+                    updateBadge();
+                }
+            }
+
+            function renderEmpty() {
+                if (container) {
+                    container.innerHTML = '<p class="text-gray-500 text-sm">No tienes notificaciones por el momento.</p>';
+                }
+                if (dropdownBody) {
+                    dropdownBody.innerHTML = '<p class="px-4 py-3 text-gray-500 text-sm">No tienes notificaciones por el momento.</p>';
+                }
+                unreadCount = 0;
+                updateBadge();
+            }
+
+            function renderError() {
+                if (container) {
+                    container.innerHTML = '<p class="text-red-500 text-sm">No se pudieron cargar las notificaciones.</p>';
+                }
+                if (dropdownBody) {
+                    dropdownBody.innerHTML = '<p class="px-4 py-3 text-red-500 text-sm">No se pudieron cargar las notificaciones.</p>';
+                }
+                unreadCount = 0;
+                updateBadge();
+            }
+
+            loadRead();
+
+            fetch('/api/deportista/notificaciones', { credentials: 'same-origin' })
+                .then(function (res) {
+                    if (!res.ok) {
+                        throw new Error('Error al cargar notificaciones');
+                    }
+                    return res.json();
+                })
+                .then(function (data) {
+                    var items = (data && Array.isArray(data.items)) ? data.items : [];
+                    if (!items.length) {
+                        renderEmpty();
+                        return;
+                    }
+
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+                    if (dropdownBody) {
+                        dropdownBody.innerHTML = '';
+                    }
+
+                    unreadCount = 0;
+
+                    items.forEach(function (n) {
+                        var id = typeof n.id === 'string' ? n.id : null;
+                        var titulo = n.titulo || 'Notificación';
+                        var mensaje = n.mensaje || '';
+                        var url = typeof n.url === 'string' ? n.url : null;
+                        var isRead = id && readMap[id] === true;
+
+                        if (!isRead) {
+                            unreadCount++;
+                        }
+
+                        if (container) {
+                            var item = document.createElement('div');
+                            item.className = 'p-3 rounded-md bg-white border border-gray-200 shadow-sm' + (isRead ? ' opacity-60' : '');
+
+                            var title = document.createElement('div');
+                            title.className = 'font-semibold text-gray-800 text-sm';
+                            title.textContent = titulo;
+
+                            var msg = document.createElement('p');
+                            msg.className = 'text-xs text-gray-600 mt-1';
+                            msg.textContent = mensaje;
+
+                            item.appendChild(title);
+                            item.appendChild(msg);
+
+                            if (url) {
+                                item.classList.add('cursor-pointer');
+                                item.addEventListener('click', function () {
+                                    markAsRead(id);
+                                    window.location.href = url;
+                                });
+                            }
+
+                            container.appendChild(item);
+                        }
+
+                        if (dropdownBody) {
+                            var row = document.createElement('div');
+                            row.className = 'px-4 py-3 border-b border-gray-100 last:border-b-0' + (isRead ? ' bg-gray-50' : ' bg-white');
+
+                            var rowTitle = document.createElement('div');
+                            rowTitle.className = 'text-xs font-semibold text-gray-800';
+                            rowTitle.textContent = titulo;
+
+                            var rowMsg = document.createElement('div');
+                            rowMsg.className = 'text-[0.7rem] text-gray-600 mt-0.5';
+                            rowMsg.textContent = mensaje;
+
+                            row.appendChild(rowTitle);
+                            row.appendChild(rowMsg);
+
+                            if (url) {
+                                row.classList.add('cursor-pointer');
+                                row.addEventListener('click', function (e) {
+                                    e.stopPropagation();
+                                    markAsRead(id);
+                                    window.location.href = url;
+                                });
+                            }
+
+                            dropdownBody.appendChild(row);
+                        }
+                    });
+
+                    updateBadge();
+                })
+                .catch(function () {
+                    renderError();
+                });
+
+            if (bell && dropdown) {
+                bell.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function () {
+                    dropdown.classList.add('hidden');
+                });
+            }
+        });
+    </script>
     <script th:src="@{/sidebar.js}"></script>
 </body>
 </html>

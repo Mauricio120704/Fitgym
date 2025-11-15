@@ -89,4 +89,12 @@ public class Promocion {
 
     public List<PromocionMembresia> getMembresias() { return membresias; }
     public void setMembresias(List<PromocionMembresia> membresias) { this.membresias = membresias; }
+
+    public Integer getUsosDisponibles() {
+        if (maxUsos == null) {
+            return null;
+        }
+        int usadosSeguros = (usados != null) ? usados : 0;
+        return maxUsos - usadosSeguros;
+    }
 }

@@ -60,6 +60,14 @@
                         <span class="sidebar-text ml-3 hidden">Comunidad</span>
                     </a>
                 </li>
+                <li>
+                    <a th:href="@{/deportista/promociones}" th:classappend="${activeMenu == 'promociones-cliente'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Promociones">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10a2 2 0 012 2v6a2 2 0 01-2 2H7l-4 3V9a2 2 0 012-2h2m7 3l-2 2m0 0l-2-2m2 2l2 2m-2-2l-2 2"/>
+                        </svg>
+                        <span class="sidebar-text ml-3 hidden">Promociones</span>
+                    </a>
+                </li>
                 <li th:if="${tieneSuscripcionActiva}">
                     <a th:href="@{/reclamos}" th:classappend="${activeMenu == 'reclamos'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Reclamos">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4"></path></svg>
