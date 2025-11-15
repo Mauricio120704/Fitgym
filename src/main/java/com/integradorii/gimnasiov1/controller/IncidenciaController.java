@@ -123,7 +123,7 @@ public class IncidenciaController {
 
     @RequestMapping(value = "/incidencias/{id}/estado", method = {RequestMethod.POST, RequestMethod.PUT})
     @ResponseBody
-    public Map<String, Object> actualizarEstado(@PathVariable Long id, @RequestBody(required = false) String body,
+    public Map<String, Object> actualizarEstado(@PathVariable long id, @RequestBody(required = false) String body,
                                                 @RequestParam(required = false) String estado) {
         // estado puede venir en body JSON simple ("RESUELTO") o como parámetro
         String nuevoEstado = estado;
@@ -155,7 +155,7 @@ public class IncidenciaController {
     }
 
     @PostMapping("/incidencias/{id}/eliminar")
-    public String eliminar(@PathVariable Long id) {
+    public String eliminar(@PathVariable long id) {
         incidenciaRepository.deleteById(id);
         return "redirect:/incidencias";
     }

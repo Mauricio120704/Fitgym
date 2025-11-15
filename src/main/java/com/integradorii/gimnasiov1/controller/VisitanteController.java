@@ -87,7 +87,7 @@ public class VisitanteController {
     }
 
     @PostMapping("/{id}/registrar-salida")
-    public String registrarSalida(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String registrarSalida(@PathVariable long id, RedirectAttributes redirectAttributes) {
         try {
             Visitante visitante = visitanteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Visitante no encontrado"));

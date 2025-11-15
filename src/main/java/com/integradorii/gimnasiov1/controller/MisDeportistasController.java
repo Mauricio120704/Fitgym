@@ -59,7 +59,7 @@ public class MisDeportistasController {
      * Ver perfil detallado de un deportista
      */
     @GetMapping("/{id}/perfil")
-    public String verPerfilDeportista(@PathVariable Long id, Model model) {
+    public String verPerfilDeportista(@PathVariable long id, Model model) {
         Persona deportista = personaRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Deportista no encontrado"));
         

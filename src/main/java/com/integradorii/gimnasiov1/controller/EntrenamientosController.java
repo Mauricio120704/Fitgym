@@ -56,7 +56,7 @@ public class EntrenamientosController {
     // POST actualizar
     @PostMapping(path = "/entrenamientos/{id}", consumes = "application/x-www-form-urlencoded", produces = "application/json")
     @ResponseBody
-    public Map<String, Object> actualizar(@PathVariable Long id,
+    public Map<String, Object> actualizar(@PathVariable long id,
                                           @RequestParam String tipo,
                                           @RequestParam String diaSemana,
                                           @RequestParam String horaInicio,
@@ -81,7 +81,7 @@ public class EntrenamientosController {
     // POST eliminar/{id} devuelve JSON {success}
     @PostMapping(path = "/entrenamientos/eliminar/{id}", produces = "application/json")
     @ResponseBody
-    public Map<String, Object> eliminar(@PathVariable Long id) {
+    public Map<String, Object> eliminar(@PathVariable long id) {
         Map<String, Object> resp = new HashMap<>();
         if (entrenamientoRepository.existsById(id)) {
             entrenamientoRepository.deleteById(id);

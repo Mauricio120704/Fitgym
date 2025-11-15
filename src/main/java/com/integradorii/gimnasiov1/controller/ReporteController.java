@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/reportes")
@@ -41,7 +42,7 @@ public class ReporteController {
         
         // Generate the membership income report
         Map<String, Object> reporte = reporteService.generarReporteIngresosMembresias(fechaInicio, fechaFin);
-        model.addAllAttributes(reporte);
+        model.addAllAttributes(Objects.requireNonNull(reporte));
         
         return "reportes/ingresos-membresias";
     }

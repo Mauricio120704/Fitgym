@@ -196,10 +196,10 @@ public class ClasesController {
      */
     @PutMapping(value = "/clases/{id}", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public Map<String, Object> actualizar(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+    public Map<String, Object> actualizar(@PathVariable long id, @RequestBody Map<String, Object> body) {
         Clase c = claseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Clase no encontrada"));
         applyFromBody(c, body);
-        claseRepository.save(c);
+        claseRepository.save(java.util.Objects.requireNonNull(c));
         return toJson(c);
     }
 
@@ -209,7 +209,7 @@ public class ClasesController {
      */
     @DeleteMapping("/clases/{id}")
     @ResponseBody
-    public void eliminar(@PathVariable Long id) {
+    public void eliminar(@PathVariable long id) {
         reservaClaseRepository.deleteByClase_Id(id);
         claseRepository.deleteById(id);
     }

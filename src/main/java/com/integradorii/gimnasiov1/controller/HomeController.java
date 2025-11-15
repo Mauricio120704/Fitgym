@@ -284,7 +284,7 @@ public class HomeController {
      * GET /miembros/editar/{id} - Formulario para editar miembro del personal
      */
     @GetMapping("/miembros/editar/{id}")
-    public String editarMiembroForm(@PathVariable Long id, Model model, HttpServletResponse response) {
+    public String editarMiembroForm(@PathVariable long id, Model model, HttpServletResponse response) {
         // Configurar headers para evitar errores de respuesta
         response.setContentType("text/html;charset=UTF-8");
         response.setBufferSize(8192); // Aumentar el tamaño del buffer
@@ -307,7 +307,7 @@ public class HomeController {
      * CUIDADO: Eliminación permanente de la BD
      */
     @PostMapping("/miembros/eliminar/{id}")
-    public String eliminarMiembro(@PathVariable Long id) {
+    public String eliminarMiembro(@PathVariable long id) {
         usuarioRepository.deleteById(id);
         return "redirect:/miembros";
     }
@@ -450,7 +450,7 @@ public class HomeController {
      */
     @PostMapping("/miembros/editar/{id}")
     public String editarMiembro(
-            @PathVariable Long id,
+            @PathVariable long id,
             @RequestParam String nombre,
             @RequestParam String apellido,
             @RequestParam String dni,

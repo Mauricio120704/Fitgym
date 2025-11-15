@@ -82,13 +82,6 @@
             <span class="sidebar-text px-4 text-sm font-semibold text-gray-500 hidden">Gestión</span>
             <ul class="mt-2">
                 <li>
-                    <a th:href="@{/reportes/asistencia-clases}" th:classappend="${activeMenu == 'reporte-asistencia'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Reporte de Asistencia">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h4a1 1 0 001-1V10"/></svg>
-                        <span class="sidebar-text ml-3 hidden">Reporte de Asistencia a Clases</span>
-                    </a>
-                </li>
-                <!-- Registrar removed as requested -->
-                <li>
                     <a th:href="@{/miembros}" th:classappend="${activeMenu == 'miembros'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Personal">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2h5m6-11a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <span class="sidebar-text ml-3 hidden">Personal</span>

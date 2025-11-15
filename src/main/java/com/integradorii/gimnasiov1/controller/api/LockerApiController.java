@@ -60,7 +60,7 @@ public class LockerApiController {
     @PostMapping("/asignar")
     public ResponseEntity<?> asignarLocker(
             @RequestParam String numeroLocker,
-            @RequestParam Long personaId) {
+            @RequestParam long personaId) {
         
         Optional<Locker> lockerOpt = lockerRepository.findByNumero(numeroLocker);
         Optional<Persona> personaOpt = personaRepository.findById(personaId);

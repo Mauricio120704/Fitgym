@@ -62,7 +62,7 @@ public class ComunidadController {
     @GetMapping("/api/comunidad/miembros/{id}")
     @ResponseBody
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<Map<String, Object>> detalle(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> detalle(@PathVariable long id) {
         return personaRepository.findById(id)
                 .filter(p -> Boolean.TRUE.equals(p.getPerfilVisible()))
                 .map(p -> ResponseEntity.ok(toDetail(p)))

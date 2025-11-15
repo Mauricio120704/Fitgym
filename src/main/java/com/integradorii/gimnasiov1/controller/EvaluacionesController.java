@@ -38,7 +38,7 @@ public class EvaluacionesController {
 
     @PostMapping("/evaluaciones/eliminar/{id}")
     @ResponseBody
-    public Map<String, Object> eliminar(@PathVariable Long id) {
+    public Map<String, Object> eliminar(@PathVariable long id) {
         Map<String, Object> resp = new HashMap<>();
         if (evaluacionRepository.existsById(id)) {
             evaluacionRepository.deleteById(id);

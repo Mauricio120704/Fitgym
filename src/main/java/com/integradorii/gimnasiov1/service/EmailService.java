@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import java.util.Objects;
 
 @Service
 public class EmailService {
@@ -39,10 +40,10 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         
-        helper.setFrom(fromEmail);
-        helper.setTo(toEmail);
+        helper.setFrom(Objects.requireNonNull(fromEmail));
+        helper.setTo(Objects.requireNonNull(toEmail));
         helper.setSubject("Verifica tu cuenta - FitGym");
-        helper.setText(htmlContent, true);
+        helper.setText(Objects.requireNonNull(htmlContent), true);
         
         mailSender.send(message);
     }
@@ -112,10 +113,10 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         
-        helper.setFrom(fromEmail);
-        helper.setTo(toEmail);
+        helper.setFrom(Objects.requireNonNull(fromEmail));
+        helper.setTo(Objects.requireNonNull(toEmail));
         helper.setSubject("Recuperación de Contraseña - FitGym");
-        helper.setText(htmlContent, true);
+        helper.setText(Objects.requireNonNull(htmlContent), true);
         
         mailSender.send(message);
     }

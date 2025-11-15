@@ -162,9 +162,9 @@ public class ReporteService {
         Map<String, Double> ingresosPorMetodo = new HashMap<>();
         for (PaymentSummaryDTO item : resumen) {
             ingresosPorMetodo.merge(
-                item.getMetodoPago(), 
-                item.getTotalAmount(), 
-                Double::sum
+                item.getMetodoPago(),
+                item.getTotalAmount(),
+                (a, b) -> (a == null ? 0.0 : a) + (b == null ? 0.0 : b)
             );
         }
         

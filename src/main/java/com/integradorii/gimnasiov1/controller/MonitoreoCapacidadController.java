@@ -1,7 +1,9 @@
 package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.model.Asistencia;
+import com.integradorii.gimnasiov1.model.Persona;
 import com.integradorii.gimnasiov1.repository.AsistenciaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,7 +45,15 @@ public class MonitoreoCapacidadController {
 
         // Convertir las asistencias a un formato adecuado para la vista
         List<Map<String, Object>> registrosRecientes = ultimasAsistencias.stream()
-            .map(this::convertirAsistenciaAMapa)
+            .map(a -> {
+                try {
+                    return convertirAsistenciaAMapa(a);
+                } catch (RuntimeException ex) {
+                    System.err.println("Error al convertir asistencia ID " + a.getId() + ": " + ex.getMessage());
+                    return null; // se filtrará más adelante si es necesario
+                }
+            })
+            .filter(m -> m != null)
             .collect(Collectors.toList());
 
         // Obtener datos para el gráfico de uso por hora
@@ -78,6 +88,7 @@ public class MonitoreoCapacidadController {
 
         // Procesar datos para el gráfico por hora
         Map<Integer, Long> conteoPorHora = asistenciasHoy.stream()
+            .filter(a -> a.getFechaHoraIngreso() != null)
             .collect(Collectors.groupingBy(
                 a -> a.getFechaHoraIngreso().getHour(),
                 Collectors.counting()
@@ -115,18 +126,32 @@ public class MonitoreoCapacidadController {
     private Map<String, Object> convertirAsistenciaAMapa(Asistencia asistencia) {
         Map<String, Object> registro = new HashMap<>();
         registro.put("id", asistencia.getId());
-        registro.put("hora", asistencia.getFechaHoraIngreso().toLocalTime().toString().substring(0, 5));
+
+        LocalDateTime fechaIngreso = asistencia.getFechaHoraIngreso();
+        String horaTexto = "--:--";
+        if (fechaIngreso != null) {
+            String completa = fechaIngreso.toLocalTime().toString();
+            horaTexto = completa.length() >= 5 ? completa.substring(0, 5) : completa;
+        }
+        registro.put("hora", horaTexto);
         registro.put("tipo", asistencia.getFechaHoraSalida() == null ? "Dentro" : "Salida");
 
-        if (asistencia.getPersona() != null) {
+        Persona persona = null;
+        try {
+            persona = asistencia.getPersona();
+        } catch (EntityNotFoundException ex) {
+            System.err.println("Asistencia ID " + asistencia.getId() + " referencia una persona inexistente: " + ex.getMessage());
+        }
+
+        if (persona != null) {
             // Construir el nombre completo a partir de nombre y apellido
             String nombreCompleto = String.format("%s %s",
-                asistencia.getPersona().getNombre() != null ? asistencia.getPersona().getNombre() : "",
-                asistencia.getPersona().getApellido() != null ? asistencia.getPersona().getApellido() : ""
+                persona.getNombre() != null ? persona.getNombre() : "",
+                persona.getApellido() != null ? persona.getApellido() : ""
             ).trim();
 
             registro.put("nombre", nombreCompleto.isEmpty() ? "Usuario sin nombre" : nombreCompleto);
-            registro.put("dni", asistencia.getPersona().getDni() != null ? asistencia.getPersona().getDni() : "N/A");
+            registro.put("dni", persona.getDni() != null ? persona.getDni() : "N/A");
 
             // Usar un avatar generado
             String fotoUrl = String.format("https://ui-avatars.com/api/?name=%s&background=random",
@@ -151,6 +176,7 @@ public class MonitoreoCapacidadController {
 
         // Agrupar por hora y contar asistencias
         Map<Integer, Long> conteoPorHora = asistenciasHoy.stream()
+            .filter(a -> a.getFechaHoraIngreso() != null)
             .collect(Collectors.groupingBy(
                 a -> a.getFechaHoraIngreso().getHour(),
                 Collectors.counting()

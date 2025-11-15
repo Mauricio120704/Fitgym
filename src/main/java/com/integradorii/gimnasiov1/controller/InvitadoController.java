@@ -61,7 +61,7 @@ public class InvitadoController {
      */
     @GetMapping("/registrar/{personaId}")
     public String mostrarFormularioRegistroInvitado(
-            @PathVariable Long personaId,
+            @PathVariable long personaId,
             Model model,
             RedirectAttributes redirectAttributes) {
         
@@ -86,7 +86,7 @@ public class InvitadoController {
      */
     @PostMapping("/registrar/{personaId}")
     public String registrarInvitado(
-            @PathVariable Long personaId,
+            @PathVariable long personaId,
             @ModelAttribute Visitante visitante,
             RedirectAttributes redirectAttributes) {
         
@@ -130,7 +130,7 @@ public class InvitadoController {
      */
     @GetMapping("/persona/{personaId}")
     public String verInvitadosDePersona(
-            @PathVariable Long personaId,
+            @PathVariable long personaId,
             @RequestParam(required = false) String estado,
             Model model,
             RedirectAttributes redirectAttributes) {
@@ -166,7 +166,7 @@ public class InvitadoController {
      */
     @PostMapping("/{id}/registrar-salida")
     public String registrarSalidaInvitado(
-            @PathVariable Long id,
+            @PathVariable long id,
             RedirectAttributes redirectAttributes) {
         
         try {

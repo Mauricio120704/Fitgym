@@ -159,7 +159,7 @@ public class ReservasController {
     @PostMapping("/api/reservas")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> crearReserva(
-            @RequestParam("claseId") Long claseId,
+            @RequestParam("claseId") long claseId,
             @AuthenticationPrincipal UserDetails user) {
         
         Map<String, Object> res = new HashMap<>();

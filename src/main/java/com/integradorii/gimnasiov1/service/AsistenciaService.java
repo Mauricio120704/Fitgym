@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,14 +126,25 @@ public class AsistenciaService {
         // Obtener las últimas 50 asistencias ordenadas por fecha de ingreso descendente
         return asistenciaRepository.findTop50ByOrderByFechaHoraIngresoDesc().stream()
             .map(asistencia -> {
-                Map<String, Object> dto = new HashMap<>();
-                dto.put("id", asistencia.getId());
-                dto.put("nombreCompleto", asistencia.getPersona().getNombre() + " " + asistencia.getPersona().getApellido());
-                dto.put("dni", asistencia.getPersona().getDni());
-                dto.put("fechaHoraIngreso", asistencia.getFechaHoraIngreso());
-                dto.put("fechaHoraSalida", asistencia.getFechaHoraSalida());
-                return dto;
+                try {
+                    Map<String, Object> dto = new HashMap<>();
+                    dto.put("id", asistencia.getId());
+
+                    Persona persona = asistencia.getPersona();
+                    String nombre = persona != null ? Objects.toString(persona.getNombre(), "") : "";
+                    String apellido = persona != null ? Objects.toString(persona.getApellido(), "") : "";
+
+                    dto.put("nombreCompleto", (nombre + " " + apellido).trim());
+                    dto.put("dni", persona != null ? persona.getDni() : null);
+                    dto.put("fechaHoraIngreso", asistencia.getFechaHoraIngreso());
+                    dto.put("fechaHoraSalida", asistencia.getFechaHoraSalida());
+                    return dto;
+                } catch (Exception e) {
+                    System.err.println("Error al procesar asistencia ID " + asistencia.getId() + ": " + e.getMessage());
+                    return null;
+                }
             })
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
     

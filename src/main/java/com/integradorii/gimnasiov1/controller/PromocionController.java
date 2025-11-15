@@ -168,7 +168,7 @@ public class PromocionController {
      * Solo alterna entre ACTIVE e INACTIVE (no afecta EXPIRED)
      */
     @PostMapping("/promociones/{id}/toggle")
-    public String toggle(@PathVariable Long id) {
+    public String toggle(@PathVariable long id) {
         Optional<Promocion> opt = promocionRepository.findById(id);
         if (opt.isPresent()) {
             Promocion p = opt.get();
@@ -190,7 +190,7 @@ public class PromocionController {
      * POST /promociones/{id}/reactivar - Reactiva una promoción vencida con nuevas fechas
      */
     @PostMapping("/promociones/{id}/reactivar")
-    public String reactivar(@PathVariable Long id,
+    public String reactivar(@PathVariable long id,
                             @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
                             @RequestParam(value = "fin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
                             @RequestParam(value = "fechaInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
@@ -216,7 +216,7 @@ public class PromocionController {
      * POST /promociones/{id}/delete - Elimina promoción por ID
      */
     @PostMapping("/promociones/{id}/delete")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable long id) {
         Optional<Promocion> opt = promocionRepository.findById(id);
         if (opt.isPresent()) {
             Promocion p = opt.get();
@@ -233,7 +233,7 @@ public class PromocionController {
      * Reemplaza completamente las membresías asociadas
      */
     @PostMapping("/promociones/{id}/editar")
-    public String editar(@PathVariable Long id,
+    public String editar(@PathVariable long id,
                          @RequestParam String nombre,
                          @RequestParam String tipo,
                          @RequestParam(required = false) String descripcion,
@@ -283,7 +283,7 @@ public class PromocionController {
      * GET /promociones/{id}/historial - Historial por promoción
      */
     @GetMapping("/promociones/{id}/historial")
-    public String historialPorPromocion(@PathVariable Long id, Model model) {
+    public String historialPorPromocion(@PathVariable long id, Model model) {
         Promocion p = promocionRepository.findById(id).orElseThrow();
         model.addAttribute("promocion", p);
         model.addAttribute("historial", historialRepository.findByPromocionIdOrderByRealizadoEnDesc(id));

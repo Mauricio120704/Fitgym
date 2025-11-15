@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/clases/calificaciones")
@@ -51,7 +52,8 @@ public class ClaseCalificacionApiController {
         if (existing.isPresent()) {
             return ResponseEntity.ok(saved);
         }
-        return ResponseEntity.created(URI.create("/api/clases/calificaciones/" + saved.getId())).body(saved);
+        URI location = Objects.requireNonNull(URI.create("/api/clases/calificaciones/" + saved.getId()));
+        return ResponseEntity.created(location).body(saved);
     }
 
     @DeleteMapping("/by-reserva/{reservaId}")
