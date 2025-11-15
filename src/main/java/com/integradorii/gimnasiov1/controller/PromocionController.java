@@ -3,6 +3,8 @@ package com.integradorii.gimnasiov1.controller;
 import com.integradorii.gimnasiov1.model.Promocion;
 import com.integradorii.gimnasiov1.model.PromocionMembresia;
 import com.integradorii.gimnasiov1.repository.PromocionRepository;
+import com.integradorii.gimnasiov1.model.PromocionHistorial;
+import com.integradorii.gimnasiov1.repository.PromocionHistorialRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
 import java.math.BigDecimal;
@@ -28,60 +29,73 @@ import java.util.stream.Collectors;
 public class PromocionController {
 
     private final PromocionRepository promocionRepository;
+    private final PromocionHistorialRepository historialRepository;
 
-    public PromocionController(PromocionRepository promocionRepository) {
+    public PromocionController(PromocionRepository promocionRepository,
+                               PromocionHistorialRepository historialRepository) {
         this.promocionRepository = promocionRepository;
+        this.historialRepository = historialRepository;
     }
 
     /**
      * GET /promociones - Lista todas las promociones
      * Permite búsqueda por nombre/descripción
-     * Separa activas/expiradas de inactivas
+     * Separa activas, expiradas e inactivas
      */
     @GetMapping("/promociones")
     public String listarPromociones(@RequestParam(name = "q", required = false) String q,
                                     @RequestParam(name = "estado", required = false) String estado,
                                     Model model) {
-        List<Promocion> activasYExpiradas;
+        List<Promocion> activas;
+        List<Promocion> expiradas;
         List<Promocion> inactivas;
+        LocalDate hoy = LocalDate.now();
         if (q != null && q.isBlank()) {
             q = null; // Tratar búsqueda vacía como no aplicada para no perder el filtro de estado
         }
+        // Base de datos: o filtradas por texto, o todas
+        List<Promocion> base = (q != null)
+                ? promocionRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(q, q)
+                : promocionRepository.findAll();
+
         if (q != null) {
-            List<Promocion> filtradas = promocionRepository
-                    .findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(q, q);
-            // Separar resultados buscando mantener juntas las promociones visibles en el tablero principal
-            activasYExpiradas = filtradas.stream()
-                    .filter(p -> p.getEstado() == Promocion.Estado.ACTIVE || p.getEstado() == Promocion.Estado.EXPIRED)
-                    .collect(Collectors.toList());
-            inactivas = filtradas.stream()
-                    .filter(p -> p.getEstado() == Promocion.Estado.INACTIVE)
-                    .collect(Collectors.toList());
             model.addAttribute("q", q);
-        } else {
-            activasYExpiradas = promocionRepository.findByEstadoIn(
-                    Arrays.asList(Promocion.Estado.ACTIVE, Promocion.Estado.EXPIRED)
-            );
-            inactivas = promocionRepository.findByEstado(Promocion.Estado.INACTIVE);
         }
+
+        // Expiradas por FECHA (siempre): fechaFin < hoy
+        expiradas = base.stream()
+                .filter(p -> p.getFechaFin() != null && p.getFechaFin().isBefore(hoy))
+                .collect(Collectors.toList());
+
+        // Restantes (no expiradas) separadas por ESTADO
+        List<Promocion> noExpiradas = base.stream()
+                .filter(p -> p.getFechaFin() == null || !p.getFechaFin().isBefore(hoy))
+                .collect(Collectors.toList());
+
+        activas = noExpiradas.stream()
+                .filter(p -> p.getEstado() == Promocion.Estado.ACTIVE)
+                .collect(Collectors.toList());
+
+        inactivas = noExpiradas.stream()
+                .filter(p -> p.getEstado() == Promocion.Estado.INACTIVE)
+                .collect(Collectors.toList());
 
         // Filtro por estado (ACTIVE, INACTIVE, EXPIRED)
         if (estado != null && !estado.isBlank()) {
             try {
                 Promocion.Estado estadoEnum = Promocion.Estado.valueOf(estado);
                 if (estadoEnum == Promocion.Estado.INACTIVE) {
-                    // Solo inactivas
-                    activasYExpiradas = Collections.emptyList();
-                    inactivas = inactivas.stream()
-                            .filter(p -> p.getEstado() == Promocion.Estado.INACTIVE)
-                            .collect(Collectors.toList());
-                } else {
-                    // Solo ACTIVE o EXPIRED en la lista de activas/expiradas
+                    activas = Collections.emptyList();
+                    expiradas = Collections.emptyList();
+                    inactivas = inactivas.stream().filter(p -> p.getEstado() == Promocion.Estado.INACTIVE).collect(Collectors.toList());
+                } else if (estadoEnum == Promocion.Estado.ACTIVE) {
+                    expiradas = Collections.emptyList();
                     inactivas = Collections.emptyList();
-                    Promocion.Estado finalEstado = estadoEnum;
-                    activasYExpiradas = activasYExpiradas.stream()
-                            .filter(p -> p.getEstado() == finalEstado)
-                            .collect(Collectors.toList());
+                    activas = activas.stream().filter(p -> p.getEstado() == Promocion.Estado.ACTIVE).collect(Collectors.toList());
+                } else if (estadoEnum == Promocion.Estado.EXPIRED) {
+                    activas = Collections.emptyList();
+                    inactivas = Collections.emptyList();
+                    // Ya están determinadas por fecha; no aplicar filtro por estado aquí
                 }
                 model.addAttribute("estadoFiltro", estadoEnum.name());
             } catch (IllegalArgumentException e) {
@@ -91,11 +105,14 @@ public class PromocionController {
             model.addAttribute("estadoFiltro", "");
         }
 
-        model.addAttribute("activas", activasYExpiradas);
+        model.addAttribute("activas", activas);
+        model.addAttribute("expiradas", expiradas);
         model.addAttribute("inactivas", inactivas);
         
         // Agregar la lista de estados al modelo
         model.addAttribute("todosEstados", Promocion.Estado.values());
+        // Fecha actual para la vista (evita T(java.time.LocalDate).now())
+        model.addAttribute("hoy", hoy);
         
         return "promociones";
     }
@@ -142,6 +159,7 @@ public class PromocionController {
         }
 
         promocionRepository.save(p);
+        guardarHistorial(p, PromocionHistorial.Accion.CREAR, null, p.getEstado(), "Creación de promoción");
         return "redirect:/promociones";
     }
 
@@ -154,14 +172,44 @@ public class PromocionController {
         Optional<Promocion> opt = promocionRepository.findById(id);
         if (opt.isPresent()) {
             Promocion p = opt.get();
-            if (p.getEstado() == Promocion.Estado.INACTIVE) {
+            Promocion.Estado anterior = p.getEstado();
+            if (anterior == Promocion.Estado.INACTIVE) {
                 p.setEstado(Promocion.Estado.ACTIVE);
-            } else if (p.getEstado() == Promocion.Estado.ACTIVE) {
+                promocionRepository.save(p);
+                guardarHistorial(p, PromocionHistorial.Accion.REACTIVAR, anterior, p.getEstado(), "Reactivación de promoción");
+            } else if (anterior == Promocion.Estado.ACTIVE) {
                 p.setEstado(Promocion.Estado.INACTIVE);
+                promocionRepository.save(p);
+                guardarHistorial(p, PromocionHistorial.Accion.TOGGLE, anterior, p.getEstado(), "Cambio de estado");
             }
-            promocionRepository.save(p);
         }
         return "redirect:/promociones";
+    }
+
+    /**
+     * POST /promociones/{id}/reactivar - Reactiva una promoción vencida con nuevas fechas
+     */
+    @PostMapping("/promociones/{id}/reactivar")
+    public String reactivar(@PathVariable Long id,
+                            @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+                            @RequestParam(value = "fin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
+                            @RequestParam(value = "fechaInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+                            @RequestParam(value = "fechaFin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+        Promocion p = promocionRepository.findById(id).orElseThrow();
+        Promocion.Estado anterior = p.getEstado();
+        if (inicio == null) inicio = fechaInicio;
+        if (fin == null) fin = fechaFin;
+        if (fin != null && inicio != null && fin.isBefore(inicio)) {
+            // En caso de rango inválido, solo redirige sin cambios; se podría mejorar con feedback
+            return "redirect:/promociones";
+        }
+        p.setFechaInicio(inicio);
+        p.setFechaFin(fin);
+        p.setEstado(Promocion.Estado.ACTIVE);
+        promocionRepository.save(p);
+        guardarHistorial(p, PromocionHistorial.Accion.REACTIVAR, anterior, p.getEstado(),
+                "Reactivación con nuevo período: " + inicio + " - " + fin);
+        return "redirect:/promociones#promo-" + id;
     }
 
     /**
@@ -169,7 +217,14 @@ public class PromocionController {
      */
     @PostMapping("/promociones/{id}/delete")
     public String delete(@PathVariable Long id) {
-        promocionRepository.deleteById(id);
+        Optional<Promocion> opt = promocionRepository.findById(id);
+        if (opt.isPresent()) {
+            Promocion p = opt.get();
+            guardarHistorial(p, PromocionHistorial.Accion.ELIMINAR, p.getEstado(), null, "Eliminación de promoción");
+            promocionRepository.deleteById(id);
+        } else {
+            promocionRepository.deleteById(id);
+        }
         return "redirect:/promociones";
     }
 
@@ -188,6 +243,7 @@ public class PromocionController {
                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
                          @RequestParam(name = "membership", required = false) List<String> memberships) {
         Promocion p = promocionRepository.findById(id).orElseThrow();
+        Promocion.Estado anterior = p.getEstado();
         p.setNombre(nombre);
         p.setDescripcion(descripcion);
         p.setTipo("AMOUNT".equalsIgnoreCase(tipo) ? Promocion.TipoDescuento.AMOUNT : Promocion.TipoDescuento.PERCENTAGE);
@@ -210,6 +266,39 @@ public class PromocionController {
             }
         }
         promocionRepository.save(p);
+        guardarHistorial(p, PromocionHistorial.Accion.EDITAR, anterior, p.getEstado(), "Edición de promoción");
         return "redirect:/promociones";
+    }
+
+    /**
+     * GET /promociones/historial - Historial global de promociones
+     */
+    @GetMapping("/promociones/historial")
+    public String historialGlobal(Model model) {
+        model.addAttribute("historial", historialRepository.findAllWithPromocionOrderByRealizadoEnDesc());
+        return "promociones_historial";
+    }
+
+    /**
+     * GET /promociones/{id}/historial - Historial por promoción
+     */
+    @GetMapping("/promociones/{id}/historial")
+    public String historialPorPromocion(@PathVariable Long id, Model model) {
+        Promocion p = promocionRepository.findById(id).orElseThrow();
+        model.addAttribute("promocion", p);
+        model.addAttribute("historial", historialRepository.findByPromocionIdOrderByRealizadoEnDesc(id));
+        return "promocion_historial";
+    }
+
+    private void guardarHistorial(Promocion p, PromocionHistorial.Accion accion,
+                                  Promocion.Estado anterior, Promocion.Estado nuevo,
+                                  String detalle) {
+        PromocionHistorial h = new PromocionHistorial();
+        h.setPromocion(p);
+        h.setAccion(accion);
+        h.setEstadoAnterior(anterior);
+        h.setEstadoNuevo(nuevo);
+        h.setDetalle(detalle);
+        historialRepository.save(h);
     }
 }

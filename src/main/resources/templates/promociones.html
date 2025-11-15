@@ -109,6 +109,7 @@
         .badge-completed{ background:#e0e7ff; color:#3730a3; }
         .chip-expired{ background:#fee2e2; color:#b91c1c; padding:.2rem .5rem; border-radius:999px; font-size:.7rem; font-weight:700; margin-left:.5rem; }
         .promo-description{ color:#6c757d; font-size:.9rem; margin-bottom:1.5rem; }
+        .promo-description{ display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; min-height:3.6em; }
         .promo-value{ background:linear-gradient(135deg,#f0f4ff 0%,#e0e7ff 100%); border-radius:10px; padding:2rem; text-align:center; margin-bottom:1.5rem; min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
         .value-icon{ color:#93a3ff; font-size:2rem; margin-bottom:.5rem; }
         .value-amount{ font-size:2.75rem; font-weight:700; color:#f97316; margin-bottom:.25rem; }
@@ -124,8 +125,8 @@
         .usage-count{ font-size:.85rem; font-weight:600; color:#000; }
         .progress-bar{ height:8px; background:#e5e7eb; border-radius:10px; overflow:hidden; margin-bottom:.5rem; }
         .progress-fill{ height:100%; background:linear-gradient(90deg,#f97316 0%, #fb923c 100%); border-radius:10px; transition:width .3s ease; }
-        .promo-actions{ display:grid; grid-template-columns:repeat(3,1fr); gap:.75rem; margin-top:auto; }
-        .promo-actions > *{ width:100%; }
+        .promo-actions{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin-top:auto; align-items:stretch; }
+        .promo-actions > *{ width:100%; min-width:0; }
         .promo-actions form{ width:100%; display:contents; }
         .btn-action{ 
             flex: 1;
@@ -135,13 +136,15 @@
             border-radius: 8px;
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             font-size: 0.9rem;
             font-weight: 500;
             color: #374151;
             transition: all 0.2s ease;
+            min-height: 44px;
         }
         
         .btn-action:hover {
@@ -153,7 +156,8 @@
             transform: translateY(0);
         }
         .btn-action:hover { background:#fff; border-color:#d1d5db; box-shadow:0 1px 3px rgba(0,0,0,.1); }
-        .btn-action .emoji { font-size: 1.2em; }
+        .btn-action .emoji { font-size: 1.3rem; line-height: 1; }
+        .btn-action span { white-space: nowrap; }
         .btn-action.edit { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
         .btn-action.edit:hover { background: #dbeafe; }
         
@@ -189,6 +193,8 @@
         .btn-primary:hover{ background:#ea580c; }
         /* Se usa auto-fill con minmax en .promo-grid; no forzar 1 columna en 1400px para mantener responsividad natural */
         @media (max-width:768px){ .container{ padding:1rem; } .form-row{ grid-template-columns:1fr; } }
+        .reactivate-section{ display:flex; gap:.5rem; align-items:center; margin:.5rem 0 1rem; }
+        .reactivate-section .form-input{ padding:.4rem .6rem; height:36px; }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -231,7 +237,8 @@
                 <h1>Gestión de Promociones</h1>
                 <p>Crea y administra descuentos en membresías</p>
             </div>
-            <form id="searchForm" th:action="@{/promociones}" method="get" style="display: flex; flex-wrap: nowrap; gap: 0.5rem; align-items: center; width: 100%; max-width: 800px; margin-left: auto;">
+            <div style="display:flex; align-items:center; gap:.5rem; margin-left:auto;">
+            <form id="searchForm" th:action="@{/promociones}" method="get" style="display: flex; flex-wrap: nowrap; gap: 0.5rem; align-items: center; width: 100%; max-width: 800px;">
                 <div style="position: relative; flex: 1; min-width: 200px;">
                     <svg style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; z-index: 10;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
@@ -262,14 +269,16 @@
                     Filtrar
                 </button>
             </form>
+            <a th:href="@{/promociones/historial}" class="btn btn-secondary" style="white-space:nowrap;">Historial</a>
+            </div>
         </div>
 
         <section>
             <h2 class="section-title">Promociones Activas</h2>
             <div class="promo-grid">
-                <div th:each="p : ${activas}" class="promo-card">
+                <div th:each="p : ${activas}" class="promo-card" th:attr="id=${'promo-' + p.id}">
                     <div class="promo-header">
-                        <div class="promo-title-wrapper" th:with="now=${T(java.time.LocalDate).now()}">
+                        <div class="promo-title-wrapper" th:with="now=${hoy}">
                             <h3 class="promo-title" th:text="${p.nombre}">Nombre</h3>
                             <span class="badge"
                                   th:classappend="
@@ -331,7 +340,7 @@
                                   data-inicio=${#temporals.format(p.fechaInicio, 'yyyy-MM-dd')},
                                   data-fin=${#temporals.format(p.fechaFin, 'yyyy-MM-dd')}
                                 "
-                                onclick="openEditFromButton(this)">✏️ Editar</button>
+                                onclick="openEditFromButton(this)"><span class="emoji">✏️</span><span>Editar</span></button>
                         <form th:action="@{'/promociones/' + ${p.id} + '/toggle'}" method="post">
                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <button class="btn-action" type="submit">
@@ -341,7 +350,57 @@
                         </form>
                         <form th:action="@{'/promociones/' + ${p.id} + '/delete'}" method="post" onsubmit="return confirm('¿Eliminar esta promoción?');">
                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button class="btn-action delete" type="submit">🗑️ Eliminar</button>
+                            <button class="btn-action delete" type="submit"><span class="emoji">🗑️</span><span>Eliminar</span></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2 class="section-title">Promociones Expiradas</h2>
+            <div class="promo-grid">
+                <div th:each="p : ${expiradas}" class="promo-card" th:attr="id=${'promo-' + p.id}">
+                    <div class="promo-header">
+                        <div class="promo-title-wrapper" th:with="now=${hoy}">
+                            <h3 class="promo-title" th:text="${p.nombre}">Nombre</h3>
+                            <span class="badge badge-completed">Concluida</span>
+                            <span class="chip-expired">Expirada</span>
+                        </div>
+                    </div>
+                    <p class="promo-description" th:text="${p.descripcion}">Descripción</p>
+                    <div class="promo-value">
+                        <div class="value-icon" th:text="${p.tipo.name() == 'PERCENTAGE' ? '%' : 'S/'}">%</div>
+                        <div class="value-amount" th:text="${p.tipo.name() == 'PERCENTAGE' ? '%' + p.valor : 'S/ ' + p.valor}">$20</div>
+                        <div class="value-label" th:text="${p.tipo.name() == 'PERCENTAGE' ? 'DESCUENTO' : 'AHORRO'}">DESCUENTO</div>
+                    </div>
+                    <div class="promo-actions">
+                        <button class="btn-action" type="button"
+                                th:attr="
+                                  data-id=${p.id},
+                                  data-nombre=${p.nombre},
+                                  data-tipo=${p.tipo.name()},
+                                  data-descripcion=${p.descripcion},
+                                  data-valor=${p.valor},
+                                  data-maxusos=${p.maxUsos},
+                                  data-inicio=${#temporals.format(p.fechaInicio, 'yyyy-MM-dd')},
+                                  data-fin=${#temporals.format(p.fechaFin, 'yyyy-MM-dd')}
+                                "
+                                onclick="openEditFromButton(this)"><span class="emoji">✏️</span><span>Editar</span></button>
+                        <button class="btn-action" type="button"
+                                th:attr="
+                                  data-id=${p.id},
+                                  data-nombre=${p.nombre},
+                                  data-tipo=${p.tipo.name()},
+                                  data-descripcion=${p.descripcion},
+                                  data-valor=${p.valor},
+                                  data-maxusos=${p.maxUsos},
+                                  data-inicio=${#temporals.format(hoy, 'yyyy-MM-dd')},
+                                  data-fin=${#temporals.format(hoy.plusDays(30), 'yyyy-MM-dd')}
+                                "
+                                onclick="openReactivateFromButton(this)"><span class="emoji">▶️</span><span>Reactivar</span></button>
+                        <form th:action="@{'/promociones/' + ${p.id} + '/delete'}" method="post" onsubmit="return confirm('¿Eliminar esta promoción?');">
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button class="btn-action delete" type="submit"><span class="emoji">🗑️</span><span>Eliminar</span></button>
                         </form>
                     </div>
                 </div>
@@ -351,9 +410,9 @@
         <section>
             <h2 class="section-title">Promociones Inactivas</h2>
             <div class="promo-grid">
-                <div th:each="p : ${inactivas}" class="promo-card">
+                <div th:each="p : ${inactivas}" class="promo-card" th:attr="id=${'promo-' + p.id}">
                     <div class="promo-header">
-                        <div class="promo-title-wrapper" th:with="now=${T(java.time.LocalDate).now()}">
+                        <div class="promo-title-wrapper" th:with="now=${hoy}">
                             <h3 class="promo-title" th:text="${p.nombre}">Nombre</h3>
                             <span class="badge"
                                   th:classappend="
@@ -385,14 +444,14 @@
                                   data-inicio=${#temporals.format(p.fechaInicio, 'yyyy-MM-dd')},
                                   data-fin=${#temporals.format(p.fechaFin, 'yyyy-MM-dd')}
                                 "
-                                onclick="openEditFromButton(this)">✏️ Editar</button>
+                                onclick="openEditFromButton(this)"><span class="emoji">✏️</span><span>Editar</span></button>
                         <form th:action="@{'/promociones/' + ${p.id} + '/toggle'}" method="post">
                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button class="btn-action" type="submit">▶️ Activar</button>
+                            <button class="btn-action" type="submit"><span class="emoji">▶️</span><span>Activar</span></button>
                         </form>
                         <form th:action="@{'/promociones/' + ${p.id} + '/delete'}" method="post" onsubmit="return confirm('¿Eliminar esta promoción?');">
                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button class="btn-action delete" type="submit">🗑️ Eliminar</button>
+                            <button class="btn-action delete" type="submit"><span class="emoji">🗑️</span><span>Eliminar</span></button>
                         </form>
                     </div>
                 </div>
@@ -462,7 +521,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Crear Promoción</button>
+                    <button type="submit" id="modalSubmitButton" class="btn btn-primary">Crear Promoción</button>
                 </div>
             </form>
         </div>
@@ -477,6 +536,8 @@
             document.getElementById('modalTitle').textContent = 'Nueva Promoción';
             form.reset();
             updateDiscountPrefix();
+            const submitBtn = document.getElementById('modalSubmitButton');
+            if (submitBtn) submitBtn.textContent = 'Crear Promoción';
             openModal();
         }
         function updateDiscountPrefix(){
@@ -500,6 +561,26 @@
             updateDiscountPrefix();
             // Si en el futuro se pasa la lista de membresías por data-*, aquí se puede mapear.
             // Por ahora se dejan como están y el usuario puede re-seleccionarlas.
+            const submitBtn = document.getElementById('modalSubmitButton');
+            if (submitBtn) submitBtn.textContent = 'Guardar cambios';
+            openModal();
+        }
+
+        function openReactivateFromButton(btn){
+            const form = document.getElementById('promoForm');
+            const id = btn.dataset.id;
+            form.setAttribute('action', '/promociones/' + id + '/reactivar');
+            document.getElementById('modalTitle').textContent = 'Reactivar Promoción';
+            document.getElementById('promoName').value = btn.dataset.nombre;
+            document.getElementById('discountType').value = btn.dataset.tipo;
+            document.getElementById('description').value = btn.dataset.descripcion || '';
+            document.getElementById('discountValue').value = btn.dataset.valor;
+            document.getElementById('maxUses').value = btn.dataset.maxusos;
+            document.getElementById('startDate').value = btn.dataset.inicio;
+            document.getElementById('endDate').value = btn.dataset.fin;
+            updateDiscountPrefix();
+            const submitBtn = document.getElementById('modalSubmitButton');
+            if (submitBtn) submitBtn.textContent = 'Reactivar';
             openModal();
         }
     </script>
