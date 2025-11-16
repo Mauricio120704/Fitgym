@@ -156,7 +156,6 @@ public class NotificacionesDeportistaController {
 
         OffsetDateTime ahora = OffsetDateTime.now(ZoneId.systemDefault());
 
-        // Clases nuevas disponibles para reservar en los próximos 7 días (que el deportista aún no reservó)
         OffsetDateTime limiteClases = ahora.plusDays(7);
         List<Clase> clasesProximasDisponibles = claseRepository.findByFechaAfterOrderByFechaAsc(ahora);
         int maxClasesNuevas = 3;
@@ -183,7 +182,7 @@ public class NotificacionesDeportistaController {
             String fechaClaseTexto = c.getFecha().format(fechaHoraFormatter);
             n.put("mensaje", "Se ha agregado la clase \"" + nombreClaseDisponible + "\" para el " + fechaClaseTexto + ".");
             n.put("fechaReferencia", c.getFecha());
-            n.put("url", "/reservas");
+            n.put("url", "/reservas?fecha=" + c.getFecha().toLocalDate());
             items.add(n);
             contadorClasesNuevas++;
         }
@@ -207,7 +206,7 @@ public class NotificacionesDeportistaController {
             String textoFecha = fechaClase.format(fechaHoraFormatter);
             n.put("mensaje", "Tienes la clase \"" + nombreClase + "\" el " + textoFecha + ".");
             n.put("fechaReferencia", fechaClase);
-            n.put("url", "/reservas");
+            n.put("url", "/reservas?fecha=" + fechaClase.toLocalDate());
             items.add(n);
             contador++;
         }

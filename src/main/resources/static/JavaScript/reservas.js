@@ -140,10 +140,18 @@ function capitalize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
 // Inicializar Flatpickr y cargar datos
 document.addEventListener("DOMContentLoaded", function() {
+  const params = new URLSearchParams(window.location.search);
+  const fechaParam = params.get("fecha");
+
+  let defaultDateOption = "today";
+  if (fechaParam && /^\d{4}-\d{2}-\d{2}$/.test(fechaParam)) {
+    defaultDateOption = fechaParam;
+  }
+
   const fp = flatpickr("#calendario-inline", {
     inline: true,
     locale: "es",
-    defaultDate: "today",
+    defaultDate: defaultDateOption,
     dateFormat: "Y-m-d",
     onChange: function(selectedDates, dateStr) {
       if (selectedDates.length > 0) {
