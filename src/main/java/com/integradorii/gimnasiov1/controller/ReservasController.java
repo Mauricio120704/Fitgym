@@ -6,6 +6,7 @@ import com.integradorii.gimnasiov1.model.ReservaClase;
 import com.integradorii.gimnasiov1.repository.ClaseRepository;
 import com.integradorii.gimnasiov1.repository.PersonaRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
+import com.integradorii.gimnasiov1.repository.SuscripcionRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,13 +30,16 @@ public class ReservasController {
     private final ClaseRepository claseRepository;
     private final ReservaClaseRepository reservaClaseRepository;
     private final PersonaRepository personaRepository;
+    private final SuscripcionRepository suscripcionRepository;
 
     public ReservasController(ClaseRepository claseRepository,
                               ReservaClaseRepository reservaClaseRepository,
-                              PersonaRepository personaRepository) {
+                              PersonaRepository personaRepository,
+                              SuscripcionRepository suscripcionRepository) {
         this.claseRepository = claseRepository;
         this.reservaClaseRepository = reservaClaseRepository;
         this.personaRepository = personaRepository;
+        this.suscripcionRepository = suscripcionRepository;
     }
 
     /**
@@ -113,6 +117,8 @@ public class ReservasController {
             
             // Rating fijo (placeholder)
             m.put("rating", "4.8");
+            m.put("esPago", Boolean.TRUE.equals(c.getEsPago()));
+            m.put("precio", c.getPrecio());
             return m;
         }).collect(Collectors.toList());
     }
@@ -217,6 +223,43 @@ public class ReservasController {
             res.put("success", false);
             res.put("message", "La clase está completa");
             return ResponseEntity.badRequest().body(res);
+        }
+
+        // Validación 8: Manejar clases pagadas según membresía y bandera "para todos"
+        if (Boolean.TRUE.equals(clase.getEsPago())) {
+            boolean requierePago = false;
+
+            var suscripcionActivaOpt = suscripcionRepository.findActiveByDeportistaId(deportista.getId());
+            boolean esPremiumOElite = false;
+            if (suscripcionActivaOpt.isPresent() && suscripcionActivaOpt.get().getPlan() != null) {
+                String nombrePlan = Optional.ofNullable(suscripcionActivaOpt.get().getPlan().getNombre())
+                        .orElse("").toLowerCase();
+                // Premium o Elite reservan gratis
+                if (nombrePlan.contains("premium") || nombrePlan.contains("elite")) {
+                    esPremiumOElite = true;
+                }
+            }
+
+            if (esPremiumOElite) {
+                // Miembros Premium/Elite reservan sin pago adicional
+                requierePago = false;
+            } else {
+                // Básico o sin membresía: solo pueden reservar pagando si la clase es "para todos"
+                if (!Boolean.TRUE.equals(clase.getParaTodos())) {
+                    res.put("success", false);
+                    res.put("message", "Esta clase es solo para miembros.");
+                    return ResponseEntity.badRequest().body(res);
+                }
+                requierePago = true;
+            }
+
+            if (requierePago) {
+                res.put("success", false);
+                res.put("requiresPayment", true);
+                res.put("message", "Esta clase requiere pago para tu tipo de membresía.");
+                res.put("checkoutUrl", "/checkout/clase?claseId=" + clase.getId());
+                return ResponseEntity.ok(res);
+            }
         }
 
         // Todas las validaciones pasaron, crear la reserva

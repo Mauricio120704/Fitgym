@@ -199,7 +199,15 @@ async function reservarClase(claseId){
       body: body.toString()
     });
     const data = await resp.json().catch(() => ({ success:false, message:'Error inesperado'}));
-    if (!resp.ok || !data.success){
+    if (!resp.ok){
+      alert(data.message || 'No se pudo crear la reserva');
+    } else if (data.requiresPayment){
+      if (data.checkoutUrl){
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert(data.message || 'Esta clase requiere pago.');
+      }
+    } else if (!data.success){
       alert(data.message || 'No se pudo crear la reserva');
     } else {
       alert('✅ ' + data.message);

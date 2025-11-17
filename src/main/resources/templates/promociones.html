@@ -379,7 +379,10 @@
                                   data-valor=${p.valor},
                                   data-maxusos=${p.maxUsos},
                                   data-inicio=${#temporals.format(p.fechaInicio, 'yyyy-MM-dd')},
-                                  data-fin=${#temporals.format(p.fechaFin, 'yyyy-MM-dd')}
+                                  data-fin=${#temporals.format(p.fechaFin, 'yyyy-MM-dd')},
+                                  data-tipopromocion=${p.tipoPromocion},
+                                  data-tipoplan=${p.tipoPlan},
+                                  data-claseid=${p.clase == null ? '' : p.clase.id}
                                 "
                                 onclick="openEditFromButton(this)"><span class="emoji">✏️</span><span>Editar</span></button>
                         <form th:action="@{'/promociones/' + ${p.id} + '/toggle'}" method="post">
@@ -436,7 +439,10 @@
                                   data-valor=${p.valor},
                                   data-maxusos=${p.maxUsos},
                                   data-inicio=${#temporals.format(hoy, 'yyyy-MM-dd')},
-                                  data-fin=${#temporals.format(hoy.plusDays(30), 'yyyy-MM-dd')}
+                                  data-fin=${#temporals.format(hoy.plusDays(30), 'yyyy-MM-dd')},
+                                  data-tipopromocion=${p.tipoPromocion},
+                                  data-tipoplan=${p.tipoPlan},
+                                  data-claseid=${p.clase == null ? '' : p.clase.id}
                                 "
                                 onclick="openReactivateFromButton(this)"><span class="emoji">▶️</span><span>Reactivar</span></button>
                         <form th:action="@{'/promociones/' + ${p.id} + '/delete'}" method="post" onsubmit="return confirm('¿Eliminar esta promoción?');">
@@ -552,13 +558,37 @@
                     </div>
                 </div>
                 <div class="form-group full-width">
+                    <label class="form-label">Aplicar a <span class="required">*</span></label>
+                    <select class="form-select" name="tipoPromocion" id="promoType" required onchange="updatePromoTypeSections()">
+                        <option value="MEMBRESIA" selected>Plan de membresía</option>
+                        <option value="CLASE">Clase individual</option>
+                    </select>
+                </div>
+                <div class="form-group full-width" id="membresiasSection">
                     <label class="form-label">Membresías Aplicables <span class="required">*</span></label>
                     <div class="checkbox-group">
                         <label class="checkbox-label"><input type="checkbox" class="form-checkbox" name="membership" value="Mensual"> <span>Mensual</span></label>
-                        <label class="checkbox-label"><input type="checkbox" class="form-checkbox" name="membership" value="Trimestral"> <span>Trimestral</span></label>
-                        <label class="checkbox-label"><input type="checkbox" class="form-checkbox" name="membership" value="Semestral"> <span>Semestral</span></label>
                         <label class="checkbox-label"><input type="checkbox" class="form-checkbox" name="membership" value="Anual"> <span>Anual</span></label>
                     </div>
+                </div>
+                <div class="form-group full-width" id="tipoPlanSection">
+                    <label class="form-label">Tipo de plan (opcional)</label>
+                    <select class="form-select" name="tipoPlan" id="tipoPlan">
+                        <option value="">Todos los tipos</option>
+                        <option value="Básico">Básico</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Elite">Elite</option>
+                    </select>
+                </div>
+                <div class="form-group full-width" id="claseSection" style="display:none;">
+                    <label class="form-label">Clase aplicable</label>
+                    <select class="form-select" name="claseId" id="claseId">
+                        <option value="">-- Selecciona una clase --</option>
+                        <option th:each="clase : ${clasesDisponibles}"
+                                th:value="${clase.id}"
+                                th:text="${#temporals.format(clase.fecha, 'dd/MM/yyyy HH:mm') + ' - ' + clase.nombre}">
+                        </option>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -571,12 +601,65 @@
     <script>
         function openModal(){ document.getElementById('modalOverlay').style.display='flex'; }
         function closeModal(){ document.getElementById('modalOverlay').style.display='none'; }
+        async function cargarClasesPorRango() {
+            const inicio = document.getElementById('startDate')?.value;
+            const fin = document.getElementById('endDate')?.value;
+            const select = document.getElementById('claseId');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">-- Selecciona una clase --</option>';
+
+            if (!inicio || !fin) {
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams({ inicio, fin });
+                const resp = await fetch('/promociones/clases-disponibles?' + params.toString());
+                if (!resp.ok) return;
+                const data = await resp.json();
+                (data || []).forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.label;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Error cargando clases para promociones', e);
+            }
+        }
+
+        async function updatePromoTypeSections(){
+            const promoType = document.getElementById('promoType').value;
+            const membresiasSection = document.getElementById('membresiasSection');
+            const tipoPlanSection = document.getElementById('tipoPlanSection');
+            const claseSection = document.getElementById('claseSection');
+
+            if (promoType === 'CLASE') {
+                if (membresiasSection) membresiasSection.style.display = 'none';
+                if (tipoPlanSection) tipoPlanSection.style.display = 'none';
+                if (claseSection) claseSection.style.display = 'block';
+                await cargarClasesPorRango();
+            } else {
+                if (membresiasSection) membresiasSection.style.display = 'block';
+                if (tipoPlanSection) tipoPlanSection.style.display = 'block';
+                if (claseSection) claseSection.style.display = 'none';
+            }
+        }
         function openModalCreate(){
             const form = document.getElementById('promoForm');
             form.setAttribute('action', '/promociones');
             document.getElementById('modalTitle').textContent = 'Nueva Promoción';
             form.reset();
+            // valores por defecto
+            const promoType = document.getElementById('promoType');
+            if (promoType) promoType.value = 'MEMBRESIA';
+            const tipoPlan = document.getElementById('tipoPlan');
+            if (tipoPlan) tipoPlan.value = '';
+            const claseSelect = document.getElementById('claseId');
+            if (claseSelect) claseSelect.value = '';
             updateDiscountPrefix();
+            updatePromoTypeSections();
             const submitBtn = document.getElementById('modalSubmitButton');
             if (submitBtn) submitBtn.textContent = 'Crear Promoción';
             openModal();
@@ -599,9 +682,23 @@
             document.getElementById('maxUses').value = btn.dataset.maxusos;
             document.getElementById('startDate').value = btn.dataset.inicio;
             document.getElementById('endDate').value = btn.dataset.fin;
+
+            const promoType = document.getElementById('promoType');
+            const tipoPlan = document.getElementById('tipoPlan');
+            const claseSelect = document.getElementById('claseId');
+            if (promoType && btn.dataset.tipopromocion) {
+                promoType.value = btn.dataset.tipopromocion;
+            }
+            if (tipoPlan) {
+                tipoPlan.value = btn.dataset.tipoplan || '';
+            }
+
             updateDiscountPrefix();
-            // Si en el futuro se pasa la lista de membresías por data-*, aquí se puede mapear.
-            // Por ahora se dejan como están y el usuario puede re-seleccionarlas.
+            updatePromoTypeSections().then(() => {
+                if (claseSelect && btn.dataset.claseid) {
+                    claseSelect.value = btn.dataset.claseid;
+                }
+            });
             const submitBtn = document.getElementById('modalSubmitButton');
             if (submitBtn) submitBtn.textContent = 'Guardar cambios';
             openModal();
@@ -619,11 +716,42 @@
             document.getElementById('maxUses').value = btn.dataset.maxusos;
             document.getElementById('startDate').value = btn.dataset.inicio;
             document.getElementById('endDate').value = btn.dataset.fin;
+
+            const promoType = document.getElementById('promoType');
+            const tipoPlan = document.getElementById('tipoPlan');
+            const claseSelect = document.getElementById('claseId');
+            if (promoType && btn.dataset.tipopromocion) {
+                promoType.value = btn.dataset.tipopromocion;
+            }
+            if (tipoPlan) {
+                tipoPlan.value = btn.dataset.tipoplan || '';
+            }
+
             updateDiscountPrefix();
+            updatePromoTypeSections().then(() => {
+                if (claseSelect && btn.dataset.claseid) {
+                    claseSelect.value = btn.dataset.claseid;
+                }
+            });
             const submitBtn = document.getElementById('modalSubmitButton');
             if (submitBtn) submitBtn.textContent = 'Reactivar';
             openModal();
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+            if (startInput) startInput.addEventListener('change', () => {
+                if (document.getElementById('promoType').value === 'CLASE') {
+                    cargarClasesPorRango();
+                }
+            });
+            if (endInput) endInput.addEventListener('change', () => {
+                if (document.getElementById('promoType').value === 'CLASE') {
+                    cargarClasesPorRango();
+                }
+            });
+        });
     </script>
             </main>
         </div>

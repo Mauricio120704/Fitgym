@@ -59,7 +59,11 @@ public class ClaseViewService {
             ocupadosPremium,
             ocupadosElite,
             tipoClaseId,
-            tipoClaseNombre
+            tipoClaseNombre,
+            c.getCuposBasico(),
+            c.getEsPago(),
+            c.getParaTodos(),
+            c.getPrecio()
     );
     }
 }

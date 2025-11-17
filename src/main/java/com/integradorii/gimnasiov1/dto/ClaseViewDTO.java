@@ -1,5 +1,6 @@
 package com.integradorii.gimnasiov1.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -16,13 +17,19 @@ public class ClaseViewDTO {
     private Long ocupadosElite;
     private Long tipoClaseId;
     private String tipoClaseNombre;
+    private Integer cuposBasico;
+    private Boolean esPago;
+    private Boolean paraTodos;
+    private BigDecimal precio;
 
     public ClaseViewDTO() {}
 
     public ClaseViewDTO(Long id, String nombre, String instructor, LocalDate fecha, LocalTime hora,
                          Integer duracion, Integer cuposPremium, Integer cuposElite,
                          Long ocupadosPremium, Long ocupadosElite,
-                         Long tipoClaseId, String tipoClaseNombre) {
+                         Long tipoClaseId, String tipoClaseNombre,
+                         Integer cuposBasico,
+                         Boolean esPago, Boolean paraTodos, BigDecimal precio) {
         this.id = id;
         this.nombre = nombre;
         this.instructor = instructor;
@@ -35,6 +42,10 @@ public class ClaseViewDTO {
         this.ocupadosElite = ocupadosElite;
         this.tipoClaseId = tipoClaseId;
         this.tipoClaseNombre = tipoClaseNombre;
+        this.cuposBasico = cuposBasico;
+        this.esPago = esPago;
+        this.paraTodos = paraTodos;
+        this.precio = precio;
     }
 
     public Long getId() { return id; }
@@ -61,4 +72,12 @@ public class ClaseViewDTO {
     public void setTipoClaseId(Long tipoClaseId) { this.tipoClaseId = tipoClaseId; }
     public String getTipoClaseNombre() { return tipoClaseNombre; }
     public void setTipoClaseNombre(String tipoClaseNombre) { this.tipoClaseNombre = tipoClaseNombre; }
+    public Integer getCuposBasico() { return cuposBasico; }
+    public void setCuposBasico(Integer cuposBasico) { this.cuposBasico = cuposBasico; }
+    public Boolean getEsPago() { return esPago; }
+    public void setEsPago(Boolean esPago) { this.esPago = esPago; }
+    public Boolean getParaTodos() { return paraTodos; }
+    public void setParaTodos(Boolean paraTodos) { this.paraTodos = paraTodos; }
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 }

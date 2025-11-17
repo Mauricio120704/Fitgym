@@ -179,6 +179,10 @@
                                                         th:data-cupos-elite="${clase.cuposElite}"
                                                         th:data-tipo-id="${clase.tipoClaseId}"
                                                         th:data-tipo-nombre="${clase.tipoClaseNombre}"
+                                                        th:data-cupos-basico="${clase.cuposBasico}"
+                                                        th:data-es-pago="${clase.esPago}"
+                                                        th:data-para-todos="${clase.paraTodos}"
+                                                        th:data-precio="${clase.precio}"
                                                         title="Editar">
                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -317,7 +321,12 @@
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">Cupos por Tipo de Membresía</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Membresía Básico *</label>
+                            <input type="number" id="clase-cupos-basico" min="0" step="1" value="0" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Membresía Premium *</label>
                             <input type="number" id="clase-cupos-premium" min="0" step="1" value="15" required
@@ -328,6 +337,33 @@
                             <input type="number" id="clase-cupos-elite" min="0" step="1" value="20" required
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                         </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Clase de pago</label>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="clase-es-pago" class="h-4 w-4 text-orange-500 border-gray-300 rounded">
+                            <span class="text-sm text-gray-600">Si está activado, la clase tendrá un precio y se cobrará a Básico/no miembros según la configuración.</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Precio (S/)</label>
+                        <input type="number" id="clase-precio" min="0" step="0.1" placeholder="0.00"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Disponibilidad</label>
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="clase-disponibilidad" id="clase-solo-miembros" value="soloMiembros" class="h-4 w-4 text-orange-500 border-gray-300" checked>
+                            <span class="ml-2 text-sm text-gray-700">Solo miembros (Premium/Elite)</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="clase-disponibilidad" id="clase-para-todos" value="paraTodos" class="h-4 w-4 text-orange-500 border-gray-300">
+                            <span class="ml-2 text-sm text-gray-700">Para todos (permite compra de cupos para Básico y no miembros)</span>
+                        </label>
                     </div>
                 </div>
             </form>
@@ -393,6 +429,14 @@
                 tipoSelect.value = '';
                 if (nuevoTipoWrapper) { nuevoTipoWrapper.classList.add('hidden'); }
                 if (nuevoTipoNombre) { nuevoTipoNombre.value = ''; }
+                const esPagoInput = document.getElementById('clase-es-pago');
+                const precioInput = document.getElementById('clase-precio');
+                const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+                const paraTodosRadio = document.getElementById('clase-para-todos');
+                if (esPagoInput) esPagoInput.checked = false;
+                if (precioInput) precioInput.value = '';
+                if (soloMiembrosRadio) soloMiembrosRadio.checked = true;
+                if (paraTodosRadio) paraTodosRadio.checked = false;
             }
         }
 
@@ -404,7 +448,7 @@
             claseEditandoId = null;
         }
 
-        if (btnNuevaClase) btnNuevaClase.addEventListener('click', openModal);
+        if (btnNuevaClase) btnNuevaClase.addEventListener('click', () => openModal(false));
         if (modalClose) modalClose.addEventListener('click', closeModal);
         if (modalCancel) modalCancel.addEventListener('click', closeModal);
 
@@ -476,13 +520,17 @@
                     fecha: document.getElementById('clase-fecha').value,
                     hora: document.getElementById('clase-hora').value,
                     duracion: parseInt(document.getElementById('clase-duracion').value),
+                    cuposBasico: parseInt(document.getElementById('clase-cupos-basico').value),
                     cuposPremium: parseInt(document.getElementById('clase-cupos-premium').value),
                     cuposElite: parseInt(document.getElementById('clase-cupos-elite').value),
                     ocupadosPremium: 0,
                     ocupadosElite: 0,
                     estado: 'ACTIVA',
                     tipoClaseId: (tipoSelect && tipoSelect.value && tipoSelect.value !== 'nuevo') ? parseInt(tipoSelect.value) : null,
-                    tipoClaseNombre: (tipoSelect && tipoSelect.value === 'nuevo') ? (nuevoTipoNombre?.value || '').trim() : undefined
+                    tipoClaseNombre: (tipoSelect && tipoSelect.value === 'nuevo') ? (nuevoTipoNombre?.value || '').trim() : undefined,
+                    esPago: document.getElementById('clase-es-pago').checked,
+                    paraTodos: document.getElementById('clase-para-todos').checked,
+                    precio: document.getElementById('clase-precio').value
                 };
 
                 // Determinar si es crear o actualizar
@@ -535,6 +583,7 @@
                 document.getElementById('clase-fecha').value = btn.dataset.fecha;
                 document.getElementById('clase-hora').value = btn.dataset.hora;
                 document.getElementById('clase-duracion').value = btn.dataset.duracion;
+                document.getElementById('clase-cupos-basico').value = btn.dataset.cuposBasico || 0;
                 document.getElementById('clase-cupos-premium').value = btn.dataset.cuposPremium;
                 document.getElementById('clase-cupos-elite').value = btn.dataset.cuposElite;
                 // Preseleccionar tipo de clase
@@ -544,6 +593,21 @@
                         tipoSelect.value = String(tid);
                     }
                 }
+
+                // Cargar flags de pago y disponibilidad
+                const esPagoInput = document.getElementById('clase-es-pago');
+                const precioInput = document.getElementById('clase-precio');
+                const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+                const paraTodosRadio = document.getElementById('clase-para-todos');
+
+                const esPago = btn.dataset.esPago === 'true';
+                const paraTodos = btn.dataset.paraTodos === 'true';
+                const precio = btn.dataset.precio || '';
+
+                if (esPagoInput) esPagoInput.checked = esPago;
+                if (precioInput) precioInput.value = precio;
+                if (soloMiembrosRadio) soloMiembrosRadio.checked = !paraTodos;
+                if (paraTodosRadio) paraTodosRadio.checked = paraTodos;
                 
                 openModal(true);
             }

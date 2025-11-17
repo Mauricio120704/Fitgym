@@ -13,6 +13,7 @@ public class Promocion {
 
     public enum TipoDescuento { PERCENTAGE, AMOUNT }
     public enum Estado { ACTIVE, INACTIVE, EXPIRED }
+    public enum TipoPromocion { MEMBRESIA, CLASE }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +31,9 @@ public class Promocion {
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal valor;
+
+    @Column(name = "codigo_stripe", length = 50)
+    private String codigoStripe;
 
     @Column(name = "max_usos", nullable = false)
     private Integer maxUsos;
@@ -53,6 +57,17 @@ public class Promocion {
     @OneToMany(mappedBy = "promocion", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<PromocionMembresia> membresias = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_promocion", nullable = false, length = 20)
+    private TipoPromocion tipoPromocion = TipoPromocion.MEMBRESIA;
+
+    @Column(name = "tipo_plan", length = 50)
+    private String tipoPlan; // Ej: Básico, Premium, Elite. Opcional, solo para MEMBRESIA
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "clase_id")
+    private Clase clase; // Opcional, solo para promociones de CLASE
+
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -68,6 +83,9 @@ public class Promocion {
 
     public BigDecimal getValor() { return valor; }
     public void setValor(BigDecimal valor) { this.valor = valor; }
+
+    public String getCodigoStripe() { return codigoStripe; }
+    public void setCodigoStripe(String codigoStripe) { this.codigoStripe = codigoStripe; }
 
     public Integer getMaxUsos() { return maxUsos; }
     public void setMaxUsos(Integer maxUsos) { this.maxUsos = maxUsos; }
@@ -89,6 +107,15 @@ public class Promocion {
 
     public List<PromocionMembresia> getMembresias() { return membresias; }
     public void setMembresias(List<PromocionMembresia> membresias) { this.membresias = membresias; }
+
+    public TipoPromocion getTipoPromocion() { return tipoPromocion; }
+    public void setTipoPromocion(TipoPromocion tipoPromocion) { this.tipoPromocion = tipoPromocion; }
+
+    public String getTipoPlan() { return tipoPlan; }
+    public void setTipoPlan(String tipoPlan) { this.tipoPlan = tipoPlan; }
+
+    public Clase getClase() { return clase; }
+    public void setClase(Clase clase) { this.clase = clase; }
 
     public Integer getUsosDisponibles() {
         if (maxUsos == null) {

@@ -6,9 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const pricePeriods = document.querySelectorAll('.price-period');
     const priceOlds = document.querySelectorAll('.price-old');
 
-    // Obtener el usuario de la URL si existe
+    // Obtener parámetros de la URL si existen
     const urlParams = new URLSearchParams(window.location.search);
     const usuario = urlParams.get('usuario') || '';
+    const promoId = urlParams.get('promoId') || '';
 
     function updatePlanLinks(period) {
         // Actualizar los enlaces de los botones de selección de plan
@@ -18,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const btn = card.querySelector('.btn-select-plan');
             const periodo = period === 'monthly' ? 'mensual' : 'anual';
             
-            // Actualizar el enlace con los parámetros correctos
-            btn.href = `/checkout?plan=${encodeURIComponent(planName)}&periodo=${periodo}&precio=${encodeURIComponent(price)}${usuario ? '&usuario=' + encodeURIComponent(usuario) : ''}`;
+            // Actualizar el enlace con los parámetros correctos (incluyendo promoId si existe)
+            btn.href = `/checkout?plan=${encodeURIComponent(planName)}&periodo=${periodo}&precio=${encodeURIComponent(price)}${usuario ? '&usuario=' + encodeURIComponent(usuario) : ''}${promoId ? '&promoId=' + encodeURIComponent(promoId) : ''}`;
         });
     }
 

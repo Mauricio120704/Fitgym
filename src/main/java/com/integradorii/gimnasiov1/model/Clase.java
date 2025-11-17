@@ -1,6 +1,7 @@
 package com.integradorii.gimnasiov1.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -27,6 +28,9 @@ public class Clase {
     @Column(nullable = false)
     private Integer capacidad;
 
+    @Column(name = "cupos_basico", nullable = false)
+    private Integer cuposBasico = 0;
+
     @Column(nullable = false)
     private OffsetDateTime fecha; // fecha/hora de la clase
 
@@ -35,6 +39,15 @@ public class Clase {
 
     @Column(nullable = false, length = 20)
     private String estado; // Programada, Cancelada, Finalizada
+
+    @Column(name = "es_pago", nullable = false)
+    private Boolean esPago = Boolean.FALSE;
+
+    @Column(name = "para_todos", nullable = false)
+    private Boolean paraTodos = Boolean.FALSE;
+
+    @Column(name = "precio", precision = 12, scale = 2)
+    private BigDecimal precio;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -48,10 +61,18 @@ public class Clase {
     public void setTipoClase(TipoClase tipoClase) { this.tipoClase = tipoClase; }
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
+    public Integer getCuposBasico() { return cuposBasico; }
+    public void setCuposBasico(Integer cuposBasico) { this.cuposBasico = cuposBasico; }
     public OffsetDateTime getFecha() { return fecha; }
     public void setFecha(OffsetDateTime fecha) { this.fecha = fecha; }
     public Integer getDuracionMinutos() { return duracionMinutos; }
     public void setDuracionMinutos(Integer duracionMinutos) { this.duracionMinutos = duracionMinutos; }
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+    public Boolean getEsPago() { return esPago; }
+    public void setEsPago(Boolean esPago) { this.esPago = esPago; }
+    public Boolean getParaTodos() { return paraTodos; }
+    public void setParaTodos(Boolean paraTodos) { this.paraTodos = paraTodos; }
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 }

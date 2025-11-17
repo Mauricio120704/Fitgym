@@ -17,6 +17,8 @@ import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.csrf.CsrfToken;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -87,10 +89,20 @@ public class HomeController {
         return "recuperacion";
     }
 
-    // GET /planes - Página de planes de membresía (acceso público)
+    // GET /planes - Página de planes de membresía (acceso público o deportista logueado)
     @GetMapping("/planes")
-    public String planes(@RequestParam(required = false) String usuario, Model model) {
-        model.addAttribute("usuario", usuario);
+    public String planes(@RequestParam(required = false) String usuario,
+                        @RequestParam(required = false) Long promoId,
+                        Model model,
+                        @AuthenticationPrincipal UserDetails userDetails) {
+
+        String usuarioFinal = usuario;
+        if ((usuarioFinal == null || usuarioFinal.isBlank()) && userDetails != null && userDetails.getUsername() != null) {
+            usuarioFinal = userDetails.getUsername();
+        }
+
+        model.addAttribute("usuario", usuarioFinal);
+        model.addAttribute("promoId", promoId);
         return "planes";
     }
 
