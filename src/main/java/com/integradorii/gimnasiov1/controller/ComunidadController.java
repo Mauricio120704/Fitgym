@@ -30,6 +30,12 @@ public class ComunidadController {
         this.personaRepository = personaRepository;
     }
 
+    /**
+     * Vista principal de la comunidad de deportistas.
+     *
+     * Solo accesible para usuarios con rol CLIENTE. El contenido dinámico de la
+     * vista se llena vía llamadas AJAX a los endpoints REST de este mismo controlador.
+     */
     @GetMapping("/deportista/comunidad")
     @PreAuthorize("hasRole('CLIENTE')")
     public String comunidad(Model model, Principal principal) {
@@ -37,6 +43,14 @@ public class ComunidadController {
         return "deportista/comunidad";
     }
 
+    /**
+     * Devuelve el listado de miembros visibles en la comunidad.
+     *
+     * - Solo se incluyen personas con `perfilVisible = true`.
+     * - Si hay un usuario autenticado, se excluye su propio perfil del listado.
+     * - Permite filtrar por nombre, apellido o DNI usando el parámetro `q`.
+     * - La estructura de respuesta está pensada para cards/resúmenes en la UI.
+     */
     @GetMapping("/api/comunidad/miembros")
     @ResponseBody
     @PreAuthorize("hasRole('CLIENTE')")
@@ -59,6 +73,12 @@ public class ComunidadController {
         return base.stream().map(this::toCard).collect(Collectors.toList());
     }
 
+    /**
+     * Devuelve el detalle de un miembro específico de la comunidad.
+     *
+     * Si el perfil no es visible (`perfilVisible = false`) o el ID no existe,
+     * responde 404 para evitar exponer datos privados.
+     */
     @GetMapping("/api/comunidad/miembros/{id}")
     @ResponseBody
     @PreAuthorize("hasRole('CLIENTE')")
@@ -69,6 +89,13 @@ public class ComunidadController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Construye el mapa de datos mínimos para mostrar la "card" de un deportista
+     * en el listado de comunidad.
+     *
+     * Solo se incluyen peso y altura si el usuario marcó explícitamente que desea
+     * mostrarlos (`mostrarPeso` / `mostrarAltura`).
+     */
     private Map<String, Object> toCard(Persona p) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", p.getId());
@@ -86,6 +113,13 @@ public class ComunidadController {
         return m;
     }
 
+    /**
+     * Construye el detalle ampliado de un deportista para la vista de perfil
+     * dentro de la comunidad.
+     *
+     * Extiende los datos de la card con información de contacto (email, teléfono, DNI)
+     * y respeta la misma lógica de visibilidad para peso y altura.
+     */
     private Map<String, Object> toDetail(Persona p) {
         Map<String, Object> m = toCard(p);
         m.put("email", p.getEmail());
@@ -103,6 +137,12 @@ public class ComunidadController {
         return m;
     }
 
+    /**
+     * Devuelve la inicial segura de un texto (nombre o apellido).
+     *
+     * Si el valor es nulo o en blanco, devuelve cadena vacía para evitar errores
+     * y que la UI pueda decidir cómo mostrar un placeholder.
+     */
     private String safeInitial(String s) {
         return (s != null && !s.isBlank()) ? s.substring(0, 1).toUpperCase() : "";
         

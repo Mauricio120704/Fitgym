@@ -29,6 +29,19 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * API de notificaciones para el panel del deportista.
+ *
+ * Genera notificaciones "on the fly" a partir del estado actual de la base de datos,
+ * sin almacenar una tabla de notificaciones persistentes.
+ *
+ * Tipos de notificación generados:
+ * - Estado de la suscripción: vencida, próxima a vencer, próximo pago.
+ * - Falta de suscripción activa.
+ * - Nuevas promociones relevantes creadas recientemente.
+ * - Nuevas clases disponibles en los próximos días.
+ * - Próximas clases reservadas por el deportista.
+ */
 @RestController
 @RequestMapping("/api/deportista")
 public class NotificacionesDeportistaController {
@@ -51,6 +64,20 @@ public class NotificacionesDeportistaController {
         this.claseRepository = claseRepository;
     }
 
+    /**
+     * GET /api/deportista/notificaciones
+     *
+     * Construye un listado de notificaciones para el deportista autenticado.
+     *
+     * Estructura de respuesta:
+     * - `total`: número total de notificaciones calculadas.
+     * - `items`: lista de mapas con los campos:
+     *   - `tipo`: código de tipo (SUSCRIPCION_VENCIDA, PAGO_PROXIMO, etc.).
+     *   - `id`: identificador estable del evento.
+     *   - `titulo` y `mensaje`: texto para mostrar en la UI.
+     *   - `fechaReferencia`: fecha/hora relevante para ordenar.
+     *   - `url`: enlace sugerido para llevar al usuario al flujo adecuado.
+     */
     @GetMapping("/notificaciones")
     public ResponseEntity<?> obtenerNotificaciones(Principal principal) {
         if (principal == null) {
@@ -69,6 +96,7 @@ public class NotificacionesDeportistaController {
         DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(new Locale("es"));
         DateTimeFormatter fechaHoraFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withLocale(new Locale("es"));
 
+        // Bloque 1: notificaciones relacionadas a la suscripción actual
         Optional<Suscripcion> suscripcionOpt = suscripcionRepository.findActiveByDeportistaId(persona.getId());
         if (suscripcionOpt.isPresent()) {
             Suscripcion s = suscripcionOpt.get();
@@ -108,6 +136,7 @@ public class NotificacionesDeportistaController {
                 }
             }
         } else {
+            // Si no hay suscripción activa, se genera una invitación a contratar un plan
             Map<String, Object> n = new LinkedHashMap<>();
             n.put("tipo", "SIN_SUSCRIPCION");
             n.put("id", "SIN_SUSCRIPCION_" + persona.getId());
@@ -118,7 +147,7 @@ public class NotificacionesDeportistaController {
             items.add(n);
         }
 
-        // Nuevas promociones creadas recientemente (últimos 7 días) y vigentes
+        // Bloque 2: nuevas promociones creadas recientemente (últimos 7 días) y vigentes
         LocalDateTime haceSieteDias = LocalDateTime.now().minusDays(7);
         List<Promocion> promocionesActivas = promocionRepository.findByEstado(Promocion.Estado.ACTIVE);
         int maxPromos = 3;
@@ -154,6 +183,7 @@ public class NotificacionesDeportistaController {
             contadorPromos++;
         }
 
+        // Bloque 3: clases nuevas disponibles en los próximos 7 días que el deportista aún no reservó
         OffsetDateTime ahora = OffsetDateTime.now(ZoneId.systemDefault());
 
         OffsetDateTime limiteClases = ahora.plusDays(7);
@@ -187,6 +217,7 @@ public class NotificacionesDeportistaController {
             contadorClasesNuevas++;
         }
 
+        // Bloque 4: próximas clases ya reservadas por el deportista
         List<ReservaClase> proximas = reservaClaseRepository.findProximasByDeportista(persona.getId(), ahora);
         int maxClases = 3;
         int contador = 0;

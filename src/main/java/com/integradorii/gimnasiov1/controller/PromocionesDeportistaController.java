@@ -11,6 +11,17 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Vista de promociones para el deportista.
+ *
+ * Muestra únicamente promociones vigentes (por fecha y estado ACTIVE) y las
+ * separa en dos grupos para la vista:
+ * - `promocionesMembresia`: promociones asociadas a planes/membresías.
+ * - `promocionesClases`: promociones aplicables a clases individuales.
+ *
+ * La vista resultante puede usarse como punto de entrada al flujo de checkout,
+ * donde el usuario selecciona una promoción y luego continúa con el pago.
+ */
 @Controller
 @RequestMapping("/deportista")
 public class PromocionesDeportistaController {
@@ -21,6 +32,15 @@ public class PromocionesDeportistaController {
         this.promocionRepository = promocionRepository;
     }
 
+    /**
+     * GET /deportista/promociones
+     *
+     * Carga en el modelo todas las promociones vigentes para el día de hoy y
+     * las organiza en listas separadas para facilitar su renderizado en la UI.
+     *
+     * También marca el menú activo para que la vista de layout resalte la sección
+     * de promociones del cliente.
+     */
     @GetMapping("/promociones")
     public String promocionesVigentes(Model model) {
         LocalDate hoy = LocalDate.now();

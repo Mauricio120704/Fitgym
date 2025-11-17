@@ -20,6 +20,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * API de foro de la comunidad.
+ *
+ * Pensado para ser consumido desde la vista de comunidad del deportista a través
+ * de peticiones AJAX (por ejemplo, en un tabpanel con pestañas de "Foro").
+ *
+ * Responsabilidades principales:
+ * - Listar las últimas publicaciones activas.
+ * - Permitir crear nuevas publicaciones.
+ * - Permitir responder a publicaciones existentes.
+ * - Devolver estructuras planas (Map<String,Object>) fáciles de renderizar en la UI.
+ */
 @RestController
 @RequestMapping("/api/comunidad/foro")
 @PreAuthorize("hasRole('CLIENTE')")
@@ -39,12 +51,31 @@ public class ComunidadForoController {
         this.personaRepository = personaRepository;
     }
 
+    /**
+     * GET /api/comunidad/foro/posts
+     *
+     * Devuelve las últimas 50 publicaciones activas del foro, ordenadas por fecha
+     * de creación descendente. Cada post se serializa con sus respuestas activas
+     * para que la UI pueda renderizar el árbol de comentarios sin llamadas
+     * adicionales.
+     */
     @GetMapping("/posts")
     public List<Map<String, Object>> listarPosts() {
         List<ComunidadPost> posts = postRepository.findTop50ByActivoTrueOrderByCreadoEnDesc();
         return posts.stream().map(this::toPostDto).collect(Collectors.toList());
     }
 
+    /**
+     * POST /api/comunidad/foro/posts
+     *
+     * Crea una nueva publicación en el foro para el deportista autenticado.
+     *
+     * Reglas de validación:
+     * - El usuario debe estar autenticado y existir en la tabla personas.
+     * - El contenido no puede estar vacío.
+     * - Se limita el tamaño máximo del contenido a 1000 caracteres para evitar
+     *   textos excesivamente largos.
+     */
     @PostMapping("/posts")
     public ResponseEntity<Map<String, Object>> crearPost(@RequestParam("contenido") String contenido,
                                                          @AuthenticationPrincipal UserDetails userDetails) {
@@ -87,6 +118,17 @@ public class ComunidadForoController {
         return ResponseEntity.ok(resp);
     }
 
+    /**
+     * POST /api/comunidad/foro/posts/{postId}/respuestas
+     *
+     * Registra una respuesta a una publicación existente.
+     *
+     * Reglas de validación:
+     * - Usuario autenticado y existente.
+     * - La publicación debe existir y estar activa.
+     * - El contenido no puede estar vacío.
+     * - Se limita a 800 caracteres por respuesta.
+     */
     @PostMapping("/posts/{postId}/respuestas")
     public ResponseEntity<Map<String, Object>> crearRespuesta(@PathVariable("postId") Long postId,
                                                               @RequestParam("contenido") String contenido,
@@ -138,6 +180,16 @@ public class ComunidadForoController {
         return ResponseEntity.ok(resp);
     }
 
+    /**
+     * Transforma una entidad `ComunidadPost` en un DTO basado en `Map`.
+     *
+     * Incluye:
+     * - Datos básicos del autor (nombre completo, iniciales).
+     * - Contenido del post.
+     * - Fecha formateada para mostrar en la UI.
+     * - Lista de respuestas activas ya serializadas (para un tabpanel o componente
+     *   de hilo de conversación).
+     */
     private Map<String, Object> toPostDto(ComunidadPost post) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", post.getId());
@@ -162,6 +214,12 @@ public class ComunidadForoController {
         return m;
     }
 
+    /**
+     * Transforma una entidad `ComunidadRespuesta` en un DTO basado en `Map`.
+     *
+     * Incluye datos del autor, contenido y fecha formateada para que el frontend
+     * pueda renderizar cada respuesta como parte del hilo de comentarios.
+     */
     private Map<String, Object> toRespuestaDto(ComunidadRespuesta r) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", r.getId());
@@ -179,6 +237,12 @@ public class ComunidadForoController {
         return m;
     }
 
+    /**
+     * Obtiene de forma segura la inicial de un texto (nombre o apellido).
+     *
+     * Si la cadena es nula o vacía, devuelve una cadena vacía, permitiendo
+     * que el frontend muestre un placeholder genérico (por ejemplo "??").
+     */
     private String safeInitial(String s) {
         return (s != null && !s.isBlank()) ? s.substring(0, 1).toUpperCase() : "";
     }

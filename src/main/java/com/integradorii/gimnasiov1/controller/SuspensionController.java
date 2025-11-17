@@ -20,6 +20,16 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Controlador para la suspensión temporal de una membresía activa.
+ *
+ * Reglas principales:
+ * - Solo permite suspender si el deportista tiene una suscripción activa.
+ * - Valida el rango de fechas (inicio en el futuro, fin posterior al inicio).
+ * - Enforce un mínimo de 3 días por suspensión y un máximo de 30 días acumulados por año.
+ * - Extiende automáticamente la fecha de fin de la suscripción y el próximo pago
+ *   según la cantidad de días suspendidos.
+ */
 @Controller
 @RequestMapping("/suspension")
 public class SuspensionController {
@@ -36,6 +46,12 @@ public class SuspensionController {
         this.suspensionRepository = suspensionRepository;
     }
 
+    /**
+     * Muestra el formulario de solicitud de suspensión para el deportista autenticado.
+     *
+     * Si el usuario no está autenticado o no tiene una suscripción activa, se redirige
+     * a login o al perfil, ya que no tiene sentido suspender una membresía inexistente.
+     */
     @GetMapping
     public String mostrarFormulario(Model model,
                                     @AuthenticationPrincipal UserDetails userDetails) {
@@ -60,6 +76,18 @@ public class SuspensionController {
         return "suspension";
     }
 
+    /**
+     * Procesa la solicitud de suspensión temporal.
+     *
+     * Pasos principales:
+     * - Obtiene al deportista autenticado y su suscripción activa.
+     * - Parsea y valida el rango de fechas ingresado.
+     * - Verifica que no exista otra suspensión activa en el período actual.
+     * - Calcula los días de suspensión y controla que no superen los 30 días
+     *   acumulados por año.
+     * - Registra la suspensión como aprobada y extiende las fechas de la suscripción
+     *   (vencimiento y próximo pago) en la misma cantidad de días.
+     */
     @PostMapping
     @Transactional
     public String solicitarSuspension(@RequestParam("motivo") String motivo,
@@ -108,6 +136,7 @@ public class SuspensionController {
             return "suspension";
         }
 
+        // Cantidad total de días de suspensión (incluye ambos extremos del rango).
         long diasSuspension = ChronoUnit.DAYS.between(fechaInicio, fechaFin) + 1;
         if (diasSuspension < 3) {
             model.addAttribute("error", "El rango mínimo de suspensión es de 3 días.");
@@ -131,7 +160,7 @@ public class SuspensionController {
             return "suspension";
         }
 
-        // Regla: máximo 30 días acumulados por año
+        // Regla: máximo 30 días de suspensión acumulados por año para evitar abusos.
         int year = fechaInicio.getYear();
         long diasUsadosAnio = suspensionesUsuario.stream()
                 .filter(s -> {

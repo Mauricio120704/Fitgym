@@ -130,6 +130,20 @@ public class CheckoutController {
         return "checkout";
     }
 
+    /**
+     * POST /checkout/create-session
+     *
+     * Crea una sesión de Checkout de Stripe para el pago de una membresía.
+     *
+     * Flujo principal:
+     * - Calcula el monto final a cobrar (aplicando promoción si corresponde).
+     * - Construye las URLs de éxito y cancelación que Stripe utilizará.
+     * - Crea una sesión de pago con un solo ítem (la membresía seleccionada).
+     * - Devuelve el ID de sesión para que el frontend redireccione a Stripe.
+     *
+     * Los metadatos de la sesión incluyen usuario, plan, período y precio, para
+     * que en el callback de éxito se pueda reconstruir la suscripción.
+     */
     @PostMapping("/create-session")
     @ResponseBody
     public ResponseEntity<Map<String, String>> createCheckoutSession(
@@ -229,6 +243,18 @@ public class CheckoutController {
         }
     }
 
+    /**
+     * GET /checkout/clase
+     *
+     * Muestra la pantalla de pago para una clase de pago individual.
+     *
+     * Validaciones:
+     * - El usuario debe estar autenticado.
+     * - La clase debe existir y estar marcada como de pago.
+     *
+     * Si se pasa una promoción, calcula y muestra el precio con descuento
+     * estimado. El pago real se gestiona luego vía Stripe.
+     */
     @GetMapping("/clase")
     public String mostrarCheckoutClase(@RequestParam("claseId") Long claseId,
                                        @RequestParam(required = false) Long promoId,
@@ -276,6 +302,17 @@ public class CheckoutController {
         return "checkout_clase";
     }
 
+    /**
+     * POST /checkout/clase/create-session
+     *
+     * Crea una sesión de Stripe para el pago de una clase individual.
+     *
+     * Flujo principal:
+     * - Valida que la clase exista.
+     * - Calcula el monto final (aplicando promoción si corresponde).
+     * - Configura las URLs de éxito y cancelación.
+     * - Registra en metadatos: usuario, clase, precio y tipo de pago (CLASE).
+     */
     @PostMapping("/clase/create-session")
     @ResponseBody
     public ResponseEntity<Map<String, String>> createCheckoutSessionClase(
@@ -369,6 +406,20 @@ public class CheckoutController {
         }
     }
 
+    /**
+     * GET /checkout/clase/success
+     *
+     * Callback de éxito de Stripe para el pago de una clase.
+     *
+     * Pasos:
+     * - Recupera la sesión en Stripe y verifica que el pago esté "paid".
+     * - Obtiene usuario, clase y precio desde los metadatos de la sesión.
+     * - Verifica capacidad y si el usuario ya está reservado.
+     * - Crea la reserva si aún no existe.
+     * - Registra un pago en la tabla de pagos y marca la promoción como usada
+     *   si corresponde.
+     * - Redirige a la pantalla de reservas con el resultado del flujo.
+     */
     @GetMapping("/clase/success")
     @Transactional
     public String stripeSuccessClase(@RequestParam("session_id") String sessionId,
@@ -450,6 +501,22 @@ public class CheckoutController {
         }
     }
 
+    /**
+     * GET /checkout/success
+     *
+     * Callback de éxito de Stripe para el pago de una membresía.
+     *
+     * Pasos principales:
+     * - Recupera la sesión en Stripe y valida que el pago esté "paid".
+     * - Extrae de metadatos usuario, plan, período, precio y promoción.
+     * - Crea o actualiza la suscripción del deportista, fijando fecha de fin
+     *   y próximo pago según el período.
+     * - Registra un pago en la tabla `pagos` y marca la membresía del deportista
+     *   como activa.
+     * - Incrementa el contador de usos de la promoción si se utilizó una.
+     * - Redirige al perfil si el usuario está autenticado o a login si es un
+     *   nuevo registro.
+     */
     @GetMapping("/success")
     @Transactional
     public String stripeSuccess(@RequestParam("session_id") String sessionId,
@@ -554,6 +621,15 @@ public class CheckoutController {
         }
     }
 
+    /**
+     * GET /checkout/cancel
+     *
+     * Pantalla de regreso cuando el usuario cancela el pago en Stripe.
+     *
+     * Vuelve a cargar los datos del plan, período, precio y correo para que el
+     * usuario pueda reintentar el pago, mostrando un mensaje de error indicando
+     * que no se ha realizado ningún cargo.
+     */
     @GetMapping("/cancel")
     public String stripeCancel(@RequestParam String plan,
                                @RequestParam String periodo,
