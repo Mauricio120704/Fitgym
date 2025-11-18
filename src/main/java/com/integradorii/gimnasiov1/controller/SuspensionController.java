@@ -148,6 +148,30 @@ public class SuspensionController {
         // Buscar suspensiones previas del usuario
         List<SuspensionMembresia> suspensionesUsuario = suspensionRepository.findByUsuario_Id(persona.getId());
 
+        // Validación de superposición de fechas entre la nueva suspensión y
+        // cualquier otra suspensión ya aprobada/activa del mismo usuario.
+        // Dos rangos se consideran solapados si comparten al menos un día en común.
+        boolean haySuperposicion = suspensionesUsuario.stream().anyMatch(s -> {
+            // Solo se consideran suspensiones que ya están aprobadas o activas.
+            if (!"aprobada".equalsIgnoreCase(s.getEstado())
+                    && !"activa".equalsIgnoreCase(s.getEstado())) {
+                return false;
+            }
+            LocalDate ini = s.getFechaInicio();
+            LocalDate fin = s.getFechaFin();
+            if (ini == null || fin == null) {
+                return false;
+            }
+            // Se solapan si el fin de uno no es anterior al inicio del otro
+            // y el inicio de uno no es posterior al fin del otro.
+            return !fechaFin.isBefore(ini) && !fechaInicio.isAfter(fin);
+        });
+
+        if (haySuperposicion) {
+            model.addAttribute("error", "Ya tienes una suspensión registrada en esas fechas. Por favor selecciona un nuevo rango.");
+            return "suspension";
+        }
+
         // Regla: no debe tener una suspensión actualmente activa
         boolean tieneActiva = suspensionesUsuario.stream().anyMatch(s -> {
             LocalDate ini = s.getFechaInicio();
