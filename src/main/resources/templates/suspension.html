@@ -91,7 +91,7 @@
                                 <div class="form-group">
                                     <label for="fecha-inicio">Fecha de Inicio</label>
                                     <div class="date-input-wrapper">
-                                        <input type="date" id="fecha-inicio" name="fecha_inicio" value="2025-11-14" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                                        <input type="date" id="fecha-inicio" name="fecha_inicio" value="2025-11-14" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"th:value="${hoy}" th:attr="min=${hoy}"/>
                                     </div>
                                 </div>
                                 <div class="form-group">

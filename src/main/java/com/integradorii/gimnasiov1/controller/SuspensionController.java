@@ -72,6 +72,8 @@ public class SuspensionController {
             // Sin suscripción activa no tiene sentido suspender
             return "redirect:/perfil";
         }
+        LocalDate hoy = LocalDate.now();
+        model.addAttribute("hoy", hoy);
 
         return "suspension";
     }
