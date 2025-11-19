@@ -1,7 +1,13 @@
 package com.integradorii.gimnasiov1.controller;
 
+import com.integradorii.gimnasiov1.model.Persona;
 import com.integradorii.gimnasiov1.model.Promocion;
+import com.integradorii.gimnasiov1.model.Suscripcion;
+import com.integradorii.gimnasiov1.repository.PersonaRepository;
 import com.integradorii.gimnasiov1.repository.PromocionRepository;
+import com.integradorii.gimnasiov1.repository.SuscripcionRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -27,9 +34,15 @@ import java.util.stream.Collectors;
 public class PromocionesDeportistaController {
 
     private final PromocionRepository promocionRepository;
+    private final PersonaRepository personaRepository;
+    private final SuscripcionRepository suscripcionRepository;
 
-    public PromocionesDeportistaController(PromocionRepository promocionRepository) {
+    public PromocionesDeportistaController(PromocionRepository promocionRepository,
+                                           PersonaRepository personaRepository,
+                                           SuscripcionRepository suscripcionRepository) {
         this.promocionRepository = promocionRepository;
+        this.personaRepository = personaRepository;
+        this.suscripcionRepository = suscripcionRepository;
     }
 
     /**
@@ -42,7 +55,8 @@ public class PromocionesDeportistaController {
      * de promociones del cliente.
      */
     @GetMapping("/promociones")
-    public String promocionesVigentes(Model model) {
+    public String promocionesVigentes(Model model,
+                                      @AuthenticationPrincipal UserDetails userDetails) {
         LocalDate hoy = LocalDate.now();
         List<Promocion> base = promocionRepository.findByEstado(Promocion.Estado.ACTIVE);
         List<Promocion> vigentes = base.stream()
@@ -58,11 +72,32 @@ public class PromocionesDeportistaController {
                 .filter(p -> p.getMembresias() == null || p.getMembresias().isEmpty())
                 .collect(Collectors.toList());
 
+        boolean mostrarPromocionesClases = true;
+
+        if (userDetails != null && userDetails.getUsername() != null && !userDetails.getUsername().isBlank()) {
+            String email = userDetails.getUsername();
+            Optional<Persona> personaOpt = personaRepository.findByEmail(email);
+            if (personaOpt.isPresent()) {
+                Persona persona = personaOpt.get();
+                Optional<Suscripcion> suscripcionOpt = suscripcionRepository.findActiveByDeportistaId(persona.getId());
+                if (suscripcionOpt.isPresent()) {
+                    Suscripcion suscripcion = suscripcionOpt.get();
+                    if (suscripcion.getPlan() != null && suscripcion.getPlan().getNombre() != null) {
+                        String nombrePlan = suscripcion.getPlan().getNombre().toLowerCase();
+                        if (nombrePlan.contains("premium") || nombrePlan.contains("elite")) {
+                            mostrarPromocionesClases = false;
+                        }
+                    }
+                }
+            }
+        }
+
         model.addAttribute("promociones", vigentes);
         model.addAttribute("promocionesMembresia", promocionesMembresia);
         model.addAttribute("promocionesClases", promocionesClases);
         model.addAttribute("hoy", hoy);
         model.addAttribute("activeMenu", "promociones-cliente");
+        model.addAttribute("mostrarPromocionesClases", mostrarPromocionesClases);
         return "deportista/promociones";
     }
 }
