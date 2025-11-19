@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto - Inventario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar('inventario')}"></div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center py-4">
+                        <div class="flex items-center">
+                            <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                            <h1 class="ml-4 text-2xl font-bold text-gray-800">Editar Producto</h1>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <a th:href="@{/admin/inventario}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                                <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Volver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+                <div class="container mx-auto px-6 py-8">
+                    <!-- Alert Messages -->
+                    <div th:if="${mensaje}" class="mb-6">
+                        <div th:classappend="${tipoMensaje == 'success' ? 'bg-green-50 border-green-500 text-green-700' : 'bg-red-50 border-red-500 text-red-700'}" 
+                             class="border-l-4 p-4 rounded">
+                            <p th:text="${mensaje}"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Form -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <form th:action="@{/admin/inventario/actualizar/{id}(id=${inventario.id})}" th:object="${inventario}" method="post" class="space-y-6">
+                            <input type="hidden" th:field="*{id}">
+                            <input type="hidden" th:field="*{estado}">
+                            <input type="hidden" th:field="*{fechaIngreso}">
+                            <input type="hidden" th:field="*{ultimaActualizacion}">
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Información Básica -->
+                                <div class="space-y-6">
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Información Básica</h3>
+                                        
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre del Producto *</label>
+                                                <input type="text" id="nombre" th:field="*{nombre}" required
+                                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                <p th:if="${#fields.hasErrors('nombre')}" class="mt-1 text-sm text-red-600" th:errors="*{nombre}"></p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="codigoProducto" class="block text-sm font-medium text-gray-700">Código del Producto *</label>
+                                                <input type="text" id="codigoProducto" th:field="*{codigoProducto}" required
+                                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                <p class="mt-1 text-sm text-gray-500">Código único para identificar el producto</p>
+                                                <p th:if="${#fields.hasErrors('codigoProducto')}" class="mt-1 text-sm text-red-600" th:errors="*{codigoProducto}"></p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría *</label>
+                                                <select id="categoria" th:field="*{categoria}" required
+                                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                    <option value="">Seleccionar categoría</option>
+                                                    <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}">Categoría</option>
+                                                </select>
+                                                <p th:if="${#fields.hasErrors('categoria')}" class="mt-1 text-sm text-red-600" th:errors="*{categoria}"></p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción *</label>
+                                                <textarea id="descripcion" th:field="*{descripcion}" rows="3" required
+                                                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                                                <p th:if="${#fields.hasErrors('descripcion')}" class="mt-1 text-sm text-red-600" th:errors="*{descripcion}"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Información de Stock y Precios -->
+                                <div class="space-y-6">
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Stock y Precios</h3>
+                                        
+                                        <div class="space-y-4">
+                                            <div class="grid grid-cols-3 gap-4">
+                                                <div>
+                                                    <label for="cantidad" class="block text-sm font-medium text-gray-700">Cantidad *</label>
+                                                    <input type="number" id="cantidad" th:field="*{cantidad}" min="0" required
+                                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                    <p th:if="${#fields.hasErrors('cantidad')}" class="mt-1 text-sm text-red-600" th:errors="*{cantidad}"></p>
+                                                </div>
+                                                
+                                                <div>
+                                                    <label for="stockMinimo" class="block text-sm font-medium text-gray-700">Stock Mínimo *</label>
+                                                    <input type="number" id="stockMinimo" th:field="*{stockMinimo}" min="0" required
+                                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                    <p th:if="${#fields.hasErrors('stockMinimo')}" class="mt-1 text-sm text-red-600" th:errors="*{stockMinimo}"></p>
+                                                </div>
+                                                
+                                                <div>
+                                                    <label for="stockMaximo" class="block text-sm font-medium text-gray-700">Stock Máximo *</label>
+                                                    <input type="number" id="stockMaximo" th:field="*{stockMaximo}" min="0" required
+                                                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                    <p th:if="${#fields.hasErrors('stockMaximo')}" class="mt-1 text-sm text-red-600" th:errors="*{stockMaximo}"></p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="precioUnitario" class="block text-sm font-medium text-gray-700">Precio Unitario *</label>
+                                                <div class="mt-1 relative rounded-md shadow-sm">
+                                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <span class="text-gray-500 sm:text-sm">S/</span>
+                                                    </div>
+                                                    <input type="number" id="precioUnitario" th:field="*{precioUnitario}" min="0" step="0.01" required
+                                                           class="mt-1 block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                </div>
+                                                <p th:if="${#fields.hasErrors('precioUnitario')}" class="mt-1 text-sm text-red-600" th:errors="*{precioUnitario}"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Información Adicional -->
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Información Adicional</h3>
+                                        
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label for="proveedor" class="block text-sm font-medium text-gray-700">Proveedor *</label>
+                                                <input type="text" id="proveedor" th:field="*{proveedor}" required
+                                                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                <p th:if="${#fields.hasErrors('proveedor')}" class="mt-1 text-sm text-red-600" th:errors="*{proveedor}"></p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="ubicacion" class="block text-sm font-medium text-gray-700">Ubicación *</label>
+                                                <select id="ubicacion" th:field="*{ubicacion}" required
+                                                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                    <option value="">Seleccionar ubicación</option>
+                                                    <option th:each="ubic : ${ubicaciones}" th:value="${ubic}" th:text="${#strings.replace(ubic, '_', ' ')}">Ubicación</option>
+                                                </select>
+                                                <p th:if="${#fields.hasErrors('ubicacion')}" class="mt-1 text-sm text-red-600" th:errors="*{ubicacion}"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Current Status Display -->
+                            <div class="border-t pt-6">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Estado Actual</h3>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                        <div>
+                                            <span class="font-medium text-gray-700">Estado Actual:</span>
+                                            <span th:classappend="${inventario.estado == 'DISPONIBLE' ? 'bg-green-100 text-green-800' : 
+                                                             inventario.estado == 'BAJO_STOCK' ? 'bg-yellow-100 text-yellow-800' : 
+                                                             inventario.estado == 'AGOTADO' ? 'bg-red-100 text-red-800' : 
+                                                             'bg-gray-100 text-gray-800'}" 
+                                                  class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                                <span th:text="${#strings.replace(inventario.estado, '_', ' ')}">DISPONIBLE</span>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span class="font-medium text-gray-700">Valor Total:</span>
+                                            <span class="text-gray-900 ml-2">S/<span th:text="${#numbers.formatDecimal(inventario.valorTotal, 0, 'COMMA', 2, 'POINT')}">0.00</span></span>
+                                        </div>
+                                        <div>
+                                            <span class="font-medium text-gray-700">Última Actualización:</span>
+                                            <span class="text-gray-900 ml-2" th:text="${#temporals.format(inventario.ultimaActualizacion, 'dd/MM/yyyy HH:mm')}">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Form Actions -->
+                            <div class="border-t pt-6 flex justify-end space-x-4">
+                                <a th:href="@{/admin/inventario}" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                                    Cancelar
+                                </a>
+                                <a th:href="@{/admin/inventario/detalle/{id}(id=${inventario.id})}" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                    Ver Detalles
+                                </a>
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Actualizar Producto
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script>
+        // Preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const nombreInput = document.getElementById('nombre');
+            const codigoInput = document.getElementById('codigoProducto');
+            const cantidadInput = document.getElementById('cantidad');
+            const precioInput = document.getElementById('precioUnitario');
+            
+            function updatePreview() {
+                document.getElementById('preview-nombre').textContent = nombreInput.value || '-';
+                document.getElementById('preview-codigo').textContent = codigoInput.value || '-';
+                
+                const cantidad = parseFloat(cantidadInput.value) || 0;
+                const precio = parseFloat(precioInput.value) || 0;
+                const valorTotal = cantidad * precio;
+                
+                document.getElementById('preview-valor').textContent = 'S/' + valorTotal.toFixed(2);
+            }
+            
+            nombreInput.addEventListener('input', updatePreview);
+            codigoInput.addEventListener('input', updatePreview);
+            cantidadInput.addEventListener('input', updatePreview);
+            precioInput.addEventListener('input', updatePreview);
+        });
+    </script>
+</body>
+</html>
