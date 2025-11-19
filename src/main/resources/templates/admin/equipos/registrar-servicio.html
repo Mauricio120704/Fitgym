@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Servicio de Mantenimiento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside th:replace="fragments/sidebar :: sidebar('equipos')"></aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Registrar Servicio de Mantenimiento</div>
+                </div>
+                <a th:href="@{/admin/equipos}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                    Volver
+                </a>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="max-w-2xl mx-auto">
+                    <!-- Información del Equipo -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Información del Equipo</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-sm text-gray-600">Nombre:</span>
+                                <div class="font-medium" th:text="${equipo.nombre}"></div>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-600">Tipo:</span>
+                                <div class="font-medium" th:text="${equipo.tipo}"></div>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-600">Marca/Modelo:</span>
+                                <div class="font-medium" th:text="${equipo.marca + ' ' + equipo.modelo}"></div>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-600">Ubicación:</span>
+                                <div class="font-medium" th:text="${equipo.ubicacion}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de Registro de Servicio -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-6">Información del Servicio</h2>
+                        
+                        <form th:action="@{/admin/equipos/guardar-servicio}" th:object="${mantenimiento}" method="post" class="space-y-6">
+                            <input type="hidden" th:field="*{equipo.id}">
+                            
+                            <!-- Información Básica del Servicio -->
+                            <div class="border-b border-gray-200 pb-6">
+                                <h3 class="text-md font-medium text-gray-700 mb-4">Datos del Servicio</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha del Servicio *</label>
+                                        <input type="date" th:field="*{fechaServicio}" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Servicio *</label>
+                                        <select th:field="*{tipoServicio}" required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                            <option value="">Seleccionar tipo</option>
+                                            <option value="PREVENTIVO">Preventivo</option>
+                                            <option value="CORRECTIVO">Correctivo</option>
+                                            <option value="EMERGENCIA">Emergencia</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado del Servicio *</label>
+                                        <select th:field="*{estado}" required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                            <option value="PROGRAMADO">Programado</option>
+                                            <option value="EN_PROGRESO">En Progreso</option>
+                                            <option value="COMPLETADO">Completado</option>
+                                            <option value="CANCELADO">Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Técnico Responsable *</label>
+                                        <input type="text" th:field="*{tecnicoResponsable}" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                               placeholder="Nombre del técnico">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo del Servicio</label>
+                                        <input type="text" th:field="*{costo}"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                               placeholder="Ej: $150.00">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Descripción del Servicio -->
+                            <div class="border-b border-gray-200 pb-6">
+                                <h3 class="text-md font-medium text-gray-700 mb-4">Descripción del Servicio</h3>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+                                    <textarea th:field="*{descripcion}" rows="4" required
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                              placeholder="Describe detalladamente el servicio realizado..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Detalles Adicionales -->
+                            <div class="border-b border-gray-200 pb-6">
+                                <h3 class="text-md font-medium text-gray-700 mb-4">Detalles Adicionales</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Piezas Reemplazadas</label>
+                                        <textarea th:field="*{piezasReemplazadas}" rows="3"
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                  placeholder="Lista de piezas que fueron reemplazadas..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                                        <textarea th:field="*{observaciones}" rows="3"
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                  placeholder="Observaciones adicionales sobre el servicio..."></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Próxima Revisión</label>
+                                        <input type="date" th:field="*{proximaRevision}"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                                <a th:href="@{/admin/equipos}" 
+                                   class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                                    Cancelar
+                                </a>
+                                <button type="submit" 
+                                        class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                                    Registrar Servicio
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script>
+        // Establecer fecha actual por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaServicio = document.getElementById('fechaServicio');
+            if (fechaServicio && !fechaServicio.value) {
+                const today = new Date().toISOString().split('T')[0];
+                fechaServicio.value = today;
+            }
+
+            // Auto-calcular próxima revisión basada en el tipo de servicio
+            const tipoServicio = document.getElementById('tipoServicio');
+            const proximaRevision = document.getElementById('proximaRevision');
+            
+            if (tipoServicio && proximaRevision) {
+                tipoServicio.addEventListener('change', function() {
+                    if (!proximaRevision.value) {
+                        const fechaServicio = new Date(document.getElementById('fechaServicio').value);
+                        let diasAdicionales = 30; // por defecto 30 días
+                        
+                        switch(this.value) {
+                            case 'PREVENTIVO':
+                                diasAdicionales = 90;
+                                break;
+                            case 'CORRECTIVO':
+                                diasAdicionales = 60;
+                                break;
+                            case 'EMERGENCIA':
+                                diasAdicionales = 30;
+                                break;
+                        }
+                        
+                        const proximaFecha = new Date(fechaServicio.getTime() + (diasAdicionales * 24 * 60 * 60 * 1000));
+                        proximaRevision.value = proximaFecha.toISOString().split('T')[0];
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
