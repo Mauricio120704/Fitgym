@@ -11,30 +11,30 @@ INSERT INTO roles (codigo, nombre) VALUES
 ON CONFLICT (codigo) DO NOTHING;
 
 -- Personal de ejemplo
-INSERT INTO personas (nombre, apellido, email, telefono, dni, tipo, rol_id, membresia_activa, fecha_registro)
-SELECT 'Laura','Gómez','laura.gomez@email.com','555-0201','74125896','PERSONAL',
-       (SELECT id FROM roles WHERE codigo='ADMINISTRADOR'), TRUE, DATE '2024-01-14'
-WHERE NOT EXISTS (SELECT 1 FROM personas WHERE email='laura.gomez@email.com');
+INSERT INTO usuarios (nombre, apellido, email, telefono, dni, rol_id, activo, fecha_registro, contraseña) VALUES
+('Laura','Gómez','laura.gomez@email.com','555-0201','74125896',
+ (SELECT id FROM roles WHERE codigo='ADMINISTRADOR'), TRUE, DATE '2024-01-14', '$2a$10$encrypted_password')
+ON CONFLICT (email) DO NOTHING;
 
-INSERT INTO personas (nombre, apellido, email, telefono, dni, tipo, rol_id, membresia_activa, fecha_registro)
-SELECT 'María','García','maria.garcia@email.com','555-0202','70234561','PERSONAL',
-       (SELECT id FROM roles WHERE codigo='RECEPCIONISTA'), TRUE, DATE '2023-06-01'
-WHERE NOT EXISTS (SELECT 1 FROM personas WHERE email='maria.garcia@email.com');
+INSERT INTO usuarios (nombre, apellido, email, telefono, dni, rol_id, activo, fecha_registro, contraseña) VALUES
+('María','García','maria.garcia@email.com','555-0202','70234561',
+ (SELECT id FROM roles WHERE codigo='RECEPCIONISTA'), TRUE, DATE '2023-06-01', '$2a$10$encrypted_password')
+ON CONFLICT (email) DO NOTHING;
 
-INSERT INTO personas (nombre, apellido, email, telefono, dni, tipo, rol_id, membresia_activa, fecha_registro)
-SELECT 'Carlos','López','carlos.lopez@email.com','555-0203','78901234','PERSONAL',
-       (SELECT id FROM roles WHERE codigo='ENTRENADOR'), TRUE, DATE '2024-03-10'
-WHERE NOT EXISTS (SELECT 1 FROM personas WHERE email='carlos.lopez@email.com');
+INSERT INTO usuarios (nombre, apellido, email, telefono, dni, rol_id, activo, fecha_registro, contraseña) VALUES
+('Carlos','López','carlos.lopez@email.com','555-0203','78901234',
+ (SELECT id FROM roles WHERE codigo='ENTRENADOR'), TRUE, DATE '2024-03-10', '$2a$10$encrypted_password')
+ON CONFLICT (email) DO NOTHING;
 
-INSERT INTO personas (nombre, apellido, email, telefono, dni, tipo, rol_id, membresia_activa, fecha_registro)
-SELECT 'Ana','Martínez','ana.martinez@email.com','555-0204','77889966','PERSONAL',
-       (SELECT id FROM roles WHERE codigo='RECEPCIONISTA'), TRUE, DATE '2023-08-20'
-WHERE NOT EXISTS (SELECT 1 FROM personas WHERE email='ana.martinez@email.com');
+INSERT INTO usuarios (nombre, apellido, email, telefono, dni, rol_id, activo, fecha_registro, contraseña) VALUES
+('Ana','Martínez','ana.martinez@email.com','555-0204','77889966',
+ (SELECT id FROM roles WHERE codigo='RECEPCIONISTA'), TRUE, DATE '2023-08-20', '$2a$10$encrypted_password')
+ON CONFLICT (email) DO NOTHING;
 
 -- Deportista
-INSERT INTO personas (nombre, apellido, email, telefono, dni, tipo, membresia_activa, fecha_registro)
-SELECT 'Juan','Pérez','juan.perez@email.com','555-0301','55667788','DEPORTISTA', TRUE, CURRENT_DATE
-WHERE NOT EXISTS (SELECT 1 FROM personas WHERE email='juan.perez@email.com');
+INSERT INTO personas (nombre, apellido, email, telefono, dni, membresia_activa, activo, fecha_registro, contraseña) VALUES
+('Juan','Pérez','juan.perez@email.com','555-0301','55667788', TRUE, FALSE, CURRENT_DATE, '$2a$10$encrypted_password')
+ON CONFLICT (email) DO NOTHING;
 
 -- Planes
 INSERT INTO planes (nombre, precio, frecuencia) VALUES
@@ -220,3 +220,50 @@ INSERT INTO promocion_membresias (promocion_id, membresia)
 SELECT p.id, m FROM promociones p, (VALUES ('Mensual'), ('Trimestral'), ('Anual')) AS t(m)
 WHERE p.nombre='Promo Black Friday'
   AND NOT EXISTS (SELECT 1 FROM promocion_membresias pm WHERE pm.promocion_id=p.id);
+
+-- =========================
+-- Tabla de Inventario
+-- =========================
+
+-- Crear tabla de inventario
+CREATE TABLE IF NOT EXISTS inventario (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    categoria VARCHAR(100) NOT NULL,
+    codigo_producto VARCHAR(100) NOT NULL UNIQUE,
+    descripcion TEXT NOT NULL,
+    cantidad INTEGER NOT NULL DEFAULT 0,
+    stock_minimo INTEGER NOT NULL DEFAULT 0,
+    stock_maximo INTEGER NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    proveedor VARCHAR(255) NOT NULL,
+    ubicacion VARCHAR(255) NOT NULL,
+    fecha_ingreso DATE NOT NULL DEFAULT CURRENT_DATE,
+    estado VARCHAR(20) NOT NULL DEFAULT 'DISPONIBLE',
+    ultima_actualizacion DATE NOT NULL DEFAULT CURRENT_DATE
+);
+
+-- Crear índices para mejorar el rendimiento
+CREATE INDEX IF NOT EXISTS idx_inventario_categoria ON inventario(categoria);
+CREATE INDEX IF NOT EXISTS idx_inventario_estado ON inventario(estado);
+CREATE INDEX IF NOT EXISTS idx_inventario_proveedor ON inventario(proveedor);
+CREATE INDEX IF NOT EXISTS idx_inventario_ubicacion ON inventario(ubicacion);
+CREATE INDEX IF NOT EXISTS idx_inventario_codigo_producto ON inventario(codigo_producto);
+
+-- Insertar datos de ejemplo
+INSERT INTO inventario (nombre, categoria, codigo_producto, descripcion, cantidad, stock_minimo, stock_maximo, precio_unitario, proveedor, ubicacion, estado) VALUES
+('Proteína Whey 5kg', 'Suplementos', 'PROT001', 'Proteína de suero de alta calidad', 25, 10, 50, 45.99, 'NutriTech', 'Almacén A', 'DISPONIBLE'),
+('Creatina Monohidrato 500g', 'Suplementos', 'CREA001', 'Creatina pura monohidratada', 30, 15, 60, 25.50, 'PowerSupplements', 'Almacén B', 'DISPONIBLE'),
+('Mancuerras 20kg', 'Equipamiento', 'MANC020', 'Par de mancuerras ajustables de 20kg', 8, 5, 20, 89.99, 'FitnessGear', 'Sala de pesas', 'DISPONIBLE'),
+('Cinta de correr T3000', 'Equipamiento', 'CINTA001', 'Cinta de correr profesional con monitor cardíaco', 3, 2, 10, 1299.99, 'ProFit Equipment', 'Sala de cardio', 'BAJO_STOCK'),
+('Barra olímpica 20kg', 'Equipamiento', 'BARRA001', 'Barra olímpica estándar de 20kg', 12, 8, 25, 199.99, 'Olympic Fitness', 'Sala de pesas', 'DISPONIBLE'),
+('Discos de hierro 10kg', 'Equipamiento', 'DISC010', 'Disco de hierro de 10kg', 0, 10, 50, 29.99, 'IronWeights', 'Sala de pesas', 'AGOTADO'),
+('Rodilleras de compresión', 'Accesorios', 'RODI001', 'Rodilleras de compresión para levantamiento', 15, 8, 30, 19.99, 'SportProtection', 'Tienda', 'DISPONIBLE'),
+('Shaker de proteína 700ml', 'Accesorios', 'SHAK001', 'Shaker con mezclador esférico', 40, 20, 80, 8.99, 'FitGear', 'Tienda', 'DISPONIBLE'),
+('Pre-entreno 300g', 'Suplementos', 'PRE001', 'Suplemento pre-entreno con cafeína', 18, 10, 40, 35.99, 'EnergyBoost', 'Almacén A', 'DISPONIBLE'),
+('Guantes de gimnasio', 'Accesorios', 'GUAN001', 'Guantes de cuero con muñequera', 22, 15, 40, 15.99, 'GymWear', 'Tienda', 'DISPONIBLE');
+
+-- Actualizar estados basados en el stock
+UPDATE inventario SET estado = 'AGOTADO' WHERE cantidad <= 0;
+UPDATE inventario SET estado = 'BAJO_STOCK' WHERE cantidad > 0 AND cantidad <= stock_minimo;
+UPDATE inventario SET estado = 'DISPONIBLE' WHERE cantidad > stock_minimo;
