@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipos y Programación de Mantenimiento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside th:replace="fragments/sidebar :: sidebar('equipos')"></aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Equipos y Programación de Mantenimiento</div>
+                </div>
+                <a th:href="@{/admin/equipos/nuevo}" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                    Nuevo Equipo
+                </a>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+
+                <!-- Mensajes -->
+                <div th:if="${mensaje}" class="mb-4 px-4 py-3 rounded relative" role="alert"
+                     th:classappend="${tipoMensaje == 'success'} ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'">
+                    <span class="block sm:inline" th:text="${mensaje}"></span>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="text-sm text-gray-600">Total Equipos</div>
+                        <div class="text-2xl font-bold text-gray-800" th:text="${totalEquipos}">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="text-sm text-gray-600">Activos</div>
+                        <div class="text-2xl font-bold text-green-600" th:text="${equiposActivos}">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="text-sm text-gray-600">En Mantenimiento</div>
+                        <div class="text-2xl font-bold text-yellow-600" th:text="${equiposEnMantenimiento}">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="text-sm text-gray-600">Dañados</div>
+                        <div class="text-2xl font-bold text-red-600" th:text="${equiposDanados}">0</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <div class="text-sm text-gray-600">Fuera de Servicio</div>
+                        <div class="text-2xl font-bold text-gray-600" th:text="${equiposFueraServicio}">0</div>
+                    </div>
+                </div>
+
+                <!-- Alerta de mantenimientos pendientes -->
+                <div th:if="${!#lists.isEmpty(equiposMantenimientoPendiente)}" class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <svg class="h-5 w-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div class="text-yellow-800">
+                            <strong>Atención:</strong> Hay <span th:text="${#lists.size(equiposMantenimientoPendiente)}">0</span> equipos con mantenimiento programado para los próximos 7 días.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="bg-white p-4 rounded-lg shadow mb-6">
+                    <form th:action="@{/admin/equipos}" method="get" class="flex flex-wrap gap-4 items-end">
+                        <div class="flex-1 min-w-64">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+                            <input type="text" name="buscar" th:value="${buscar}" 
+                                   placeholder="Nombre, tipo, marca, modelo, ubicación..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div class="min-w-40">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <select name="estado" th:value="${estadoSeleccionado}" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option value="TODOS">Todos</option>
+                                <option value="ACTIVO">Activo</option>
+                                <option value="MANTENIMIENTO">En Mantenimiento</option>
+                                <option value="DAÑADO">Dañado</option>
+                                <option value="FUERA_DE_SERVICIO">Fuera de Servicio</option>
+                            </select>
+                        </div>
+                        <div class="min-w-40">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                            <select name="tipo" th:value="${tipoSeleccionado}" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option value="TODOS">Todos</option>
+                                <option value="CARDIO">Cardio</option>
+                                <option value="PESAS">Pesas</option>
+                                <option value="MAQUINAS">Máquinas</option>
+                                <option value="ACCESORIOS">Accesorios</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                            Filtrar
+                        </button>
+                        <a th:href="@{/admin/equipos}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                            Limpiar
+                        </a>
+                    </form>
+                </div>
+
+                <!-- Lista de equipos -->
+                <div class="bg-white rounded-lg shadow">
+                    <div th:if="${#lists.isEmpty(equipos)}" class="p-6 text-center text-gray-500">
+                        No se encontraron equipos
+                    </div>
+                    
+                    <table th:unless="${#lists.isEmpty(equipos)}" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca/Modelo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próximo Mantenimiento</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr th:each="equipo : ${equipos}" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${equipo.nombre}"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipo.tipo}"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <div th:text="${equipo.marca}"></div>
+                                    <div class="text-xs text-gray-400" th:text="${equipo.modelo}"></div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${equipo.ubicacion}"></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span th:if="${equipo.estado == 'ACTIVO'}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
+                                    <span th:if="${equipo.estado == 'MANTENIMIENTO'}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Mantenimiento</span>
+                                    <span th:if="${equipo.estado == 'DAÑADO'}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Dañado</span>
+                                    <span th:if="${equipo.estado == 'FUERA_DE_SERVICIO'}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Fuera de Servicio</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <div th:if="${equipo.proximoMantenimiento != null}">
+                                        <div th:text="${#temporals.format(equipo.proximoMantenimiento, 'dd/MM/yyyy')}"></div>
+                                        <div th:if="${equipo.proximoMantenimiento.isBefore(T(java.time.LocalDate).now().plusDays(7))}" 
+                                             class="text-xs text-yellow-600 font-semibold">Próximo</div>
+                                    </div>
+                                    <div th:unless="${equipo.proximoMantenimiento != null}" class="text-gray-400">No programado</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <a th:href="@{/admin/equipos/detalle/{id}(id=${equipo.id})}" 
+                                           class="text-blue-600 hover:text-blue-900" title="Ver detalles">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </a>
+                                        <a th:href="@{/admin/equipos/editar/{id}(id=${equipo.id})}" 
+                                           class="text-indigo-600 hover:text-indigo-900" title="Editar">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </a>
+                                        <a th:href="@{/admin/equipos/registrar-servicio/{id}(id=${equipo.id})}" 
+                                           class="text-green-600 hover:text-green-900" title="Registrar servicio">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                            </svg>
+                                        </a>
+                                        <form th:action="@{/admin/equipos/eliminar/{id}(id=${equipo.id})}" 
+                                              method="post" class="inline" 
+                                              onsubmit="return confirm('¿Está seguro de eliminar este equipo?')">
+                                            <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar">
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>

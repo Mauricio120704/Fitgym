@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Equipo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside th:replace="fragments/sidebar :: sidebar('equipos')"></aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Detalle del Equipo</div>
+                </div>
+                <div class="flex space-x-2">
+                    <a th:href="@{/admin/equipos/registrar-servicio/{id}(id=${equipo.id})}" 
+                       class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                        Registrar Servicio
+                    </a>
+                    <a th:href="@{/admin/equipos}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                        Volver
+                    </a>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="max-w-6xl mx-auto">
+                    <!-- Información Principal del Equipo -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800" th:text="${equipo.nombre}"></h2>
+                                <div class="flex items-center gap-4 mt-2">
+                                    <span th:if="${equipo.estado == 'ACTIVO'}" 
+                                          class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
+                                    <span th:if="${equipo.estado == 'MANTENIMIENTO'}" 
+                                          class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">En Mantenimiento</span>
+                                    <span th:if="${equipo.estado == 'DAÑADO'}" 
+                                          class="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-800">Dañado</span>
+                                    <span th:if="${equipo.estado == 'FUERA_DE_SERVICIO'}" 
+                                          class="px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800">Fuera de Servicio</span>
+                                    <span class="text-sm text-gray-600" th:text="${equipo.tipo}"></span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <a th:href="@{/admin/equipos/editar/{id}(id=${equipo.id})}" 
+                                   class="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition">
+                                    Editar
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="space-y-4">
+                                <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Información General</h3>
+                                <div class="space-y-2">
+                                    <div>
+                                        <span class="text-sm text-gray-600">Marca:</span>
+                                        <div class="font-medium" th:text="${equipo.marca}"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-600">Modelo:</span>
+                                        <div class="font-medium" th:text="${equipo.modelo}"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-600">Número de Serie:</span>
+                                        <div class="font-medium" th:text="${equipo.numeroSerie}"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-600">Ubicación:</span>
+                                        <div class="font-medium" th:text="${equipo.ubicacion}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Fechas Importantes</h3>
+                                <div class="space-y-2">
+                                    <div>
+                                        <span class="text-sm text-gray-600">Fecha de Adquisición:</span>
+                                        <div class="font-medium" th:text="${#temporals.format(equipo.fechaAdquisicion, 'dd/MM/yyyy')}"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-600">Último Mantenimiento:</span>
+                                        <div class="font-medium" th:text="${#temporals.format(equipo.ultimoMantenimiento, 'dd/MM/yyyy')}"></div>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm text-gray-600">Próximo Mantenimiento:</span>
+                                        <div class="font-medium">
+                                            <span th:if="${equipo.proximoMantenimiento != null}" 
+                                                  th:text="${#temporals.format(equipo.proximoMantenimiento, 'dd/MM/yyyy')}"></span>
+                                            <span th:unless="${equipo.proximoMantenimiento != null}" class="text-gray-400">No programado</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="text-lg font-semibold text-gray-700 border-b pb-2">Descripción</h3>
+                                <div class="text-gray-700" th:text="${equipo.descripcion ?: 'Sin descripción'}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Historial de Mantenimiento -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Historial de Mantenimiento</h3>
+                        
+                        <div th:if="${#lists.isEmpty(historialMantenimiento)}" class="text-center py-8 text-gray-500">
+                            No hay registros de mantenimiento para este equipo
+                        </div>
+                        
+                        <div th:unless="${#lists.isEmpty(historialMantenimiento)}">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr th:each="mantenimiento : ${historialMantenimiento}" class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
+                                            th:text="${#temporals.format(mantenimiento.fechaServicio, 'dd/MM/yyyy')}"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span th:if="${mantenimiento.tipoServicio == 'PREVENTIVO'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Preventivo</span>
+                                            <span th:if="${mantenimiento.tipoServicio == 'CORRECTIVO'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Correctivo</span>
+                                            <span th:if="${mantenimiento.tipoServicio == 'EMERGENCIA'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Emergencia</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${mantenimiento.tecnicoResponsable}"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span th:if="${mantenimiento.estado == 'COMPLETADO'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completado</span>
+                                            <span th:if="${mantenimiento.estado == 'EN_PROGRESO'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En Progreso</span>
+                                            <span th:if="${mantenimiento.estado == 'PROGRAMADO'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Programado</span>
+                                            <span th:if="${mantenimiento.estado == 'CANCELADO'}" 
+                                                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Cancelado</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${mantenimiento.costo ?: '-'}"></td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">
+                                            <div class="max-w-xs truncate" th:title="${mantenimiento.descripcion}" th:text="${mantenimiento.descripcion}"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+</body>
+</html>
