@@ -87,6 +87,14 @@
                         <span class="sidebar-text ml-3 hidden">Personal</span>
                     </a>
                 </li>
+                <li sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/deportistas}" th:classappend="${activeMenu == 'deportistas-admin'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Deportistas">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="sidebar-text ml-3 hidden">Deportistas</span>
+                    </a>
+                </li>
                 <li>
                     <a th:href="@{/incidencias}" th:classappend="${activeMenu == 'incidencias'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Incidencias">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10 3h4l1 7H9l1-7zM5 21h14l-1-7H6l-1 7z"/></svg>
@@ -99,6 +107,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10a2 2 0 012 2v6a2 2 0 01-2 2H7l-4 3V9a2 2 0 012-2h2m7 3l-2 2m0 0l-2-2m2 2l2 2m-2-2l-2 2"/>
                         </svg>
                         <span class="sidebar-text ml-3 hidden">Promociones</span>
+                    </a>
+                </li>
+                <li sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/notificaciones}" th:classappend="${activeMenu == 'notificaciones'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Notificaciones">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1"></path>
+                        </svg>
+                        <span class="sidebar-text ml-3 hidden">Notificaciones</span>
                     </a>
                 </li>
                 <li>
