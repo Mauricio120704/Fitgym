@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,8 @@ public class AdminDeportistasController {
                     .filter(p -> !Boolean.TRUE.equals(p.getBloqueado()))
                     .collect(Collectors.toList());
         }
+
+        filtrados.sort(Comparator.comparing(Persona::getId));
 
         long totalDeportistas = todos.size();
         long totalBloqueados = todos.stream().filter(p -> Boolean.TRUE.equals(p.getBloqueado())).count();
