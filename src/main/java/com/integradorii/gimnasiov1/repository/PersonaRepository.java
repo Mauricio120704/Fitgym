@@ -30,6 +30,8 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
             "LOWER(p.dni) LIKE LOWER(CONCAT('%', :term, '%'))")
     List<Persona> searchDeportistas(@Param("term") String term);
 
+    List<Persona> findByEmailVerificadoTrueAndActivoTrue();
+
     /**
      * Contar deportistas con membresía activa
      */
@@ -62,6 +64,16 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
      */
     List<Persona> findByPerfilVisibleTrueAndEmailNot(String email);
     
+    /**
+     * Obtener deportistas activos (cuenta y email) con suscripción activa a un plan específico
+     */
+    @Query("SELECT DISTINCT s.deportista FROM Suscripcion s " +
+           "WHERE s.estado = 'Activa' " +
+           "AND s.plan.id = :planId " +
+           "AND s.deportista.emailVerificado = true " +
+           "AND s.deportista.activo = true")
+    List<Persona> findDeportistasActivosPorPlanId(@Param("planId") Integer planId);
+
     /**
      * Buscar deportistas por nombre, apellido o DNI (para búsqueda simple)
      */

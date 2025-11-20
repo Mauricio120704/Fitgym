@@ -40,9 +40,15 @@ public class Persona {
 
     @Column(name = "activo")
     private Boolean activo = Boolean.FALSE; // Inactivo hasta verificar email
-
+ 
     @Column(name = "email_verificado")
     private Boolean emailVerificado = Boolean.FALSE;
+
+    @Column(name = "bloqueado")
+    private Boolean bloqueado = Boolean.FALSE;
+
+    @Column(name = "motivo_bloqueo", length = 255)
+    private String motivoBloqueo;
 
     @Column(nullable = false, length = 255, name = "contraseña")
     private String contraseña;
@@ -77,6 +83,9 @@ public class Persona {
 
     @Column(name = "descripcion", length = 500)
     private String descripcion;
+
+    @Column(name = "tutorial_visto")
+    private Boolean tutorialVisto = Boolean.FALSE;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -126,6 +135,12 @@ public class Persona {
     public Boolean getEmailVerificado() { return emailVerificado; }
     public void setEmailVerificado(Boolean emailVerificado) { this.emailVerificado = emailVerificado; }
     
+    public Boolean getBloqueado() { return bloqueado; }
+    public void setBloqueado(Boolean bloqueado) { this.bloqueado = bloqueado; }
+
+    public String getMotivoBloqueo() { return motivoBloqueo; }
+    public void setMotivoBloqueo(String motivoBloqueo) { this.motivoBloqueo = motivoBloqueo; }
+    
     public Boolean getPerfilVisible() { return perfilVisible; }
     public void setPerfilVisible(Boolean perfilVisible) { this.perfilVisible = perfilVisible; }
     
@@ -139,6 +154,8 @@ public class Persona {
     public void setMostrarAltura(Boolean mostrarAltura) { this.mostrarAltura = mostrarAltura; }
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public Boolean getTutorialVisto() { return tutorialVisto; }
+    public void setTutorialVisto(Boolean tutorialVisto) { this.tutorialVisto = tutorialVisto; }
     
     // Helper method
     public String getNombreCompleto() {

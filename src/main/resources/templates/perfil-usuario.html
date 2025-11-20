@@ -56,6 +56,73 @@
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
                 <div class="max-w-7xl mx-auto">
+                    <div th:if="${mostrarTutorial}" id="tutorial-overlay" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                        <div class="bg-white rounded-xl shadow-2xl max-w-xl w-full mx-4 p-6 space-y-4">
+                            <h2 class="text-2xl font-semibold text-gray-900">Bienvenido a FitGym</h2>
+                            <p class="text-gray-700 text-sm">
+                                Esta es una guía rápida para que aproveches al máximo tu cuenta desde el primer día.
+                            </p>
+                            <div class="space-y-3 text-sm text-gray-700">
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">1</div>
+                                    <div>
+                                        <p class="font-semibold">Reservar clases</p>
+                                        <p>Desde el menú lateral, ve a <span class="font-medium">"Reservas"</span> para ver el calendario de clases disponibles y reservar tu lugar.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">2</div>
+                                    <div>
+                                        <p class="font-semibold">Ver tus próximas clases</p>
+                                        <p>En <span class="font-medium">"Mis Clases"</span> podrás revisar rápidamente cuáles son tus próximas reservas y planificar tu semana.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">3</div>
+                                    <div>
+                                        <p class="font-semibold">Actualizar tu perfil y progreso</p>
+                                        <p>En esta misma pantalla de <span class="font-medium">"Mi Perfil"</span> puedes actualizar tu peso, altura y objetivos para hacer seguimiento a tu progreso.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">4</div>
+                                    <div>
+                                        <p class="font-semibold">Evaluaciones</p>
+                                        <p>En <span class="font-medium">"Evaluaciones"</span> podrás ver tus evaluaciones físicas y las recomendaciones de tu entrenador para mejorar tu rendimiento.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">5</div>
+                                    <div>
+                                        <p class="font-semibold">Suspensión</p>
+                                        <p>Si necesitas pausar tu plan por un tiempo, desde <span class="font-medium">"Suspensión"</span> puedes solicitar una suspensión temporal de tu membresía.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">6</div>
+                                    <div>
+                                        <p class="font-semibold">Comunidad</p>
+                                        <p>En <span class="font-medium">"Comunidad"</span> podrás descubrir a otros deportistas, ver sus perfiles públicos y sentirte parte del gimnasio.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">7</div>
+                                    <div>
+                                        <p class="font-semibold">Promociones y reclamos</p>
+                                        <p>En <span class="font-medium">"Promociones"</span> verás ofertas y beneficios especiales, y en <span class="font-medium">"Reclamos"</span> podrás registrar cualquier problema o sugerencia para que podamos ayudarte.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" class="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-50" onclick="document.getElementById('tutorial-overlay')?.classList.add('hidden')">
+                                    Ver más tarde
+                                </button>
+                                <button type="button" class="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="document.getElementById('tutorial-overlay')?.classList.add('hidden')">
+                                    Entendido
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Header con info del usuario -->
                     <div class="user-profile-header">
                         <div class="user-info-section">
