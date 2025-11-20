@@ -77,12 +77,15 @@ public class CheckoutController {
             Model model,
             @AuthenticationPrincipal UserDetails userDetails) {
 
+        boolean autenticado = userDetails != null && userDetails.getUsername() != null;
+        if (!autenticado) {
+            return "redirect:/registro";
+        }
+
         String usuarioFinal = usuario;
         if ((usuarioFinal == null || usuarioFinal.isBlank()) && userDetails != null && userDetails.getUsername() != null) {
             usuarioFinal = userDetails.getUsername();
         }
-
-        boolean autenticado = userDetails != null && userDetails.getUsername() != null;
 
         model.addAttribute("planNombre", plan);
         model.addAttribute("periodo", periodo);
