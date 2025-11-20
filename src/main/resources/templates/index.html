@@ -35,7 +35,8 @@
 
             <div class="cta-buttons">
                 <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-primary">Comenzar Ahora</a>
-                <a sec:authorize="isAuthenticated()" th:href="@{/perfil}" class="btn btn-primary">Ir a tu panel</a>
+                <a sec:authorize="hasRole('CLIENTE')" th:href="@{/perfil}" class="btn btn-primary">Ir a tu panel</a>
+                <a sec:authorize="hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')" th:href="@{/miembros}" class="btn btn-primary">Ir a tu panel</a>
                 <a th:href="@{/planes}" class="btn btn-secondary">Ver Planes</a>
             </div>
         </div>
