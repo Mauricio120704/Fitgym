@@ -198,6 +198,7 @@ Este proyecto es de uso académico.
 - **[FUNCIONALIDADES.md](FUNCIONALIDADES.md)** - Listado completo de funcionalidades
 - **[RECLAMOS_IMPLEMENTATION.md](RECLAMOS_IMPLEMENTATION.md)** - Módulo de reclamos
 - **[VERIFICACION_EMAIL_IMPLEMENTATION.md](VERIFICACION_EMAIL_IMPLEMENTATION.md)** - Sistema de verificación de email
+- **[HISTORIAS_USUARIO.md](HISTORIAS_USUARIO.md)** - Historias de usuario
 
 ---
 

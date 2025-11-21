@@ -106,7 +106,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         System.out.println("Authorities: " + authorities);
         // Bloquear cuenta si no está activa (email no verificado)
-        boolean isAccountLocked = persona.getActivo() == null || !persona.getActivo();
+        boolean isAccountLocked = persona.getActivo() == null || !persona.getActivo() || Boolean.TRUE.equals(persona.getBloqueado());
         System.out.println("Account Locked: " + isAccountLocked);
         System.out.println("===================");
 

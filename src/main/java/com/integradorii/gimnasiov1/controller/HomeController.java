@@ -352,10 +352,18 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        boolean tieneMembresiaActiva = persona.getMembresiaActiva() != null && persona.getMembresiaActiva();
+        boolean mostrarTutorial = tieneMembresiaActiva && (persona.getTutorialVisto() == null || !persona.getTutorialVisto());
+        if (mostrarTutorial) {
+            persona.setTutorialVisto(Boolean.TRUE);
+            personaRepository.save(persona);
+        }
+
         try {
             // Añadir al modelo los objetos esperados por la vista
             model.addAttribute("usuario", persona);
             model.addAttribute("miembro", persona);
+            model.addAttribute("mostrarTutorial", mostrarTutorial);
 
             // Muchas plantillas (originalmente pensadas para 'Usuario') esperan propiedades como 'tipo' o
             // 'rol.nombre' que no existen en Persona; proporcionar valores por defecto evita excepciones en Thymeleaf.

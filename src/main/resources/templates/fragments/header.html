@@ -50,12 +50,17 @@
                                 <span sec:authentication="name"></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" th:href="@{/perfil}">Mi Perfil</a></li>
+                                <li sec:authorize="hasRole('CLIENTE')">
+                                    <a class="dropdown-item" th:href="@{/perfil}">Mi Perfil</a>
+                                </li>
+                                <li sec:authorize="hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')">
+                                    <a class="dropdown-item" th:href="@{/miembros}">Ir a tu panel</a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form th:action="@{/logout}" method="post">
                                         <button type="submit" class="dropdown-item text-danger">
-                                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesin
                                         </button>
                                     </form>
                                 </li>

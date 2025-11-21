@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,7 +34,9 @@
 
 
             <div class="cta-buttons">
-                <a th:href="@{/login}" class="btn btn-primary">Comenzar Ahora</a>
+                <a sec:authorize="isAnonymous()" th:href="@{/login}" class="btn btn-primary">Comenzar Ahora</a>
+                <a sec:authorize="hasRole('CLIENTE')" th:href="@{/perfil}" class="btn btn-primary">Ir a tu panel</a>
+                <a sec:authorize="hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')" th:href="@{/miembros}" class="btn btn-primary">Ir a tu panel</a>
                 <a th:href="@{/planes}" class="btn btn-secondary">Ver Planes</a>
             </div>
         </div>

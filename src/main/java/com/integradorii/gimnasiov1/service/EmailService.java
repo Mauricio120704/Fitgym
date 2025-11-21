@@ -48,6 +48,25 @@ public class EmailService {
         mailSender.send(message);
     }
     
+    public void enviarNotificacionGeneral(String toEmail, String nombreCompleto, String asunto, String mensaje)
+            throws MessagingException {
+        String htmlContent = construirEmailNotificacion(nombreCompleto, mensaje);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        String safeFrom = fromEmail != null ? fromEmail.replaceAll("[\\r\\n]", "").trim() : null;
+        String safeTo = toEmail != null ? toEmail.replaceAll("[\\r\\n]", "").trim() : null;
+        String safeSubject = asunto != null ? asunto.replaceAll("[\\r\\n]", " ").trim() : null;
+
+        helper.setFrom(Objects.requireNonNull(safeFrom));
+        helper.setTo(Objects.requireNonNull(safeTo));
+        helper.setSubject(Objects.requireNonNull(safeSubject));
+        helper.setText(Objects.requireNonNull(htmlContent), true);
+
+        mailSender.send(message);
+    }
+
     /**
      * Construye el contenido HTML del email de verificación
      */
@@ -92,6 +111,41 @@ public class EmailService {
                 "        <div class='footer'>" +
                 "            <p>© 2024 FitGym. Todos los derechos reservados.</p>" +
                 "            <p>Este es un correo automático, por favor no respondas a este mensaje.</p>" +
+                "        </div>" +
+                "    </div>" +
+                "</body>" +
+                "</html>";
+    }
+
+    private String construirEmailNotificacion(String nombreCompleto, String mensaje) {
+        return "<!DOCTYPE html>" +
+                "<html lang='es'>" +
+                "<head>" +
+                "    <meta charset='UTF-8'>" +
+                "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                "    <title>Notificación FitGym</title>" +
+                "    <style>" +
+                "        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }" +
+                "        .container { max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }" +
+                "        .header { text-align: center; padding-bottom: 20px; border-bottom: 3px solid #f97316; }" +
+                "        .header h1 { color: #f97316; margin: 0; font-size: 26px; }" +
+                "        .content { padding: 20px 0; }" +
+                "        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; }" +
+                "        .message-box { background-color: #f9fafb; border-radius: 8px; padding: 16px; border: 1px solid #e5e7eb; white-space: pre-line; }" +
+                "    </style>" +
+                "</head>" +
+                "<body>" +
+                "    <div class='container'>" +
+                "        <div class='header'>" +
+                "            <h1>FitGym</h1>" +
+                "        </div>" +
+                "        <div class='content'>" +
+                "            <h2>Hola, " + nombreCompleto + "</h2>" +
+                "            <p>Tenemos un anuncio importante para ti:</p>" +
+                "            <div class='message-box'>" + mensaje + "</div>" +
+                "        </div>" +
+                "        <div class='footer'>" +
+                "            <p>© 2024 FitGym. Este es un mensaje informativo enviado a los deportistas del gimnasio.</p>" +
                 "        </div>" +
                 "    </div>" +
                 "</body>" +

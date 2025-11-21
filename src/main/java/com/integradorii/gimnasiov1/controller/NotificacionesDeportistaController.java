@@ -1,11 +1,13 @@
 package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.model.Clase;
+import com.integradorii.gimnasiov1.model.NotificacionMasiva;
 import com.integradorii.gimnasiov1.model.Persona;
 import com.integradorii.gimnasiov1.model.Promocion;
 import com.integradorii.gimnasiov1.model.ReservaClase;
 import com.integradorii.gimnasiov1.model.Suscripcion;
 import com.integradorii.gimnasiov1.repository.ClaseRepository;
+import com.integradorii.gimnasiov1.repository.NotificacionMasivaRepository;
 import com.integradorii.gimnasiov1.repository.PersonaRepository;
 import com.integradorii.gimnasiov1.repository.PromocionRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
@@ -51,17 +53,20 @@ public class NotificacionesDeportistaController {
     private final ReservaClaseRepository reservaClaseRepository;
     private final PromocionRepository promocionRepository;
     private final ClaseRepository claseRepository;
+    private final NotificacionMasivaRepository notificacionMasivaRepository;
 
     public NotificacionesDeportistaController(PersonaRepository personaRepository,
                                               SuscripcionRepository suscripcionRepository,
                                               ReservaClaseRepository reservaClaseRepository,
                                               PromocionRepository promocionRepository,
-                                              ClaseRepository claseRepository) {
+                                              ClaseRepository claseRepository,
+                                              NotificacionMasivaRepository notificacionMasivaRepository) {
         this.personaRepository = personaRepository;
         this.suscripcionRepository = suscripcionRepository;
         this.reservaClaseRepository = reservaClaseRepository;
         this.promocionRepository = promocionRepository;
         this.claseRepository = claseRepository;
+        this.notificacionMasivaRepository = notificacionMasivaRepository;
     }
 
     /**
@@ -96,8 +101,53 @@ public class NotificacionesDeportistaController {
         DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy").withLocale(new Locale("es"));
         DateTimeFormatter fechaHoraFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withLocale(new Locale("es"));
 
-        // Bloque 1: notificaciones relacionadas a la suscripción actual
         Optional<Suscripcion> suscripcionOpt = suscripcionRepository.findActiveByDeportistaId(persona.getId());
+
+        LocalDateTime haceTreintaDias = LocalDateTime.now().minusDays(30);
+        List<NotificacionMasiva> anunciosRecientes = notificacionMasivaRepository
+                .findByFechaEnvioAfterOrderByFechaEnvioDesc(haceTreintaDias);
+
+        Integer planActualId = null;
+        if (suscripcionOpt.isPresent() && suscripcionOpt.get().getPlan() != null) {
+            planActualId = suscripcionOpt.get().getPlan().getId();
+        }
+
+        int maxAnuncios = 3;
+        int contadorAnuncios = 0;
+        for (NotificacionMasiva anuncio : anunciosRecientes) {
+            if (contadorAnuncios >= maxAnuncios) {
+                break;
+            }
+
+            String filtroPlan = anuncio.getFiltroPlan();
+            boolean aplica = false;
+
+            if (filtroPlan == null || filtroPlan.isBlank() || "TODOS".equalsIgnoreCase(filtroPlan)) {
+                aplica = true;
+            } else if (planActualId != null) {
+                try {
+                    Integer planFiltro = Integer.valueOf(filtroPlan.trim());
+                    aplica = planFiltro.equals(planActualId);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            if (!aplica) {
+                continue;
+            }
+
+            Map<String, Object> n = new LinkedHashMap<>();
+            n.put("tipo", "ANUNCIO_GENERAL");
+            n.put("id", "ANUNCIO_GENERAL_" + anuncio.getId());
+            n.put("titulo", anuncio.getAsunto());
+            n.put("mensaje", anuncio.getMensaje());
+            n.put("fechaReferencia", anuncio.getFechaEnvio());
+            n.put("url", "/perfil");
+            items.add(n);
+            contadorAnuncios++;
+        }
+
+        // Bloque 1: notificaciones relacionadas a la suscripción actual
         if (suscripcionOpt.isPresent()) {
             Suscripcion s = suscripcionOpt.get();
             if (s.getFechaFin() != null) {
