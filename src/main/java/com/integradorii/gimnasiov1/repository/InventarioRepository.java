@@ -72,7 +72,7 @@ public interface InventarioRepository extends JpaRepository<Inventario, Long> {
     @Query(value = "SELECT * FROM inventario i WHERE " +
            "(:estado IS NULL OR i.estado = CAST(:estado AS VARCHAR)) AND " +
            "(:categoria IS NULL OR i.categoria = CAST(:categoria AS VARCHAR)) AND " +
-           "(:proveedor IS NULL OR i.proveedor = CAST(:proveedor AS VARCHAR)) AND " +
+           "(:proveedor IS NULL OR i.proveedor LIKE CAST(CONCAT('%', :proveedor, '%') AS VARCHAR)) AND " +
            "(:ubicacion IS NULL OR i.ubicacion = CAST(:ubicacion AS VARCHAR)) AND " +
            "(:termino IS NULL OR " +
            "i.nombre LIKE CAST(CONCAT('%', :termino, '%') AS VARCHAR) OR " +

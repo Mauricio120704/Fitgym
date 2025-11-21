@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustar Stock - Inventario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar('inventario')}"></div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center py-4">
+                        <div class="flex items-center">
+                            <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                            <h1 class="ml-4 text-2xl font-bold text-gray-800">Ajustar Stock</h1>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <a th:href="@{/admin/inventario}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                                <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                </svg>
+                                Volver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-auto">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <!-- Mensajes de alerta -->
+                    <div th:if="${mensaje}" th:classappend="${tipoMensaje == 'success' ? 'bg-green-100 border-l-4 border-green-500 text-green-700' : 'bg-red-100 border-l-4 border-red-500 text-red-700'}" class="p-4 mb-6">
+                        <p th:text="${mensaje}"></p>
+                    </div>
+
+                    <!-- Información del Producto -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Información del Producto</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Código</label>
+                                <p class="mt-1 text-gray-900" th:text="${producto.codigoProducto}">COD001</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                                <p class="mt-1 text-gray-900" th:text="${producto.nombre}">Nombre del Producto</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Categoría</label>
+                                <p class="mt-1 text-gray-900" th:text="${producto.categoria}">Categoría</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Proveedor</label>
+                                <p class="mt-1 text-gray-900" th:text="${producto.proveedor}">Proveedor</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Stock Actual</label>
+                                <p class="mt-1 text-lg font-semibold text-blue-600" th:text="${producto.cantidad}">0</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Stock Mínimo</label>
+                                <p class="mt-1 text-gray-900" th:text="${producto.stockMinimo}">0</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Stock Máximo</label>
+                                <p class="mt-1 text-gray-900" th:text="${producto.stockMaximo}">0</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Estado</label>
+                                <span th:classappend="${producto.estado == 'DISPONIBLE' ? 'bg-green-100 text-green-800' : 
+                                                        producto.estado == 'BAJO_STOCK' ? 'bg-yellow-100 text-yellow-800' : 
+                                                        producto.estado == 'AGOTADO' ? 'bg-red-100 text-red-800' : 
+                                                        'bg-gray-100 text-gray-800'}" 
+                                     class="mt-1 px-3 py-1 inline-flex text-sm font-semibold rounded-full">
+                                    <span th:text="${#strings.replace(producto.estado, '_', ' ')}">DISPONIBLE</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulario de Ajuste de Stock -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Ajustar Stock</h2>
+                        <form th:action="@{/admin/inventario/actualizar-stock/{id}(id=${producto.id})}" method="post" class="space-y-6">
+                            <div>
+                                <label for="nuevaCantidad" class="block text-sm font-medium text-gray-700 mb-2">Nueva Cantidad</label>
+                                <input type="number" id="nuevaCantidad" name="nuevaCantidad" 
+                                       th:value="${producto.cantidad}" 
+                                       min="0" 
+                                       required
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="mt-2 text-sm text-gray-500">
+                                    Ingrese la nueva cantidad de stock. El estado se actualizará automáticamente.
+                                </p>
+                            </div>
+
+                            <!-- Información de Referencia -->
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h3 class="text-sm font-semibold text-blue-900 mb-2">Información de Referencia</h3>
+                                <ul class="text-sm text-blue-800 space-y-1">
+                                    <li><strong>Stock Actual:</strong> <span th:text="${producto.cantidad}">0</span> unidades</li>
+                                    <li><strong>Stock Mínimo:</strong> <span th:text="${producto.stockMinimo}">0</span> unidades</li>
+                                    <li><strong>Stock Máximo:</strong> <span th:text="${producto.stockMaximo}">0</span> unidades</li>
+                                    <li><strong>Rango Recomendado:</strong> Entre <span th:text="${producto.stockMinimo}">0</span> y <span th:text="${producto.stockMaximo}">0</span> unidades</li>
+                                </ul>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="border-t pt-6 flex justify-end space-x-4">
+                                <a th:href="@{/admin/inventario}" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Actualizar Stock
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Script para manejar el menú -->
+    <script>
+        document.getElementById('menu-button').addEventListener('click', function() {
+            const sidebar = document.querySelector('[th\\:replace*="sidebar"]').parentElement;
+            sidebar.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

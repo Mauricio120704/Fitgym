@@ -43,7 +43,7 @@
                 <div class="max-w-2xl mx-auto">
                     <div class="bg-white rounded-lg shadow p-6">
                         <h2 class="text-lg font-semibold text-gray-800 mb-6">Información del Equipo</h2>
-                        
+
                         <form th:action="@{/admin/equipos/actualizar/{id}(id=${equipo.id})}" th:object="${equipo}" method="post" class="space-y-6">
                             <!-- Información Básica -->
                             <div class="border-b border-gray-200 pb-6">
@@ -62,7 +62,8 @@
                                             <option value="CARDIO">Cardio</option>
                                             <option value="PESAS">Pesas</option>
                                             <option value="MAQUINAS">Máquinas</option>
-                                            <option value="ACCESORIOS">Accesorios</option>
+                                            <option value="FUERZA">Fuerza</option>
+                                            <option value="Peso Libre">Peso Libre</option>
                                         </select>
                                     </div>
                                     <div>
@@ -100,7 +101,8 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
                                         <select th:field="*{estado}" required
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none">
+                                            <option value="">Seleccionar estado</option>
                                             <option value="ACTIVO">Activo</option>
                                             <option value="MANTENIMIENTO">En Mantenimiento</option>
                                             <option value="DAÑADO">Dañado</option>
@@ -127,11 +129,11 @@
 
                             <!-- Botones -->
                             <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
-                                <a th:href="@{/admin/equipos}" 
+                                <a th:href="@{/admin/equipos}"
                                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
                                     Cancelar
                                 </a>
-                                <button type="submit" 
+                                <button type="submit"
                                         class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
                                     Actualizar Equipo
                                 </button>

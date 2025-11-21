@@ -135,17 +135,17 @@
                                         </div>
                                         
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Estado de Stock:</span>
+                                            <span class="text-sm font-medium text-gray-500">Porcentaje de Stock:</span>
                                             <div class="mt-1">
                                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                                    <div th:style="'width: ' + ${inventario.porcentajeStock} + '%'" 
+                                                    <div th:style="'width: ' + ${(inventario.cantidad * 100) / inventario.stockMaximo} + '%'" 
                                                          th:classappend="${inventario.estado == 'DISPONIBLE' ? 'bg-green-500' : 
                                                                         inventario.estado == 'BAJO_STOCK' ? 'bg-yellow-500' : 
                                                                         'bg-red-500'}" 
                                                          class="h-2 rounded-full"></div>
                                                 </div>
                                                 <p class="text-sm text-gray-600 mt-1" 
-                                                   th:text="${#numbers.formatDecimal(inventario.porcentajeStock, 0, 'COMMA', 1, 'POINT')} + '%'">0%</p>
+                                                   th:text="${#numbers.formatDecimal((inventario.cantidad * 100) / inventario.stockMaximo, 0, 'COMMA', 1, 'POINT')} + '%'">0%</p>
                                             </div>
                                         </div>
                                     </div>
@@ -167,8 +167,8 @@
                                         </div>
                                         
                                         <div>
-                                            <span class="text-sm font-medium text-gray-500">Fecha de Registro:</span>
-                                            <p class="text-gray-900" th:text="${#temporals.format(inventario.fechaRegistro, 'dd/MM/yyyy')}">-</p>
+                                            <span class="text-sm font-medium text-gray-500">Fecha de Ingreso:</span>
+                                            <p class="text-gray-900" th:text="${#temporals.format(inventario.fechaIngreso, 'dd/MM/yyyy')}">-</p>
                                         </div>
                                         
                                         <div>
@@ -203,7 +203,7 @@
                                           onsubmit="return confirm('¿Está seguro que desea eliminar este producto? Esta acción no se puede deshacer.');"
                                           class="inline">
                                         <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                                            <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="inline-block w-5 h-5 mr-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
                                             Eliminar Producto

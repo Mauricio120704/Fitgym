@@ -71,20 +71,20 @@ SELECT 'Fuga en ducha', 'Se detectó una fuga en la ducha del vestuario masculin
        (SELECT id FROM personas WHERE email='laura.gomez@email.com')
 WHERE NOT EXISTS (SELECT 1 FROM incidencias WHERE titulo='Fuga en ducha');
 
--- Clase y reserva de ejemplo
-INSERT INTO clases (nombre, descripcion, entrenador_id, capacidad, fecha, duracion_minutos, estado)
-SELECT 'Spinning', 'Clase de alta intensidad en bicicleta estática.',
-       (SELECT id FROM personas WHERE email='carlos.lopez@email.com'),
-       20, NOW() + INTERVAL '3 days', 60, 'Programada'
-WHERE NOT EXISTS (SELECT 1 FROM clases WHERE nombre='Spinning');
+-- Clase y reserva de ejemplo (deshabilitado)
+-- INSERT INTO clases (nombre, descripcion, entrenador_id, capacidad, fecha, duracion_minutos, estado)
+-- SELECT 'Spinning', 'Clase de alta intensidad en bicicleta estática.',
+--        (SELECT id FROM personas WHERE email='carlos.lopez@email.com'),
+--        20, NOW() + INTERVAL '3 days', 60, 'Programada'
+-- WHERE NOT EXISTS (SELECT 1 FROM clases WHERE nombre='Spinning');
 
-INSERT INTO reservas_clase (clase_id, deportista_id, estado)
-SELECT c.id, p.id, 'Reservado'
-FROM clases c, personas p
-WHERE c.nombre='Spinning' AND p.email='juan.perez@email.com'
-  AND NOT EXISTS (
-    SELECT 1 FROM reservas_clase rc WHERE rc.clase_id=c.id AND rc.deportista_id=p.id
-  );
+-- INSERT INTO reservas_clase (clase_id, deportista_id, estado)
+-- SELECT c.id, p.id, 'Reservado'
+-- FROM clases c, personas p
+-- WHERE c.nombre='Spinning' AND p.email='juan.perez@email.com'
+--   AND NOT EXISTS (
+--     SELECT 1 FROM reservas_clase rc WHERE rc.clase_id=c.id AND rc.deportista_id=p.id
+--   );
 
 -- Evaluación de ejemplo
 INSERT INTO evaluaciones (deportista_id, evaluador_id, peso_kg, estatura_cm, imc, grasa_corporal_pct, observaciones)
@@ -135,12 +135,12 @@ WHERE p.email='juan.perez@email.com' AND e.nombre='Plan Fuerza 8 semanas'
 -- Datos adicionales para que las pantallas no aparezcan vacías
 -- =========================
 
--- Clase adicional (Yoga Matutino)
-INSERT INTO clases (nombre, descripcion, entrenador_id, capacidad, fecha, duracion_minutos, estado)
-SELECT 'Yoga Matutino', 'Sesión suave de estiramiento y respiración',
-       (SELECT id FROM personas WHERE email='carlos.lopez@email.com'),
-       25, NOW() + INTERVAL '5 days', 60, 'Programada'
-WHERE NOT EXISTS (SELECT 1 FROM clases WHERE nombre='Yoga Matutino');
+-- Clase adicional (Yoga Matutino) (deshabilitado)
+-- INSERT INTO clases (nombre, descripcion, entrenador_id, capacidad, fecha, duracion_minutos, estado)
+-- SELECT 'Yoga Matutino', 'Sesión suave de estiramiento y respiración',
+--        (SELECT id FROM personas WHERE email='carlos.lopez@email.com'),
+--        25, NOW() + INTERVAL '5 days', 60, 'Programada'
+-- WHERE NOT EXISTS (SELECT 1 FROM clases WHERE nombre='Yoga Matutino');
 
 -- Evaluación adicional (solo si no existe una en el día actual)
 INSERT INTO evaluaciones (deportista_id, evaluador_id, fecha, peso_kg, estatura_cm, imc, grasa_corporal_pct, observaciones)

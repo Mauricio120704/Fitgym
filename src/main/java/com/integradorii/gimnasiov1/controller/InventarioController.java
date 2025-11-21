@@ -20,47 +20,53 @@ public class InventarioController {
     private InventarioService inventarioService;
 
     @GetMapping
-    public String listarInventario(Model model, 
+    public String listarInventario(Model model,
                                   @RequestParam(required = false) String buscar,
                                   @RequestParam(required = false) String estado,
                                   @RequestParam(required = false) String categoria,
                                   @RequestParam(required = false) String proveedor,
                                   @RequestParam(required = false) String ubicacion) {
-        
+
         List<Inventario> inventario;
-        
+
+        // Convertir "TODOS" a null para que la consulta funcione correctamente
+        String estadoFiltro = "TODOS".equals(estado) ? null : estado;
+        String categoriaFiltro = "TODOS".equals(categoria) ? null : categoria;
+        String ubicacionFiltro = "TODOS".equals(ubicacion) ? null : ubicacion;
+        String proveedorFiltro = (proveedor != null && proveedor.trim().isEmpty()) ? null : proveedor;
+
         if (buscar != null && !buscar.trim().isEmpty()) {
             inventario = inventarioService.buscarPorTermino(buscar);
         } else {
-            inventario = inventarioService.buscarConFiltros(estado, categoria, proveedor, ubicacion, null);
+            inventario = inventarioService.buscarConFiltros(estadoFiltro, categoriaFiltro, proveedorFiltro, ubicacionFiltro, null);
         }
 
         // Estadísticas del dashboard
         InventarioService.DashboardStats stats = inventarioService.getDashboardStats();
-        
+
         model.addAttribute("inventario", inventario);
         model.addAttribute("totalProductos", stats.getTotalProductos());
         model.addAttribute("productosDisponibles", stats.getProductosDisponibles());
         model.addAttribute("productosBajoStock", stats.getProductosBajoStock());
         model.addAttribute("productosAgotados", stats.getProductosAgotados());
         model.addAttribute("valorTotalInventario", stats.getValorTotalInventario());
-        
+
         // Filtros
         model.addAttribute("buscar", buscar);
         model.addAttribute("estadoSeleccionado", estado != null ? estado : "TODOS");
         model.addAttribute("categoriaSeleccionada", categoria != null ? categoria : "TODOS");
         model.addAttribute("proveedorSeleccionado", proveedor != null ? proveedor : "TODOS");
         model.addAttribute("ubicacionSeleccionada", ubicacion != null ? ubicacion : "TODOS");
-        
+
         // Listas para filtros
-        model.addAttribute("estados", List.of("TODOS", "DISPONIBLE", "BAJO_STOCK", "AGOTADO", "DESCONTINUADO"));
-        model.addAttribute("categorias", List.of("TODOS", "EQUIPAMIENTO", "SUPLEMENTOS", "ROPA_DEPORTIVA", "ACCESORIOS", "HIGIENE", "OFICINA"));
+        model.addAttribute("estados", List.of("TODOS", "DISPONIBLE", "BAJO_STOCK", "AGOTADO"));
+        model.addAttribute("categorias", List.of("TODOS", "EQUIPAMIENTO", "SUPLEMENTOS", "ROPA_DEPORTIVA", "ACCESORIOS", "HIGIENE", "OFICINA","BEBIDAS/SNACKS"));
         model.addAttribute("ubicaciones", List.of("TODOS", "ALMACEN_PRINCIPAL", "VENTA", "SHOWROOM", "DEPOSITO_SECUNDARIO"));
-        
+
         // Productos que necesitan reorden
         List<Inventario> productosReorden = inventarioService.findProductosQueNecesitanReorden();
         model.addAttribute("productosReorden", productosReorden);
-        
+
         model.addAttribute("activeMenu", "inventario");
         return "admin/inventario/listado";
     }
@@ -75,7 +81,7 @@ public class InventarioController {
     }
 
     @PostMapping("/guardar")
-    public String guardarInventario(@ModelAttribute Inventario inventario, 
+    public String guardarInventario(@ModelAttribute Inventario inventario,
                                    RedirectAttributes redirectAttributes) {
         try {
             inventarioService.save(inventario);
@@ -86,17 +92,17 @@ public class InventarioController {
             redirectAttributes.addFlashAttribute("tipoMensaje", "error");
             return "redirect:/admin/inventario/nuevo";
         }
-        
+
         return "redirect:/admin/inventario";
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model, 
+    public String mostrarFormularioEditar(@PathVariable Long id, Model model,
                                          RedirectAttributes redirectAttributes) {
         try {
             Inventario inventario = inventarioService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
+
             model.addAttribute("inventario", inventario);
             model.addAttribute("categorias", List.of("EQUIPAMIENTO", "SUPLEMENTOS", "ROPA_DEPORTIVA", "ACCESORIOS", "HIGIENE", "OFICINA"));
             model.addAttribute("ubicaciones", List.of("ALMACEN_PRINCIPAL", "VENTA", "SHOWROOM", "DEPOSITO_SECUNDARIO"));
@@ -110,7 +116,7 @@ public class InventarioController {
     }
 
     @PostMapping("/actualizar/{id}")
-    public String actualizarInventario(@PathVariable Long id, 
+    public String actualizarInventario(@PathVariable Long id,
                                       @ModelAttribute Inventario inventario,
                                       RedirectAttributes redirectAttributes) {
         try {
@@ -122,17 +128,17 @@ public class InventarioController {
             redirectAttributes.addFlashAttribute("mensaje", "Error al actualizar producto: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensaje", "error");
         }
-        
+
         return "redirect:/admin/inventario";
     }
 
     @GetMapping("/detalle/{id}")
-    public String verDetalle(@PathVariable Long id, Model model, 
+    public String verDetalle(@PathVariable Long id, Model model,
                             RedirectAttributes redirectAttributes) {
         try {
             Inventario inventario = inventarioService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
+
             model.addAttribute("inventario", inventario);
             model.addAttribute("valorTotal", inventario.getValorTotal());
             model.addAttribute("necesitaReorden", inventario.necesitaReorden());
@@ -145,8 +151,8 @@ public class InventarioController {
         }
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminarInventario(@PathVariable Long id, 
+    @PostMapping("/eliminar/{id}")
+    public String eliminarInventario(@PathVariable Long id,
                                    RedirectAttributes redirectAttributes) {
         try {
             inventarioService.deleteById(id);
@@ -156,18 +162,18 @@ public class InventarioController {
             redirectAttributes.addFlashAttribute("mensaje", "Error al eliminar producto: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensaje", "error");
         }
-        
+
         return "redirect:/admin/inventario";
     }
 
     // Operaciones de stock
     @GetMapping("/ajustar-stock/{id}")
-    public String mostrarFormularioAjustarStock(@PathVariable Long id, Model model, 
+    public String mostrarFormularioAjustarStock(@PathVariable Long id, Model model,
                                               RedirectAttributes redirectAttributes) {
         try {
             Inventario inventario = inventarioService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-            
+
             model.addAttribute("producto", inventario);
             model.addAttribute("activeMenu", "inventario");
             return "admin/inventario/ajustar-stock";
@@ -179,7 +185,7 @@ public class InventarioController {
     }
 
     @PostMapping("/actualizar-stock/{id}")
-    public String actualizarStock(@PathVariable Long id, 
+    public String actualizarStock(@PathVariable Long id,
                                  @RequestParam Integer nuevaCantidad,
                                  RedirectAttributes redirectAttributes) {
         try {
@@ -190,7 +196,7 @@ public class InventarioController {
             redirectAttributes.addFlashAttribute("mensaje", "Error al actualizar stock: " + e.getMessage());
             redirectAttributes.addFlashAttribute("tipoMensaje", "error");
         }
-        
+
         return "redirect:/admin/inventario";
     }
 

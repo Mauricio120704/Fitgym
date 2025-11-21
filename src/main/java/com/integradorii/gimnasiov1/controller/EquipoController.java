@@ -121,8 +121,14 @@ public class EquipoController {
             equipoExistente.setFechaAdquisicion(equipo.getFechaAdquisicion());
             equipoExistente.setEstado(equipo.getEstado());
             equipoExistente.setDescripcion(equipo.getDescripcion());
-            equipoExistente.setUltimoMantenimiento(equipo.getUltimoMantenimiento());
-            equipoExistente.setProximoMantenimiento(equipo.getProximoMantenimiento());
+            // Solo actualizar ultimo_mantenimiento si viene un valor, de lo contrario mantener el existente
+            if (equipo.getUltimoMantenimiento() != null) {
+                equipoExistente.setUltimoMantenimiento(equipo.getUltimoMantenimiento());
+            }
+            // Solo actualizar proximo_mantenimiento si viene un valor
+            if (equipo.getProximoMantenimiento() != null) {
+                equipoExistente.setProximoMantenimiento(equipo.getProximoMantenimiento());
+            }
             
             equipoService.save(equipoExistente);
             redirectAttributes.addFlashAttribute("mensaje", "Equipo actualizado exitosamente");
@@ -134,7 +140,7 @@ public class EquipoController {
         return "redirect:/admin/equipos";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminarEquipo(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             equipoService.deleteById(id);
