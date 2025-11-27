@@ -6,6 +6,7 @@
     <title>Lista de Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <link rel="stylesheet" th:href="@{/Estilos/miembros.css}">
     <script defer th:src="@{/JavaScript/miembros-pagination.js}"></script>
     <script defer th:src="@{/JavaScript/miembros.js}"></script>
@@ -98,17 +99,6 @@
                                </button>
                            </form>
                        </div>
-
-                        <div class="flex items-center gap-3 mb-4">
-                            <label class="text-sm text-gray-600">Rol activo del sistema (controla permisos del sidebar):</label>
-                            <select id="select-rol-activo" class="px-3 py-2 border rounded">
-                                <option value="">Sin restricción</option>
-                                <option value="ADMINISTRADOR">Administrador</option>
-                                <option value="RECEPCIONISTA">Recepcionista</option>
-                                <option value="ENTRENADOR">Entrenador</option>
-                            </select>
-                            <button type="button" id="btn-guardar-rol-activo" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">Aplicar</button>
-                        </div>
 
                         <div class="overflow-x-auto rounded-lg border border-gray-200">
                             <table class="w-full text-left bg-white">
@@ -203,19 +193,6 @@
     </a>
 
     <script th:src="@{/sidebar.js}"></script>
-    <script>
-        // Cargar valor actual
-        (function(){
-            const sel = document.getElementById('select-rol-activo');
-            if (!sel) return;
-            const current = localStorage.getItem('currentRole') || '';
-            sel.value = current;
-            document.getElementById('btn-guardar-rol-activo').addEventListener('click', () => {
-                const v = sel.value;
-                if (v === '') localStorage.removeItem('currentRole'); else localStorage.setItem('currentRole', v);
-                location.reload();
-            });
-        })();
-    </script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

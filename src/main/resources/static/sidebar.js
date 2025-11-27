@@ -1,7 +1,12 @@
 // Pre-aplicar estado del sidebar antes de pintar (evita parpadeos)
 (function () {
-  if (localStorage.getItem('sidebarExpanded') === 'true') {
+  const saved = localStorage.getItem('sidebarExpanded');
+  // Por defecto, el sidebar estará expandido (solo se colapsa si el usuario lo guarda como 'false')
+  if (saved === 'true' || saved === null) {
     document.documentElement.classList.add('sidebar-expanded');
+    if (saved === null) {
+      localStorage.setItem('sidebarExpanded', 'true');
+    }
   }
 })();
 
@@ -56,7 +61,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const savedExpanded = localStorage.getItem('sidebarExpanded');
-    if (savedExpanded === 'true') expandSidebar(); else collapseSidebar();
+    // Si nunca se ha guardado preferencia, asumimos expandido por defecto
+    if (savedExpanded === 'false') {
+        collapseSidebar();
+    } else {
+        expandSidebar();
+    }
 
     if (menuButton && sidebar) {
         menuButton.addEventListener('click', () => {

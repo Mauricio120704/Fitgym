@@ -13,7 +13,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/inventario")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class InventarioController {
 
     @Autowired

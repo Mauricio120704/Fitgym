@@ -1,6 +1,7 @@
+@import url('global-styles.css');
+
 /* ---------------- ESTILOS GENERALES ---------------- */
 body {
-  font-family: "Segoe UI", Roboto, sans-serif;
   background-color: #f9f9f9;
   color: #333;
 }

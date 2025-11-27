@@ -34,16 +34,17 @@ public class PagoController {
     }
 
     /**
-     * Muestra el historial completo de pagos de TODOS los deportistas
+     * Muestra el historial completo de pagos de TODOS los deportistas con paginación
      * 
      * Este método permite al personal administrativo:
      * - Ver todos los pagos del sistema
      * - Filtrar por estado (completado, pendiente, fallido)
      * - Buscar por nombre/DNI/email del deportista
-     * - Ver estadísticas (total anual, cantidad de pagos)
+     * - Paginar resultados (50 por página)
      * 
      * @param estado Filtro opcional por estado: "completado", "pendiente", "fallido", "todos"
      * @param buscar Término de búsqueda opcional (busca en nombre, DNI, email)
+     * @param page Número de página (0-indexed)
      * @param model Modelo para pasar datos a la vista
      * @return Vista "historial-pagos.html"
      */
@@ -51,30 +52,38 @@ public class PagoController {
     public String historialPagos(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) String buscar,
+            @RequestParam(defaultValue = "0") int page,
             Model model) {
 
         // Normalizar parámetros de filtrado
         String estadoFiltro = (estado == null || estado.isBlank()) ? "todos" : estado;
         String buscarTerm = (buscar == null) ? "" : buscar.trim();
+        int pageSize = 50;
+
+        // Validar página
+        if (page < 0) page = 0;
 
         // Obtener pagos filtrados desde la BD
-        List<Pago> pagos = pagoRepository.searchAdmin(estadoFiltro, buscarTerm);
+        List<Pago> todosPagos = pagoRepository.searchAdmin(estadoFiltro, buscarTerm);
 
-        // Calcular total de pagos completados en el año
-        double totalAnio = pagos.stream()
-                .filter(p -> "Completado".equalsIgnoreCase(p.getEstado()))
-                .mapToDouble(Pago::getMonto)
-                .sum();
+        // Calcular paginación
+        int totalPagos = todosPagos.size();
+        int totalPages = (int) Math.ceil((double) totalPagos / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        if (page >= totalPages) page = totalPages - 1;
 
-        // Contar cantidad total de pagos
-        long cantidadPagos = pagos.size();
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, totalPagos);
+        List<Pago> pagosPaginados = totalPagos == 0 ? new java.util.ArrayList<>() : todosPagos.subList(start, end);
 
         // Pasar datos a la vista
-        model.addAttribute("pagos", pagos);                   // Lista de pagos filtrados
-        model.addAttribute("totalAnio", totalAnio);           // Total recaudado
-        model.addAttribute("cantidadPagos", cantidadPagos);   // Cantidad de pagos
+        model.addAttribute("pagos", pagosPaginados);          // Lista de pagos paginados
         model.addAttribute("estadoActual", estadoFiltro);     // Estado seleccionado
         model.addAttribute("buscarActual", buscarTerm);       // Término de búsqueda
+        model.addAttribute("currentPage", page);              // Página actual
+        model.addAttribute("totalPages", totalPages);         // Total de páginas
+        model.addAttribute("pageSize", pageSize);             // Tamaño de página
+        model.addAttribute("totalPagos", totalPagos);         // Total de pagos
 
         return "historial-pagos";
     }

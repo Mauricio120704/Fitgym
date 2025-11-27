@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/heroicons@2.1.1/dist/bundle.js"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         // Aplicar estado del sidebar INMEDIATAMENTE antes de renderizar
         (function() {
@@ -41,38 +42,6 @@
                 <div class="container mx-auto">
                     <h1 class="text-2xl font-bold text-gray-800 mb-2">Historial de Pagos</h1>
                     <p class="text-gray-600 mb-6">Consulta tu historial de pagos</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-sm font-medium text-gray-500">Próximo Pago</h3>
-                            <p class="text-2xl font-bold text-gray-800 mt-2" th:if="${suscripcionActual != null and suscripcionActual.proximoPago != null}"
-                               th:text="${#temporals.format(suscripcionActual.proximoPago, 'dd MMM')}">—</p>
-                            <p class="text-2xl font-bold text-gray-800 mt-2" th:unless="${suscripcionActual != null and suscripcionActual.proximoPago != null}">—</p>
-                            <p class="text-sm text-gray-500 mt-1">
-                                <span th:if="${suscripcionActual != null}" th:text="${suscripcionActual.plan}">Sin plan</span>
-                                <span th:unless="${suscripcionActual != null}">Sin plan</span>
-                                <span th:if="${suscripcionActual != null and suscripcionActual.precio != null}"> - S/ <span th:text="${#numbers.formatDecimal(suscripcionActual.precio, 1, 'COMMA', 2, 'POINT')}">0.00</span></span>
-                            </p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-sm font-medium text-gray-500">Gastado este Año</h3>
-                            <p class="text-2xl font-bold text-gray-800 mt-2">S/ <span th:text="${#numbers.formatDecimal(totalAnio, 1, 'COMMA', 2, 'POINT')}">0</span></p>
-                            <p class="text-sm text-gray-500 mt-1"><span th:text="${cantidadPagos}">0</span> pagos realizados</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow">
-                            <h3 class="text-sm font-medium text-gray-500">Estado de Membresía</h3>
-                            <p class="text-2xl font-bold mt-2 text-red-500" th:if="${suscripcionActual == null}">Sin suscripción</p>
-                            <p class="text-2xl font-bold mt-2" th:if="${suscripcionActual != null}"
-                               th:classappend="${suscripcionActual.estado == 'Activa' ? ' text-green-500' : ' text-red-500'}"
-                               th:text="${suscripcionActual.estado}">—</p>
-                            <p class="text-sm text-gray-500 mt-1">
-                                <span th:if="${suscripcionActual != null}" th:text="${suscripcionActual.plan}">—</span>
-                                <span th:unless="${suscripcionActual != null}">—</span>
-                                <span th:if="${suscripcionActual != null and suscripcionActual.proximoPago != null}"> • hasta <span th:text="${#temporals.format(suscripcionActual.proximoPago, 'dd/MM/yyyy')}">—</span></span>
-                                <span th:if="${suscripcionActual != null and suscripcionActual.frecuencia != null}"> • <span th:text="${suscripcionActual.frecuencia}">—</span></span>
-                            </p>
-                        </div>
-                    </div>
 
                     <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
@@ -168,11 +137,52 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Paginación -->
+                        <div th:if="${totalPages != null and totalPages > 1}" class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="text-sm text-gray-600">
+                                Mostrando <span th:text="${currentPage * pageSize + 1}">1</span> a 
+                                <span th:text="${T(java.lang.Math).min((currentPage + 1) * pageSize, totalPagos)}">50</span> 
+                                de <span th:text="${totalPagos}">0</span> pagos
+                            </div>
+                            <nav class="flex gap-2 flex-wrap justify-center md:justify-end">
+                                <a th:if="${currentPage > 0}" 
+                                   th:href="@{/pagos(page=${currentPage - 1}, estado=${estadoActual}, buscar=${buscarActual})}"
+                                   class="px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm">
+                                    ← Anterior
+                                </a>
+                                <span th:if="${currentPage == 0}" class="px-3 py-2 bg-gray-300 text-gray-500 rounded text-sm cursor-not-allowed">
+                                    ← Anterior
+                                </span>
+
+                                <th:block th:each="p : ${#numbers.sequence(0, totalPages - 1)}">
+                                    <a th:if="${p != currentPage}"
+                                       th:href="@{/pagos(page=${p}, estado=${estadoActual}, buscar=${buscarActual})}"
+                                       th:text="${p + 1}"
+                                       class="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
+                                    </a>
+                                    <span th:if="${p == currentPage}"
+                                          th:text="${p + 1}"
+                                          class="px-3 py-2 bg-orange-500 text-white rounded text-sm font-semibold">
+                                    </span>
+                                </th:block>
+
+                                <a th:if="${currentPage < totalPages - 1}"
+                                   th:href="@{/pagos(page=${currentPage + 1}, estado=${estadoActual}, buscar=${buscarActual})}"
+                                   class="px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm">
+                                    Siguiente →
+                                </a>
+                                <span th:if="${currentPage >= totalPages - 1}" class="px-3 py-2 bg-gray-300 text-gray-500 rounded text-sm cursor-not-allowed">
+                                    Siguiente →
+                                </span>
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
     <title>Inventario de Productos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -144,44 +145,44 @@
                     
                     <!-- Filtros -->
                     <div class="bg-white rounded-lg shadow p-6 mb-6">
-                        <form th:action="@{/admin/inventario}" method="get" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+                        <form th:action="@{/admin/inventario}" method="get">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
                                     <input type="text" name="buscar" th:value="${buscar}" 
                                            placeholder="Nombre, código, descripción..." 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
                                     <select name="estado" th:value="${estadoSeleccionado}" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                                         <option th:each="estado : ${estados}" 
                                                 th:value="${estado}" 
                                                 th:text="${estado}" 
                                                 th:selected="${estado == estadoSeleccionado}">TODOS</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
                                     <select name="categoria" th:value="${categoriaSeleccionada}" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                                         <option th:each="cat : ${categorias}" 
                                                 th:value="${cat}" 
                                                 th:text="${cat}" 
                                                 th:selected="${cat == categoriaSeleccionada}">TODOS</option>
                                     </select>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Proveedor</label>
                                     <input type="text" name="proveedor" th:value="${proveedor}" 
                                            placeholder="Nombre del proveedor..." 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación</label>
                                     <select name="ubicacion" th:value="${ubicacionSeleccionada}" 
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                                         <option th:each="ubic : ${ubicaciones}" 
                                                 th:value="${ubic}" 
                                                 th:text="${#strings.replace(ubic, '_', ' ')}" 
@@ -296,5 +297,6 @@
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

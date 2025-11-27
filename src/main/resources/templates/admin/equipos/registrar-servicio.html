@@ -7,6 +7,7 @@
     <title>Registrar Servicio de Mantenimiento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -169,6 +170,7 @@
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
     <script>
         // Establecer fecha actual por defecto
         document.addEventListener('DOMContentLoaded', function() {

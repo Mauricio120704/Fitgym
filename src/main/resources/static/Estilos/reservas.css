@@ -1,6 +1,7 @@
+@import url('global-styles.css');
+
 * {
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
 }

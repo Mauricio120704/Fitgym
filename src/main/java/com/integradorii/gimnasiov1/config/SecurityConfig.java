@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -56,6 +57,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     /**
@@ -168,7 +170,7 @@ public class SecurityConfig {
                 // - /admin/invitados/**: Gestión de invitados
                 // - /admin/visitantes/**: Gestión de visitantes
                 // - /api/dashboard/**: API del dashboard de asistencia
-                .requestMatchers("/miembros/**", "/incidencias/**", "/pagos", "/clases/**", "/configuracion", "/admin/invitados/**", "/admin/visitantes/**", "/api/dashboard/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA", "ENTRENADOR")
+                .requestMatchers("/miembros/**", "/incidencias/**", "/pagos", "/clases/**", "/promociones/**", "/configuracion", "/admin/invitados/**", "/admin/visitantes/**", "/api/dashboard/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA", "ENTRENADOR")
                 
                 // ===== RUTAS PARA RECEPCIONISTAS Y ADMINISTRADORES =====
                 // - /asistencia: Control de asistencia

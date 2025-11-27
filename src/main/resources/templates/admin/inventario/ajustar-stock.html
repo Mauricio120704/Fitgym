@@ -7,6 +7,7 @@
     <title>Ajustar Stock - Inventario</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -149,11 +150,7 @@
     </div>
 
     <!-- Script para manejar el menú -->
-    <script>
-        document.getElementById('menu-button').addEventListener('click', function() {
-            const sidebar = document.querySelector('[th\\:replace*="sidebar"]').parentElement;
-            sidebar.classList.toggle('hidden');
-        });
-    </script>
+    <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

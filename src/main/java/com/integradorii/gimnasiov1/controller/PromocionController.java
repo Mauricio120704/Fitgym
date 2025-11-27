@@ -7,6 +7,7 @@ import com.integradorii.gimnasiov1.repository.ClaseRepository;
 import com.integradorii.gimnasiov1.repository.PromocionRepository;
 import com.integradorii.gimnasiov1.model.PromocionHistorial;
 import com.integradorii.gimnasiov1.repository.PromocionHistorialRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,6 +54,7 @@ public class PromocionController {
      * Permite búsqueda por nombre/descripción
      * Separa activas, expiradas e inactivas
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @GetMapping("/promociones")
     public String listarPromociones(@RequestParam(name = "q", required = false) String q,
                                     @RequestParam(name = "estado", required = false) String estado,
@@ -135,6 +137,7 @@ public class PromocionController {
      * Tipos: AMOUNT (monto fijo) o PERCENTAGE (porcentaje)
      * Estado auto: EXPIRED si fecha fin < hoy, sino ACTIVE
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones")
     public String crearPromocion(@RequestParam String nombre,
                                  @RequestParam String tipo,
@@ -205,6 +208,7 @@ public class PromocionController {
      * POST /promociones/{id}/toggle - Activa/Desactiva promoción
      * Solo alterna entre ACTIVE e INACTIVE (no afecta EXPIRED)
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones/{id}/toggle")
     public String toggle(@PathVariable long id) {
         Optional<Promocion> opt = promocionRepository.findById(id);
@@ -227,6 +231,7 @@ public class PromocionController {
     /**
      * POST /promociones/{id}/reactivar - Reactiva una promoción vencida con nuevas fechas
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones/{id}/reactivar")
     public String reactivar(@PathVariable long id,
                             @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
@@ -253,6 +258,7 @@ public class PromocionController {
     /**
      * POST /promociones/{id}/delete - Elimina promoción por ID
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones/{id}/delete")
     public String delete(@PathVariable long id) {
         if (promocionRepository.existsById(id)) {
@@ -265,6 +271,7 @@ public class PromocionController {
      * POST /promociones/{id}/editar - Actualiza promoción existente
      * Reemplaza completamente las membresías asociadas
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones/{id}/editar")
     public String editar(@PathVariable long id,
                          @RequestParam String nombre,
@@ -332,6 +339,7 @@ public class PromocionController {
     /**
      * GET /promociones/historial - Historial global de promociones
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @GetMapping("/promociones/historial")
     public String historialGlobal(Model model) {
         model.addAttribute("historial", historialRepository.findAllWithPromocionOrderByRealizadoEnDesc());
@@ -341,6 +349,7 @@ public class PromocionController {
     /**
      * GET /promociones/{id}/historial - Historial por promoción
      */
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @GetMapping("/promociones/{id}/historial")
     public String historialPorPromocion(@PathVariable long id, Model model) {
         Promocion p = promocionRepository.findById(id).orElseThrow();

@@ -27,11 +27,17 @@ public class IncidenciaViewService {
             String metaSegment = desc;
             int ridx = metaSegment.indexOf("\n__REPORTADO__=");
             if (ridx >= 0) {
-                fallbackReportado = metaSegment.substring(ridx + "\n__REPORTADO__=".length()).trim();
+                int startIdx = ridx + "\n__REPORTADO__=".length();
+                int endIdx = metaSegment.indexOf("\n", startIdx);
+                if (endIdx < 0) endIdx = metaSegment.length();
+                fallbackReportado = metaSegment.substring(startIdx, endIdx).trim();
             }
             int aidx = metaSegment.indexOf("\n__ASIGNADO__=");
             if (aidx >= 0) {
-                fallbackAsignado = metaSegment.substring(aidx + "\n__ASIGNADO__=".length()).trim();
+                int startIdx = aidx + "\n__ASIGNADO__=".length();
+                int endIdx = metaSegment.indexOf("\n", startIdx);
+                if (endIdx < 0) endIdx = metaSegment.length();
+                fallbackAsignado = metaSegment.substring(startIdx, endIdx).trim();
             }
             int cut = -1;
             if (ridx >= 0 && aidx >= 0) cut = Math.min(ridx, aidx);
@@ -54,8 +60,7 @@ public class IncidenciaViewService {
 
         String nombreReportado = null;
         if (i.getReportadoPor() != null) {
-            nombreReportado = (i.getReportadoPor().getNombre() == null ? "" : i.getReportadoPor().getNombre()) +
-                    (i.getReportadoPor().getApellido() == null ? "" : (" " + i.getReportadoPor().getApellido())).trim();
+            nombreReportado = i.getReportadoPor().getEmail();
         } else {
             nombreReportado = fallbackReportado != null ? fallbackReportado : "";
         }

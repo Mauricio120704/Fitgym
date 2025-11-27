@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incidencias</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/heroicons@2.1.1/dist/bundle.js"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
-    <link rel="stylesheet" th:href="@{/Estilos/incidencias-styles.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -63,34 +64,50 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                            <h2 class="text-lg font-semibold text-gray-800">Lista de Incidencias</h2>
-                            <form th:action="@{/incidencias}" method="get" class="flex gap-2 flex-wrap">
-                                <input type="text" name="buscar" th:value="${buscarActual}" 
-                                       placeholder="Buscar..." 
-                                       class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                <select name="estado" th:value="${estadoActual}" 
-                                        class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                    <option value="todos" th:selected="${estadoActual == 'todos'}">Todos los estados</option>
-                                    <option value="ABIERTO" th:selected="${estadoActual == 'ABIERTO'}">Abierto</option>
-                                    <option value="RESUELTO" th:selected="${estadoActual == 'RESUELTO'}">Resuelto</option>
-                                </select>
-                                <select name="prioridad" th:value="${prioridadActual}" 
-                                        class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                    <option value="todas" th:selected="${prioridadActual == 'todas'}">Todas las prioridades</option>
-                                    <option value="ALTA" th:selected="${prioridadActual == 'ALTA'}">Alta</option>
-                                    <option value="MEDIA" th:selected="${prioridadActual == 'MEDIA'}">Media</option>
-                                    <option value="BAJA" th:selected="${prioridadActual == 'BAJA'}">Baja</option>
-                                </select>
-                                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
+                    <!-- Filtros -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <form th:action="@{/incidencias}" method="get">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+                                    <input type="text" name="buscar" th:value="${buscarActual}" 
+                                           placeholder="Nombre, código, descripción..." 
+                                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                </div>
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                                    <select name="estado" th:value="${estadoActual}" 
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                                        <option value="todos" th:selected="${estadoActual == 'todos'}">Todos los estados</option>
+                                        <option value="ABIERTO" th:selected="${estadoActual == 'ABIERTO'}">Abierto</option>
+                                        <option value="RESUELTO" th:selected="${estadoActual == 'RESUELTO'}">Resuelto</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                                    <select name="prioridad" th:value="${prioridadActual}" 
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                                        <option value="todas" th:selected="${prioridadActual == 'todas'}">Todas las prioridades</option>
+                                        <option value="ALTA" th:selected="${prioridadActual == 'ALTA'}">Alta</option>
+                                        <option value="MEDIA" th:selected="${prioridadActual == 'MEDIA'}">Media</option>
+                                        <option value="BAJA" th:selected="${prioridadActual == 'BAJA'}">Baja</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                                    Filtrar
                                 </button>
-                            </form>
-                        </div>
+                                <a th:href="@{/incidencias}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                                    Limpiar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
 
+                    <!-- Lista de Incidencias -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Lista de Incidencias</h2>
                         <div class="space-y-4">
                             <div th:if="${incidencias.empty}" class="text-center py-8 text-gray-500">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,13 +307,6 @@
         // Cerrar con ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
-        });
-
-        // Cerrar al hacer click fuera
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
                 closeModal();
             }
         });
@@ -716,5 +726,6 @@
             });
         })();
     </script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

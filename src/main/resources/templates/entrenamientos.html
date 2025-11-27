@@ -6,6 +6,7 @@
     <title>Entrenamientos - FitGym</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <link rel="stylesheet" th:href="@{/Estilos/modal-common.css}">
     <script>
         (function() {
@@ -236,6 +237,7 @@
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
     <script th:inline="javascript">
         // Datos iniciales desde el modelo para JS
         const entrenamientosData = /*[[${entrenamientos}]]*/ [];

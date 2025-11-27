@@ -7,6 +7,7 @@
     <title>Gestión de Visitantes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -34,9 +35,6 @@
                     </button>
                     <div class="text-xl font-semibold text-gray-800">Gestión de Visitantes</div>
                 </div>
-                <a th:href="@{/admin/visitantes/registrar}" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
-                    Nuevo Visitante
-                </a>
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -122,10 +120,18 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Botón flotante para nuevo visitante -->
+                <a th:href="@{/admin/visitantes/registrar}" class="fixed bottom-6 right-6 flex items-center justify-center w-14 h-14 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition shadow-lg" title="Nuevo Visitante">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </a>
             </main>
         </div>
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

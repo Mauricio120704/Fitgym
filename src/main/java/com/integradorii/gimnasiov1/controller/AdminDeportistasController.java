@@ -31,7 +31,17 @@ public class AdminDeportistasController {
     @GetMapping
     public String listarDeportistas(@RequestParam(required = false) String buscar,
                                     @RequestParam(required = false, defaultValue = "todos") String filtroBloqueo,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "20") int size,
                                     Model model) {
+
+        if (page < 0) {
+            page = 0;
+        }
+        if (size <= 0) {
+            size = 20;
+        }
+
         List<Persona> todos = personaRepository.findAll();
         List<Persona> filtrados = new ArrayList<>(todos);
 
@@ -59,16 +69,39 @@ public class AdminDeportistasController {
 
         filtrados.sort(Comparator.comparing(Persona::getId));
 
+        int totalFiltrados = filtrados.size();
+
+        int totalPages = (int) Math.ceil((double) totalFiltrados / size);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page >= totalPages) {
+            page = totalPages - 1;
+        }
+
+        int start = page * size;
+        int end = Math.min(start + size, totalFiltrados);
+
+        List<Persona> paginados = totalFiltrados == 0 ? new ArrayList<>() : filtrados.subList(start, end);
+
         long totalDeportistas = todos.size();
         long totalBloqueados = todos.stream().filter(p -> Boolean.TRUE.equals(p.getBloqueado())).count();
         long totalNoBloqueados = totalDeportistas - totalBloqueados;
 
-        model.addAttribute("deportistas", filtrados);
+        int fromIndex = totalFiltrados == 0 ? 0 : start + 1;
+        int toIndex = totalFiltrados == 0 ? 0 : end;
+
+        model.addAttribute("deportistas", paginados);
         model.addAttribute("buscarActual", buscar != null ? buscar : "");
         model.addAttribute("filtroBloqueo", filtroBloqueo != null ? filtroBloqueo : "todos");
         model.addAttribute("totalDeportistas", totalDeportistas);
         model.addAttribute("totalBloqueados", totalBloqueados);
         model.addAttribute("totalNoBloqueados", totalNoBloqueados);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("fromIndex", fromIndex);
+        model.addAttribute("toIndex", toIndex);
 
         return "admin/deportistas";
     }

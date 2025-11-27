@@ -12,9 +12,7 @@
     --switch-bg: #ccc;
 }
 
-body { 
-    font-family: 'Roboto', sans-serif; 
-}
+@import url('global-styles.css');
 
 .settings-grid {
     display: grid;

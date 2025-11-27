@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Nuevo Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -83,19 +85,12 @@
                                 <!-- Contraseña -->
                                 <div>
                                     <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Contraseña *</label>
-                                    <div class="relative">
+                                    <div class="flex border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-orange-500">
                                         <input type="password" id="password" name="password" required minlength="6"
-                                               class="w-full pr-28 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                                        <button type="button" id="togglePassword" onclick="togglePwd('password','togglePassword')"
-                                                class="absolute inset-y-0 right-2 my-2 px-2.5 h-9 w-9 flex items-center justify-center rounded-md text-gray-600 bg-gray-100 hover:bg-gray-200 border border-gray-300"
+                                               class="flex-1 px-4 py-3 border-0 focus:outline-none focus:ring-0">
+                                        <button type="button" id="togglePassword" class="px-4 py-3 text-gray-600 hover:bg-gray-50 border-l border-gray-300 transition"
                                                 aria-label="Mostrar u ocultar contraseña">
-                                            <svg class="icon-eye h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            <svg class="icon-eye-off h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.058 10.058 0 012.956-4.733m3.64-2.113A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.06 10.06 0 01-4.043 5.197M15 12a3 3 0 00-3-3m0 0a3 3 0 013 3m-3-3L3 21m9-12L3 3m9 12l9 9"/>
-                                            </svg>
+                                            <i class="fas fa-eye-slash"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -103,19 +98,12 @@
                                 <!-- Confirmar Contraseña -->
                                 <div>
                                     <label for="confirmPassword" class="block text-sm font-semibold text-gray-700 mb-2">Confirmar Contraseña *</label>
-                                    <div class="relative">
+                                    <div class="flex border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-orange-500">
                                         <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6"
-                                               class="w-full pr-28 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                                        <button type="button" id="toggleConfirmPassword" onclick="togglePwd('confirmPassword','toggleConfirmPassword')"
-                                                class="absolute inset-y-0 right-2 my-2 px-2.5 h-9 w-9 flex items-center justify-center rounded-md text-gray-600 bg-gray-100 hover:bg-gray-200 border border-gray-300"
+                                               class="flex-1 px-4 py-3 border-0 focus:outline-none focus:ring-0">
+                                        <button type="button" id="toggleConfirmPassword" class="px-4 py-3 text-gray-600 hover:bg-gray-50 border-l border-gray-300 transition"
                                                 aria-label="Mostrar u ocultar contraseña">
-                                            <svg class="icon-eye h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
-                                            <svg class="icon-eye-off h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.058 10.058 0 012.956-4.733m3.64-2.113A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a10.06 10.06 0 01-4.043 5.197M15 12a3 3 0 00-3-3m0 0a3 3 0 013 3m-3-3L3 21m9-12L3 3m9 12l9 9"/>
-                                            </svg>
+                                            <i class="fas fa-eye-slash"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -156,6 +144,7 @@
         </div>
     </div>
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
     <script th:src="@{/JavaScript/miembros.js}"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
     <title>Equipos y Programación de Mantenimiento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -85,42 +86,46 @@
 
                 <!-- Filtros -->
                 <div class="bg-white p-4 rounded-lg shadow mb-6">
-                    <form th:action="@{/admin/equipos}" method="get" class="flex flex-wrap gap-4 items-end">
-                        <div class="flex-1 min-w-64">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
-                            <input type="text" name="buscar" th:value="${buscar}"
-                                   placeholder="Nombre, tipo, marca, modelo, ubicación..."
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <form th:action="@{/admin/equipos}" method="get">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div class="flex flex-col h-full">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+                                <input type="text" name="buscar" th:value="${buscar}"
+                                       placeholder="Nombre, tipo, marca, modelo, ubicación..."
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                            <div class="flex flex-col h-full">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                                <select name="estado" th:value="${estadoSeleccionado}"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                                    <option value="TODOS">Todos</option>
+                                    <option value="ACTIVO">Activo</option>
+                                    <option value="MANTENIMIENTO">En Mantenimiento</option>
+                                    <option value="DAÑADO">Dañado</option>
+                                    <option value="FUERA_DE_SERVICIO">Fuera de Servicio</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col h-full">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                                <select name="tipo" th:value="${tipoSeleccionado}"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white">
+                                    <option value="TODOS">Todos</option>
+                                    <option value="CARDIO">Cardio</option>
+                                    <option value="PESAS">Pesas</option>
+                                    <option value="MAQUINAS">Máquinas</option>
+                                    <option value="FUERZA">Fuerza</option>
+                                    <option value="Peso Libre">Peso Libre</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="min-w-40">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                            <select name="estado" th:value="${estadoSeleccionado}"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                <option value="TODOS">Todos</option>
-                                <option value="ACTIVO">Activo</option>
-                                <option value="MANTENIMIENTO">En Mantenimiento</option>
-                                <option value="DAÑADO">Dañado</option>
-                                <option value="FUERA_DE_SERVICIO">Fuera de Servicio</option>
-                            </select>
+                        <div class="flex justify-end gap-2">
+                            <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
+                                Filtrar
+                            </button>
+                            <a th:href="@{/admin/equipos}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
+                                Limpiar
+                            </a>
                         </div>
-                        <div class="min-w-40">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-                            <select name="tipo" th:value="${tipoSeleccionado}"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                <option value="TODOS">Todos</option>
-                                <option value="CARDIO">Cardio</option>
-                                <option value="PESAS">Pesas</option>
-                                <option value="MAQUINAS">Máquinas</option>
-                                <option value="FUERZA">Fuerza</option>
-                                <option value="Peso Libre">Peso Libre</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
-                            Filtrar
-                        </button>
-                        <a th:href="@{/admin/equipos}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
-                            Limpiar
-                        </a>
                     </form>
                 </div>
 
@@ -207,5 +212,6 @@
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

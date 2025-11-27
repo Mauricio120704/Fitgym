@@ -1,6 +1,7 @@
+@import url('global-styles.css');
+
 /* ----------- ESTILOS GENERALES ----------- */
 body {
-  font-family: 'Roboto', sans-serif;
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
