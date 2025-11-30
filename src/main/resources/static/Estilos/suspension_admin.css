@@ -1,0 +1,290 @@
+:root {
+    --primary-color: #e67e22; /* Naranja principal */
+    --primary-hover: #d35400;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --text-muted: #666666;
+    --border-color: #e0e0e0;
+    --badge-bg: #fef9c3; /* Amarillo claro */
+    --badge-text: #854d0e; /* Dorado oscuro */
+    --selected-border: #f59e0b;
+}
+
+.suspension-admin-main * {
+    box-sizing: border-box;
+}
+
+.suspension-admin-main {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+}
+
+.suspension-admin-main .container {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* La lista es un poco más ancha o igual */
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* --- Estilos Generales de Tarjetas --- */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    height: fit-content;
+}
+
+h2, h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+/* --- Panel Izquierdo: Lista --- */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th {
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding-bottom: 1rem;
+    font-size: 0.85rem;
+}
+
+td {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Estilo de fila seleccionada */
+.request-row {
+    transition: all 0.2s;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.request-row.active {
+    background-color: #fffaf0; /* Fondo muy suave naranja */
+    outline: 2px solid var(--selected-border);
+    outline-offset: -2px;
+    border-radius: 8px;
+}
+
+/* Ajuste para que el outline funcione bien en celdas */
+.request-row.active td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; padding-left: 8px;}
+.request-row.active td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; padding-right: 8px;}
+
+.badge {
+    background-color: var(--badge-bg);
+    color: var(--badge-text);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: 0.2s;
+}
+
+.btn-sm:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* --- Panel Derecho: Detalle --- */
+.detail-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.detail-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+.suspension-details {
+    background-color: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.detail-item i {
+    width: 20px;
+    color: var(--text-muted);
+    margin-right: 8px;
+}
+
+/* Sección Documentos */
+.docs-section {
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.docs-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.files-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.file-card {
+    display: flex;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+    flex: 1;
+}
+
+.file-card:hover {
+    background-color: #ffffef;
+    border-color: var(--primary-color);
+}
+
+.file-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+.fa-file-pdf { color: #e74c3c; }
+.fa-image { color: #3498db; }
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.file-name { font-size: 0.85rem; font-weight: 500; }
+.file-action { font-size: 0.75rem; color: var(--primary-color); }
+
+/* Formulario y Botones */
+.admin-notes {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+    min-height: 80px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: #fff5e6;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    /* Efecto de "doblez" en la esquina del botón visto en la imagen */
+    position: relative; 
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+}
+
+/* Media Query para móviles */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}

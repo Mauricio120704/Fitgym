@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Suspensión de Membresías</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/suspension_admin.css}">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('sidebarExpanded');
+            const expanded = saved !== 'false';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+                document.documentElement.classList.add('sidebar-expanded');
+                localStorage.setItem('sidebarExpanded', 'true');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <aside th:replace="fragments/sidebar :: sidebar('suspensiones-admin')"></aside>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Solicitudes de Suspensión</div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 suspension-admin-main">
+                <div class="container">
+                    <div class="card">
+                        <h2>Solicitudes de Suspensión Pendientes</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Deportista</th>
+                                        <th>Motivo</th>
+                                        <th>Fechas</th>
+                                        <th>Días</th>
+                                        <th>Estado</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requests-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card" id="detail-card">
+                        <div class="detail-header">
+                            <div class="detail-title-row">
+                                <h2 style="margin:0;">Detalle de Solicitud: <span id="detail-name">Cargando...</span></h2>
+                            </div>
+                            <br>
+                            <span class="badge" id="detail-status">Pendiente de Aprobación</span>
+                        </div>
+
+                        <div class="info-section">
+                            <h3>Información del Deportista</h3>
+                            <div class="info-grid">
+                                <div>
+                                    <div class="info-label">ID</div>
+                                    <div id="detail-id">---</div>
+                                </div>
+                                <div>
+                                    <div class="info-label">Plan</div>
+                                    <div id="detail-plan">---</div>
+                                </div>
+                                <div>
+                                    <div class="info-label">Vence</div>
+                                    <div id="detail-expire">---</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="suspension-details">
+                            <h3>Detalles de Suspensión</h3>
+                            <div class="detail-item">
+                                <i class="fas fa-plus-circle"></i>
+                                <span><strong>Motivo: </strong> <span id="detail-reason">---</span></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="far fa-calendar"></i>
+                                <span><strong>Inicio: </strong> <span id="detail-start">---</span></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="far fa-calendar-check"></i>
+                                <span><strong>Fin: </strong> <span id="detail-end">---</span></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Impacto: +<span id="detail-days">0</span> días a la fecha de fin</span>
+                            </div>
+                        </div>
+
+                        <div class="docs-section">
+                            <span class="docs-title">Documentación Adjunta (Justificación)</span>
+                            <div class="files-container">
+                                <div class="file-card">
+                                    <i class="far fa-file-pdf file-icon"></i>
+                                    <div class="file-info">
+                                        <span class="file-name">Certificado_Medico.pdf</span>
+                                        <span class="file-action">Vista Previa <i class="fas fa-download"></i></span>
+                                    </div>
+                                </div>
+                                <div class="file-card">
+                                    <i class="far fa-image file-icon"></i>
+                                    <div class="file-info">
+                                        <span class="file-name">Reposo_Firmado.jpg</span>
+                                        <span class="file-action">Ver Imagen</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-notes">
+                            <label for="notes" class="info-label" style="font-weight: 600; display:block; margin-bottom:5px;">Notas del Administrador (Opcional para rechazo)</label>
+                            <textarea id="notes" placeholder="Escribe aquí las razones si vas a rechazar la solicitud..."></textarea>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-outline">Rechazar Solicitud</button>
+                            <button class="btn btn-primary">Aprobar Solicitud</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/JavaScript/suspension_admin.js}"></script>
+</body>
+</html>

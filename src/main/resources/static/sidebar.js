@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuLinks = document.querySelectorAll('#sidebar nav a');
 
     const allowedByRole = {
-        'ADMINISTRADOR': ['/', '/inicio', '/registro', '/miembros', '/incidencias', '/pagos', '/clases', '/evaluaciones', '/entrenamientos', '/perfil', '/configuracion'],
+        'ADMINISTRADOR': ['/', '/inicio', '/registro', '/miembros', '/incidencias', '/pagos', '/admin/suspensiones', '/clases', '/evaluaciones', '/entrenamientos', '/perfil', '/configuracion'],
         'RECEPCIONISTA': ['/inicio', '/registro', '/miembros', '/incidencias', '/pagos', '/clases', '/perfil'],
         'ENTRENADOR': ['/inicio', '/miembros', '/entrenamientos', '/evaluaciones', '/clases', '/perfil']
     };

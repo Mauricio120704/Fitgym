@@ -105,6 +105,14 @@
                         <span class="sidebar-text ml-3 hidden">Deportistas</span>
                     </a>
                 </li>
+                <li sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/suspensiones}" th:classappend="${activeMenu == 'suspensiones-admin'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Solicitudes de suspensión">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
+                        </svg>
+                        <span class="sidebar-text ml-3 hidden">Solicitudes de suspensión</span>
+                    </a>
+                </li>
                 <li sec:authorize="hasAnyRole('RECEPCIONISTA','ENTRENADOR')">
                     <a th:href="@{/incidencias}" th:classappend="${activeMenu == 'incidencias'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Incidencias">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
