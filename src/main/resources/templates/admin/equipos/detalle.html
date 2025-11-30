@@ -35,10 +35,6 @@
                     <div class="text-xl font-semibold text-gray-800">Detalle del Equipo</div>
                 </div>
                 <div class="flex space-x-2">
-                    <a th:href="@{/admin/equipos/registrar-servicio/{id}(id=${equipo.id})}" 
-                       class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
-                        Registrar Servicio
-                    </a>
                     <a th:href="@{/admin/equipos}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition">
                         Volver
                     </a>
@@ -68,6 +64,10 @@
                                 <a th:href="@{/admin/equipos/editar/{id}(id=${equipo.id})}" 
                                    class="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition">
                                     Editar
+                                </a>
+                                <a th:href="@{/admin/equipos/registrar-servicio/{id}(id=${equipo.id})}" 
+                                   class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                                    Registrar Servicio
                                 </a>
                             </div>
                         </div>
