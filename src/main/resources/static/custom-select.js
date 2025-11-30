@@ -11,6 +11,12 @@ class CustomSelect {
     }
 
     init() {
+        // Si por alguna razón este componente se instancia sobre un select
+        // marcado explícitamente para no usar custom select, salir sin cambios.
+        if (this.select.classList.contains('no-custom-select')) {
+            return;
+        }
+
         // Crear contenedor personalizado
         this.container = document.createElement('div');
         this.container.className = 'custom-select-container';
@@ -116,8 +122,9 @@ class CustomSelect {
 
 // Inicializar todos los selects cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionar todos los selects dentro de modales y formularios
-    const selects = document.querySelectorAll('select:not([style*="display: none"])');
+    // Seleccionar todos los selects dentro de modales y formularios,
+    // excluyendo aquellos marcados explícitamente con .no-custom-select
+    const selects = document.querySelectorAll('select:not([style*="display: none"]):not(.no-custom-select)');
     selects.forEach(select => {
         // No aplicar a selects que ya tengan la clase custom-select-processed
         if (!select.classList.contains('custom-select-processed')) {
@@ -132,7 +139,8 @@ const originalShowModal = HTMLDialogElement.prototype.showModal;
 if (originalShowModal) {
     HTMLDialogElement.prototype.showModal = function() {
         originalShowModal.call(this);
-        const selects = this.querySelectorAll('select:not(.custom-select-processed)');
+        // Excluir selects marcados con .no-custom-select
+        const selects = this.querySelectorAll('select:not(.custom-select-processed):not(.no-custom-select)');
         selects.forEach(select => {
             new CustomSelect(select);
             select.classList.add('custom-select-processed');
@@ -146,7 +154,8 @@ const observer = new MutationObserver((mutations) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
             const target = mutation.target;
             if (target.classList && target.classList.contains('flex') && !target.classList.contains('hidden')) {
-                const selects = target.querySelectorAll('select:not(.custom-select-processed)');
+                // Excluir selects marcados con .no-custom-select
+                const selects = target.querySelectorAll('select:not(.custom-select-processed):not(.no-custom-select)');
                 selects.forEach(select => {
                     new CustomSelect(select);
                     select.classList.add('custom-select-processed');

@@ -1,74 +1,101 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar Visitante - Gimnasio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Registrar Visitante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
     <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
+    <script>
+        (function() {
+            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
+            if (expanded) {
+                document.documentElement.style.setProperty('--sidebar-width', '16rem');
+            } else {
+                document.documentElement.style.setProperty('--sidebar-width', '5rem');
+            }
+        })();
+    </script>
 </head>
-<body>
-    <div th:replace="fragments/header :: header"></div>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <aside th:replace="fragments/sidebar :: sidebar('visitantes')"></aside>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">Registro de Visitante</h4>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button id="menu-button" class="text-gray-600 hover:text-gray-800 focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="text-xl font-semibold text-gray-800">Registrar Nuevo Visitante</div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <div class="max-w-2xl mx-auto">
+                    <!-- Mensajes de éxito/error -->
+                    <div th:if="${success}" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline" th:text="${success}"></span>
                     </div>
-                    <div class="card-body">
-                        <!-- Mensajes de éxito/error -->
-                        <div th:if="${success}" class="alert alert-success" role="alert">
-                            <span th:text="${success}"></span>
-                        </div>
-                        <div th:if="${error}" class="alert alert-danger" role="alert">
-                            <span th:text="${error}"></span>
-                        </div>
+                    <div th:if="${error}" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline" th:text="${error}"></span>
+                    </div>
 
+                    <div class="bg-white rounded-lg shadow p-6">
                         <form th:action="@{/admin/visitantes/registrar}" method="post" th:object="${visitante}">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="nombreCompleto" class="form-label">Nombre Completo *</label>
-                                    <input type="text" class="form-control" id="nombreCompleto" th:field="*{nombreCompleto}" required>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="flex flex-col">
+                                    <label for="nombreCompleto" class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo *</label>
+                                    <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" required
+                                           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="documentoIdentidad" class="form-label">Documento de Identidad *</label>
-                                    <input type="text" class="form-control" id="documentoIdentidad" th:field="*{documentoIdentidad}" required>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="telefono" class="form-label">Teléfono</label>
-                                    <input type="tel" class="form-control" id="telefono" th:field="*{telefono}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="email" class="form-label">Correo Electrónico</label>
-                                    <input type="email" class="form-control" id="email" th:field="*{email}">
+                                <div class="flex flex-col">
+                                    <label for="documentoIdentidad" class="block text-sm font-medium text-gray-700 mb-2">Documento de Identidad *</label>
+                                    <input type="text" id="documentoIdentidad" th:field="*{documentoIdentidad}" required
+                                           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="motivoVisita" class="form-label">Motivo de la Visita *</label>
-                                <textarea class="form-control" id="motivoVisita" th:field="*{motivoVisita}" rows="3" required></textarea>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="flex flex-col">
+                                    <label for="telefono" class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                                    <input type="tel" id="telefono" th:field="*{telefono}"
+                                           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                                    <input type="email" id="email" th:field="*{email}"
+                                           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                </div>
                             </div>
 
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a th:href="@{/admin}" class="btn btn-secondary me-md-2">Cancelar</a>
-                                <button type="submit" class="btn btn-primary">Registrar Visitante</button>
+                            <div class="mb-6">
+                                <label for="motivoVisita" class="block text-sm font-medium text-gray-700 mb-2">Motivo de la Visita *</label>
+                                <textarea id="motivoVisita" th:field="*{motivoVisita}" rows="4" required
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                            </div>
+
+                            <div class="flex justify-end gap-3">
+                                <a th:href="@{/admin/visitantes/listado}" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                                    Registrar Visitante
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 
-    <div th:replace="fragments/footer :: footer"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script th:src="@{/sidebar.js}"></script>
     <script th:src="@{/custom-select.js}"></script>
 </body>

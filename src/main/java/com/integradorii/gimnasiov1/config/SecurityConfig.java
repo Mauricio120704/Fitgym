@@ -172,11 +172,14 @@ public class SecurityConfig {
                 // - /api/dashboard/**: API del dashboard de asistencia
                 .requestMatchers("/miembros/**", "/incidencias/**", "/pagos", "/clases/**", "/promociones/**", "/configuracion", "/admin/invitados/**", "/admin/visitantes/**", "/api/dashboard/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA", "ENTRENADOR")
                 
-                // ===== RUTAS PARA RECEPCIONISTAS Y ADMINISTRADORES =====
+                // ===== RUTAS PARA RECEPCIONISTAS, ADMINISTRADORES Y ENTRENADORES =====
                 // - /asistencia: Control de asistencia
+                .requestMatchers("/asistencia", "/asistencia/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA", "ENTRENADOR")
+
+                // ===== RUTAS PARA RECEPCIONISTAS Y ADMINISTRADORES =====
                 // - /lockers: Gestión de lockers
                 // - /monitoreo: Monitoreo de capacidad del gimnasio
-                .requestMatchers("/asistencia", "/asistencia/**", "/lockers", "/lockers/**", "/monitoreo", "/monitoreo/**", "/api/lockers/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
+                .requestMatchers("/lockers", "/lockers/**", "/monitoreo", "/monitoreo/**", "/api/lockers/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
                 
                 // ===== RUTAS EXCLUSIVAS PARA ENTRENADORES =====
                 // - /entrenador/**: Panel y funciones específicas de entrenadores

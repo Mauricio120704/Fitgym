@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping("/asistencia")
-@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'ENTRENADOR')")
 public class AsistenciaController {
 
     @Autowired

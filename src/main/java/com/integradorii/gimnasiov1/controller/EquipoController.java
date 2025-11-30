@@ -16,7 +16,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/equipos")
-@PreAuthorize("hasRole('ADMINISTRADOR')")
+@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
 public class EquipoController {
 
     @Autowired

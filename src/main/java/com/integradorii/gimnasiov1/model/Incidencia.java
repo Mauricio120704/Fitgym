@@ -42,6 +42,10 @@ public class Incidencia {
     @Column(name = "ultima_actualizacion", nullable = false)
     private OffsetDateTime ultimaActualizacion;
 
+    @Lob
+    @Column(name = "imagenes", columnDefinition = "BYTEA")
+    private byte[] imagenes;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitulo() { return titulo; }
@@ -64,4 +68,6 @@ public class Incidencia {
     public void setAsignadoA(Persona asignadoA) { this.asignadoA = asignadoA; }
     public OffsetDateTime getUltimaActualizacion() { return ultimaActualizacion; }
     public void setUltimaActualizacion(OffsetDateTime ultimaActualizacion) { this.ultimaActualizacion = ultimaActualizacion; }
+    public byte[] getImagenes() { return imagenes; }
+    public void setImagenes(byte[] imagenes) { this.imagenes = imagenes; }
 }

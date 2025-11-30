@@ -1,6 +1,5 @@
 package com.integradorii.gimnasiov1.controller;
 
-import com.integradorii.gimnasiov1.model.Clase;
 import com.integradorii.gimnasiov1.model.Promocion;
 import com.integradorii.gimnasiov1.model.PromocionMembresia;
 import com.integradorii.gimnasiov1.repository.ClaseRepository;
@@ -126,8 +125,6 @@ public class PromocionController {
         model.addAttribute("todosEstados", Promocion.Estado.values());
         // Fecha actual para la vista (evita T(java.time.LocalDate).now())
         model.addAttribute("hoy", hoy);
-        // Clases disponibles para promociones de tipo CLASE
-        model.addAttribute("clasesDisponibles", claseRepository.findAllByOrderByFechaAsc());
         
         return "promociones";
     }
@@ -372,7 +369,13 @@ public class PromocionController {
 
         return claseRepository.findAllByOrderByFechaAsc()
                 .stream()
+                // Solo clases con fecha válida
                 .filter(c -> c.getFecha() != null)
+                // Solo clases que sean de pago y tengan precio > 0
+                .filter(c -> Boolean.TRUE.equals(c.getEsPago())
+                        && c.getPrecio() != null
+                        && c.getPrecio().compareTo(BigDecimal.ZERO) > 0)
+                // Solo clases cuyo día esté dentro del rango de la promoción
                 .filter(c -> {
                     java.time.ZonedDateTime zdt = c.getFecha().atZoneSameInstant(zone);
                     LocalDate d = zdt.toLocalDate();

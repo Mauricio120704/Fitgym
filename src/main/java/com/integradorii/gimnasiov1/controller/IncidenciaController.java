@@ -83,11 +83,11 @@ public class IncidenciaController {
             @RequestParam(required = false) String reportado,
             @RequestParam(required = false) String asignado,
             @RequestParam String prioridad,
-            @RequestParam(required = false) String imagenes
+            @RequestParam(required = false) byte[] imagenes
     ) {
         Incidencia i = new Incidencia();
         i.setTitulo(titulo);
-        // Empaquetar imágenes y fallbacks de nombres en la descripción
+        // Guardar fallbacks de nombres en la descripción
         StringBuilder descBuilder = new StringBuilder(descripcion == null ? "" : descripcion);
         if (reportado != null && !reportado.isBlank()) {
             descBuilder.append("\n__REPORTADO__=").append(reportado.trim());
@@ -95,11 +95,9 @@ public class IncidenciaController {
         if (asignado != null && !asignado.isBlank()) {
             descBuilder.append("\n__ASIGNADO__=").append(asignado.trim());
         }
-        if (imagenes != null && !imagenes.isBlank()) {
-            descBuilder.append("\n\n__IMGS__=").append(imagenes);
-        }
         String descToSave = descBuilder.toString();
         i.setDescripcion(descToSave);
+        i.setImagenes(imagenes);
         i.setCategoria("General");
 
         String pr = "Media";

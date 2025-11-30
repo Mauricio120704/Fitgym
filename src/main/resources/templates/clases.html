@@ -103,12 +103,6 @@
                     </button>
                     <div class="text-xl font-semibold text-gray-800">Cupos de Clases</div>
                 </div>
-                <button id="btn-nueva-clase" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition flex items-center gap-2">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Nueva Clase
-                </button>
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -140,16 +134,16 @@
                             <div class="flex flex-col gap-4 w-full md:grid md:grid-cols-[auto,1fr,auto] md:items-center md:gap-6">
                                 <!-- Grupo izquierda: Filtros -->
                                 <div class="flex items-center gap-6">
-                                    <a th:href="@{/clases(periodo='hoy')}"
+                                    <a th:href="@{/clases(periodo='hoy', buscar=${buscarActual})}"
                                        th:classappend="${periodo == 'hoy' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
                                        class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Hoy</a>
-                                    <a th:href="@{/clases(periodo='semana')}"
+                                    <a th:href="@{/clases(periodo='semana', buscar=${buscarActual})}"
                                        th:classappend="${periodo == 'semana' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
                                        class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Esta semana</a>
-                                    <a th:href="@{/clases(periodo='mes')}"
+                                    <a th:href="@{/clases(periodo='mes', buscar=${buscarActual})}"
                                        th:classappend="${periodo == 'mes' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
                                        class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Este mes</a>
-                                    <a th:href="@{/clases(periodo='todos')}"
+                                    <a th:href="@{/clases(periodo='todos', buscar=${buscarActual})}"
                                        th:classappend="${periodo == 'todos' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
                                        class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Todas</a>
                                 </div>
@@ -174,7 +168,6 @@
                                                 </svg>
                                             </a>
                                         </div>
-                                        <a th:href="@{/clases(periodo='semana')}" class="h-8 px-3 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors">Hoy</a>
                                     </div>
                                     <div th:unless="${periodo == 'semana'}" class="h-9"></div>
                                 </div>
@@ -213,6 +206,16 @@
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm text-gray-700">
+                                    <!-- Mensaje cuando no hay resultados para el filtro aplicado -->
+                                    <tr th:if="${#lists.isEmpty(clases)}">
+                                        <td class="px-4 py-6 text-center text-gray-500" colspan="8"
+                                            th:text="${buscarActual != null && !#strings.isEmpty(buscarActual) ?
+                                                      'No se encontraron clases para el periodo seleccionado que coincidan con ' + buscarActual + '.' :
+                                                      'No se encontraron clases para el periodo seleccionado.'}">
+                                            No se encontraron clases para el periodo seleccionado.
+                                        </td>
+                                    </tr>
+
                                     <tr th:each="clase : ${clases}" class="border-b hover:bg-gray-50" th:data-id="${clase.id}">
                                         <td class="px-4 py-3 font-medium" th:text="${clase.nombre}">Yoga</td>
                                         <td class="px-4 py-3" th:text="${clase.instructor}">María</td>
@@ -325,6 +328,13 @@
                     </div>
                 </div>
             </main>
+            <!-- Botón flotante para crear nueva clase -->
+            <button id="btn-nueva-clase"
+                    class="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-orange-500 text-white shadow-lg hover:bg-orange-600 focus:outline-none flex items-center justify-center text-3xl"
+                    type="button"
+                    aria-label="Nueva clase">
+                +
+            </button>
         </div>
     </div>
     <!-- Modal Nueva Clase -->
@@ -515,6 +525,53 @@
                 if (soloMiembrosRadio) soloMiembrosRadio.checked = true;
                 if (paraTodosRadio) paraTodosRadio.checked = false;
             }
+            // Aplicar siempre el estado correcto de campos según la disponibilidad seleccionada
+            actualizarDisponibilidadCampos();
+        }
+
+        function actualizarDisponibilidadCampos() {
+            const cuposBasicoInput = document.getElementById('clase-cupos-basico');
+            const esPagoInput = document.getElementById('clase-es-pago');
+            const precioInput = document.getElementById('clase-precio');
+            const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+            const paraTodosRadio = document.getElementById('clase-para-todos');
+
+            if (!soloMiembrosRadio || !paraTodosRadio) {
+                return;
+            }
+
+            const soloMiembros = soloMiembrosRadio.checked;
+
+            if (soloMiembros) {
+                // Solo miembros Premium/Elite: bloquear Básico y pagos
+                if (cuposBasicoInput) {
+                    cuposBasicoInput.value = '0';
+                    cuposBasicoInput.disabled = true;
+                    cuposBasicoInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                }
+                if (esPagoInput) {
+                    esPagoInput.checked = false;
+                    esPagoInput.disabled = true;
+                }
+                if (precioInput) {
+                    precioInput.value = '';
+                    precioInput.disabled = true;
+                    precioInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                }
+            } else {
+                // Para todos: permitir configurar Básico y pagos
+                if (cuposBasicoInput) {
+                    cuposBasicoInput.disabled = false;
+                    cuposBasicoInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                }
+                if (esPagoInput) {
+                    esPagoInput.disabled = false;
+                }
+                if (precioInput) {
+                    precioInput.disabled = false;
+                    precioInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                }
+            }
         }
 
         function closeModal() {
@@ -573,6 +630,12 @@
                 closeModal();
             }
         });
+
+        // Manejar cambios de disponibilidad (Solo miembros / Para todos)
+        const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+        const paraTodosRadio = document.getElementById('clase-para-todos');
+        if (soloMiembrosRadio) soloMiembrosRadio.addEventListener('change', actualizarDisponibilidadCampos);
+        if (paraTodosRadio) paraTodosRadio.addEventListener('change', actualizarDisponibilidadCampos);
 
         // No cerrar al hacer click fuera - solo con X o Cancelar
         // (similar a incidencias)
@@ -681,7 +744,8 @@
                 if (precioInput) precioInput.value = precio;
                 if (soloMiembrosRadio) soloMiembrosRadio.checked = !paraTodos;
                 if (paraTodosRadio) paraTodosRadio.checked = paraTodos;
-                
+
+                actualizarDisponibilidadCampos();
                 openModal(true);
             }
             

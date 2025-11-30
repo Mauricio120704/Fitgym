@@ -51,56 +51,54 @@ public class ClasesController {
      */
     @GetMapping("/clases")
     public String listar(@RequestParam(required = false) String buscar,
-                         @RequestParam(defaultValue = "todos") String periodo,
+                         @RequestParam(defaultValue = "hoy") String periodo,
                          @RequestParam(required = false) String fechaInicio,
                          @RequestParam(defaultValue = "0") int page,
                          Model model) {
         // Calcular rango de fechas según el periodo
         LocalDate hoy = LocalDate.now();
+        if (periodo == null || periodo.isBlank()) {
+            periodo = "hoy";
+        }
         LocalDate inicio = null;
         LocalDate fin = null;
 
-        // Manejar el caso donde se proporciona una fecha de inicio
-        if (fechaInicio != null && !fechaInicio.isEmpty()) {
-            try {
-                inicio = LocalDate.parse(fechaInicio);
-                if (periodo.equals("semana")) {
-                    fin = inicio.plusDays(6);
-                }
-            } catch (Exception e) {
-                // Si hay un error al parsear la fecha, usar la fecha actual
+        // Calcular rango de fechas según el período
+        switch (periodo) {
+            case "hoy":
                 inicio = hoy;
                 fin = hoy;
-            }
-        }
-
-        // Si no se proporcionó fecha de inicio o hubo un error, calcular según el período
-        if (inicio == null) {
-            switch (periodo) {
-                case "hoy":
-                    inicio = hoy;
-                    fin = hoy;
-                    break;
-                case "semana":
+                break;
+            case "semana":
+                // Si hay fechaInicio, usarla; si no, usar la semana actual
+                if (fechaInicio != null && !fechaInicio.isEmpty()) {
+                    try {
+                        inicio = LocalDate.parse(fechaInicio);
+                    } catch (Exception e) {
+                        inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                    }
+                } else {
                     inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                    fin = inicio.plusDays(6);
-                    break;
-                case "mes":
-                    inicio = hoy.withDayOfMonth(1);
-                    fin = hoy.withDayOfMonth(hoy.lengthOfMonth());
-                    break;
-                case "todos":
-                default:
-                    // No se establecen fechas para mostrar todas las clases
-                    break;
-            }
+                }
+                fin = inicio.plusDays(6);
+                break;
+            case "mes":
+                inicio = hoy.withDayOfMonth(1);
+                fin = hoy.withDayOfMonth(hoy.lengthOfMonth());
+                break;
+            case "todos":
+            default:
+                // No se establecen fechas para mostrar todas las clases
+                inicio = null;
+                fin = null;
+                break;
         }
 
         List<Clase> clases;
         if (inicio != null && fin != null) {
             OffsetDateTime inicioOdt = inicio.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
             OffsetDateTime finOdt = fin.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
-            
+
             clases = (buscar == null || buscar.isBlank())
                     ? claseRepository.findByFechaBetweenOrderByFechaAsc(inicioOdt, finOdt)
                     : claseRepository.findByFechaBetweenAndTipoLike(inicioOdt, finOdt, buscar.trim());
@@ -112,10 +110,23 @@ public class ClasesController {
                             buscar.trim(), buscar.trim());
         }
 
-        // Mapear a DTOs para la vista
-        List<ClaseViewDTO> view = clases.stream().map(claseViewService::toView).collect(Collectors.toList());
+        // Mapear a DTOs para la vista y reforzar el filtro de fechas en memoria
+        final LocalDate filtroInicio = inicio;
+        final LocalDate filtroFin = fin;
+        List<ClaseViewDTO> view = clases.stream()
+                .map(claseViewService::toView)
+                .filter(v -> {
+                    if (filtroInicio == null || filtroFin == null || v.getFecha() == null) {
+                        return true; // sin filtro de fecha ("todos")
+                    }
+                    LocalDate f = v.getFecha();
+                    // Incluir fechas que están dentro del rango [filtroInicio, filtroFin]
+                    return !f.isBefore(filtroInicio) && !f.isAfter(filtroFin);
+                })
+                .collect(Collectors.toList());
 
-        long totalClases = clases.size();
+        // Calcular totales basados en la lista YA FILTRADA
+        long totalClases = view.size();
 
         // Paginación simple en memoria: 25 clases por página
         int pageSize = 25;
@@ -150,7 +161,7 @@ public class ClasesController {
         model.addAttribute("totalCupos", totalCupos);
         model.addAttribute("buscarActual", buscar == null ? "" : buscar);
         // Pasar el período actual a la vista
-        model.addAttribute("periodo", periodo == null ? "semana" : periodo);
+        model.addAttribute("periodo", periodo);
         
         // Pasar fechas de la semana actual para navegación
         if (periodo != null && periodo.equals("semana") && inicio != null) {

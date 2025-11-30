@@ -27,7 +27,7 @@ public class AdminDeportistasController {
         this.personaRepository = personaRepository;
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
     @GetMapping
     public String listarDeportistas(@RequestParam(required = false) String buscar,
                                     @RequestParam(required = false, defaultValue = "todos") String filtroBloqueo,

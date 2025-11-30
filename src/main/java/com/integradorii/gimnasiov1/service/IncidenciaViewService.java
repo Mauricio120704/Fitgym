@@ -13,18 +13,11 @@ public class IncidenciaViewService {
     public IncidenciaViewDTO toView(Incidencia i) {
         String originalDesc = i.getDescripcion();
         String desc = originalDesc;
-        String imgsJson = null;
+        byte[] imagenes = i.getImagenes();
         String fallbackReportado = null;
         String fallbackAsignado = null;
         if (originalDesc != null) {
-            int imgIdx = originalDesc.indexOf("\n\n__IMGS__=");
-            if (imgIdx >= 0) {
-                imgsJson = originalDesc.substring(imgIdx + "\n\n__IMGS__=".length());
-                desc = originalDesc.substring(0, imgIdx);
-            } else {
-                desc = originalDesc;
-            }
-            String metaSegment = desc;
+            String metaSegment = originalDesc;
             int ridx = metaSegment.indexOf("\n__REPORTADO__=");
             if (ridx >= 0) {
                 int startIdx = ridx + "\n__REPORTADO__=".length();
@@ -83,7 +76,7 @@ public class IncidenciaViewService {
                 fr,
                 nombreReportado,
                 nombreAsignado,
-                imgsJson
+                imagenes
         );
     }
 }
