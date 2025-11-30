@@ -333,6 +333,38 @@ public class CheckoutController {
                 return ResponseEntity.badRequest().body(response);
             }
 
+            // Validar que el usuario exista
+            Persona persona = personaRepository.findByEmail(usuario).orElse(null);
+            if (persona == null) {
+                response.put("error", "Usuario no encontrado");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Validar que la clase esté disponible para pago (estado, fecha, duplicados y capacidad)
+            if (!"Programada".equalsIgnoreCase(clase.getEstado())) {
+                response.put("error", "La clase no está disponible para reserva.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            java.time.OffsetDateTime ahora = java.time.OffsetDateTime.now();
+            if (clase.getFecha() == null || !clase.getFecha().isAfter(ahora)) {
+                response.put("error", "La clase ya ocurrió o no tiene fecha válida.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            boolean yaReservada = reservaClaseRepository.existsByClase_IdAndDeportista_IdAndEstadoNot(
+                    clase.getId(), persona.getId(), "Cancelado");
+            if (yaReservada) {
+                response.put("error", "Ya tienes una reserva para esta clase.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            long ocupados = reservaClaseRepository.countOcupados(clase.getId());
+            if (ocupados >= clase.getCapacidad()) {
+                response.put("error", "La clase está completa. No es posible procesar el pago.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
             Promocion promo = null;
             if (promoId != null) {
                 promo = obtenerPromocionClaseAplicable(promoId, clase);
@@ -606,16 +638,9 @@ public class CheckoutController {
                 }
             }
 
-            boolean esDeportistaAutenticado =
-                    userDetails != null &&
-                    userDetails.getUsername() != null &&
-                    userDetails.getUsername().equalsIgnoreCase(usuario);
-
-            if (esDeportistaAutenticado) {
-                return "redirect:/perfil";
-            } else {
-                return "redirect:/login?registroExitoso=true&mensaje=¡Pago+procesado+correctamente!+Ya+puedes+iniciar+sesión.";
-            }
+            // El flujo de compra exige que el usuario esté autenticado antes de pagar,
+            // por lo que tras un pago exitoso lo redirigimos siempre a su perfil.
+            return "redirect:/perfil";
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             System.err.println("Error al procesar el pago mediante Stripe: " + e.getMessage());
@@ -626,12 +651,6 @@ public class CheckoutController {
 
     /**
      * GET /checkout/cancel
-     *
-     * Pantalla de regreso cuando el usuario cancela el pago en Stripe.
-     *
-     * Vuelve a cargar los datos del plan, período, precio y correo para que el
-     * usuario pueda reintentar el pago, mostrando un mensaje de error indicando
-     * que no se ha realizado ningún cargo.
      */
     @GetMapping("/cancel")
     public String stripeCancel(@RequestParam String plan,
