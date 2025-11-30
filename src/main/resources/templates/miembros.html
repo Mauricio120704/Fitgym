@@ -12,28 +12,6 @@
     <script defer th:src="@{/JavaScript/miembros.js}"></script>
     <meta name="referrer" content="no-referrer-when-downgrade">
     <meta http-equiv="Cache-Control" content="public, max-age=60">
-    <style>
-        #floating-add-btn {
-            position: fixed !important;
-            bottom: 2rem !important;
-            right: 2rem !important;
-            z-index: 9999 !important;
-            width: 4rem !important;
-            height: 4rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 9999px !important;
-            background-color: rgb(249, 115, 22) !important;
-            color: white !important;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-            transition: all 0.2s ease-in-out !important;
-        }
-        
-        #floating-add-btn:hover {
-            transform: scale(1.1) !important;
-        }
-    </style>
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -186,7 +164,7 @@
     </div>
 
     <!-- Botón Flotante para Nuevo Personal -->
-    <a href="/miembros/nuevo" id="floating-add-btn" title="Agregar personal">
+    <a href="/miembros/nuevo" id="floating-add-btn" class="fab-add" title="Agregar personal">
         <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>

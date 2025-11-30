@@ -185,6 +185,7 @@ public class HomeController {
             model.addAttribute("totalMiembros", totalMiembrosDB);
             model.addAttribute("totalActivos", totalActivosDB);
             model.addAttribute("totalInactivos", totalInactivosDB);
+            model.addAttribute("activeMenu", "miembros");
 
             return "miembros";
         } catch (Exception ex) {
@@ -199,6 +200,7 @@ public class HomeController {
             model.addAttribute("totalActivos", 0);
             model.addAttribute("totalInactivos", 0);
             model.addAttribute("error", "Error al listar miembros: " + ex.getMessage());
+            model.addAttribute("activeMenu", "miembros");
             return "miembros";
         }
     }
@@ -210,6 +212,7 @@ public class HomeController {
     @GetMapping("/miembros/nuevo")
     public String nuevoMiembroForm(Model model) {
         model.addAttribute("miembro", new Usuario());
+        model.addAttribute("activeMenu", "miembros");
         return "nuevo-miembro";
     }
 

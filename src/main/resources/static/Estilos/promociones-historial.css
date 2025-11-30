@@ -6,6 +6,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyge
 .subtitle { color:#6b7280; }
 .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.5rem .9rem; border-radius:10px; border:1px solid #e5e7eb; background:#fff; color:#374151; text-decoration:none; font-weight:600; }
 .btn:hover { background:#f9fafb; }
+.btn svg { width:0.9rem; height:0.9rem; flex-shrink:0; }
 .btn-danger { border:1px solid #fecaca; background:#fef2f2; color:#991b1b; }
 .btn-danger:hover { background:#fee2e2; }
 .card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:1rem; }

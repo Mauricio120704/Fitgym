@@ -26,7 +26,8 @@ public class AsistenciaController {
 
     // GET /asistencia - Muestra página de control de asistencia
     @GetMapping
-    public String mostrarPaginaAsistencia() {
+    public String mostrarPaginaAsistencia(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "asistencia");
         return "asistencia";
     }
 

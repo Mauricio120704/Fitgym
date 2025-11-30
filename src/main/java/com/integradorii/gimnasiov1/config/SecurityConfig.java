@@ -205,9 +205,19 @@ public class SecurityConfig {
                             .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENTE"))) {
                         redirectUrl = "/perfil";
                     } 
-                    // Si es personal (admin, recepcionista, entrenador) → redirigir a gestión de miembros
+                    // Si es entrenador → redirigir a clases
                     else if (authentication.getAuthorities().stream()
-                            .anyMatch(a -> a.getAuthority().startsWith("ROLE_"))) {
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ENTRENADOR"))) {
+                        redirectUrl = "/clases";
+                    }
+                    // Si es recepcionista → redirigir a monitoreo
+                    else if (authentication.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_RECEPCIONISTA"))) {
+                        redirectUrl = "/monitoreo";
+                    }
+                    // Si es administrador → redirigir a miembros
+                    else if (authentication.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR"))) {
                         redirectUrl = "/miembros";
                     }
                     response.sendRedirect(redirectUrl);

@@ -54,10 +54,10 @@ public class VisitanteController {
             visitanteRepository.save(visitante);
             
             redirectAttributes.addFlashAttribute("success", "Visitante registrado exitosamente. Código de pase: " + codigoPase);
-            return "redirect:/admin/visitantes/registrar";
+            return "redirect:/admin/visitantes/listado";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al registrar el visitante: " + e.getMessage());
-            return "redirect:/admin/visitantes/registrar";
+            return "redirect:/admin/visitantes/listado";
         }
     }
 
