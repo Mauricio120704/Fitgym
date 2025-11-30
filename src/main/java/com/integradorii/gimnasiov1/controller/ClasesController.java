@@ -184,6 +184,8 @@ public class ClasesController {
         model.addAttribute("instructores", instructores);
         // Pasar tipos de clase activos para el selector
         model.addAttribute("tiposClase", tipoClaseRepository.findByActivoTrueOrderByNombreAsc());
+        // Marcar menú activo para el sidebar
+        model.addAttribute("activeMenu", "clases");
         return "clases";
     }
 

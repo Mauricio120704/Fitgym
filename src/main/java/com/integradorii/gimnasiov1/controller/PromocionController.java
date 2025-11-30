@@ -125,6 +125,8 @@ public class PromocionController {
         model.addAttribute("todosEstados", Promocion.Estado.values());
         // Fecha actual para la vista (evita T(java.time.LocalDate).now())
         model.addAttribute("hoy", hoy);
+        // Marcar menú activo para el sidebar
+        model.addAttribute("activeMenu", "promociones");
         
         return "promociones";
     }
@@ -340,6 +342,7 @@ public class PromocionController {
     @GetMapping("/promociones/historial")
     public String historialGlobal(Model model) {
         model.addAttribute("historial", historialRepository.findAllWithPromocionOrderByRealizadoEnDesc());
+        model.addAttribute("activeMenu", "promociones");
         return "promociones_historial";
     }
 
@@ -352,6 +355,7 @@ public class PromocionController {
         Promocion p = promocionRepository.findById(id).orElseThrow();
         model.addAttribute("promocion", p);
         model.addAttribute("historial", historialRepository.findByPromocionIdOrderByRealizadoEnDesc(id));
+        model.addAttribute("activeMenu", "promociones");
         return "promocion_historial";
     }
 

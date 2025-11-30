@@ -15,7 +15,8 @@ public class LockersController {
 
     // GET /lockers - Página de gestión de lockers
     @GetMapping("/lockers")
-    public String lockersPage() {
+    public String lockersPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "lockers");
         return "lockers";
     }
 }

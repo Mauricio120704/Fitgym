@@ -102,6 +102,7 @@ public class AdminDeportistasController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("fromIndex", fromIndex);
         model.addAttribute("toIndex", toIndex);
+        model.addAttribute("activeMenu", "deportistas-admin");
 
         return "admin/deportistas";
     }

@@ -30,7 +30,8 @@ public class MonitoreoCapacidadController {
     private AsistenciaRepository asistenciaRepository;
 
     @GetMapping
-    public String mostrarMonitoreo() {
+    public String mostrarMonitoreo(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "monitoreo-capacidad");
         return "monitoreo-capacidad";
     }
 

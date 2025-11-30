@@ -33,12 +33,7 @@
                     </button>
                     <div class="text-xl font-semibold text-gray-800">Incidencias</div>
                 </div>
-                <button id="btn-nueva-incidencia" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition flex items-center gap-2">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Nueva Incidencia
-                </button>
+                <div></div>
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -175,6 +170,12 @@
                     </div>
                 </div>
             </main>
+            <!-- Botón flotante para nueva incidencia -->
+            <button id="btn-nueva-incidencia" class="fab-add" type="button" aria-label="Nueva incidencia">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
         </div>
     </div>
     <!-- Modal Nueva Incidencia -->

@@ -39,14 +39,7 @@
                             </button>
                             <h1 class="ml-4 text-2xl font-bold text-gray-800">Inventario de Productos</h1>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <a th:href="@{/admin/inventario/nuevo}" class="btn btn-primary">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Nuevo Producto
-                            </a>
-                        </div>
+                        <div class="flex items-center space-x-4"></div>
                     </div>
                 </div>
             </header>
@@ -294,6 +287,12 @@
                     </div>
                 </div>
             </main>
+            <!-- Botón flotante para nuevo producto -->
+            <a th:href="@{/admin/inventario/nuevo}" class="fab-add" title="Nuevo producto">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </a>
         </div>
     </div>
 

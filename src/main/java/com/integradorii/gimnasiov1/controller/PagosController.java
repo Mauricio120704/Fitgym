@@ -116,6 +116,7 @@ public class PagosController {
         model.addAttribute("totalAnio", totalAnio);                                   // Total pagado en el año
         model.addAttribute("cantidadPagos", cantidadPagos);                          // Cantidad de pagos
         model.addAttribute("suscripcionActual", suscripcionActualMap);               // Info de suscripción activa
+        model.addAttribute("activeMenu", "pagos");                                   // Marcar menú activo
 
         return "historial-pagos";
     }

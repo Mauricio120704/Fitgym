@@ -72,6 +72,7 @@ public class IncidenciaController {
         model.addAttribute("buscarActual", buscar == null ? "" : buscar);
         model.addAttribute("estadoActual", estado == null ? "todos" : estado);
         model.addAttribute("prioridadActual", prioridad == null ? "todas" : prioridad);
+        model.addAttribute("activeMenu", "incidencias");
 
         return "incidencias";
     }
