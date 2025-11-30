@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
     <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
+    <link rel="stylesheet" th:href="@{/css/buttons.css}">
     <script>
         (function() {
             const saved = localStorage.getItem('sidebarExpanded');
@@ -140,11 +141,21 @@
                                         <form th:if="${!deportista.bloqueado}" th:action="@{/admin/deportistas/{id}/bloquear(id=${deportista.id})}" method="post" class="inline-block">
                                             <input type="hidden" name="motivo" value="Incumplimiento de normas">
                                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                            <button type="submit" class="px-3 py-1 bg-red-100 text-red-600 hover:bg-red-600 hover:text-white rounded text-xs">Bloquear</button>
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Bloquear deportista">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 10-8 0v4m2 3h8a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4a2 2 0 012-2z" />
+                                                </svg>
+                                                <span>Bloquear</span>
+                                            </button>
                                         </form>
                                         <form th:if="${deportista.bloqueado}" th:action="@{/admin/deportistas/{id}/desbloquear(id=${deportista.id})}" method="post" class="inline-block">
                                             <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                            <button type="submit" class="px-3 py-1 bg-green-100 text-green-700 hover:bg-green-600 hover:text-white rounded text-xs">Desbloquear</button>
+                                            <button type="submit" class="btn btn-success btn-sm" title="Desbloquear deportista">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0v4m-9 3h10a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2z" />
+                                                </svg>
+                                                <span>Desbloquear</span>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
