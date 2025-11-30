@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Notificaciones Deportista</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.4em; margin-bottom: 10px; }
+        .header p { font-size: 1.05em; opacity: 0.9; }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            padding: 10px 22px;
+            border: 2px solid #0ea5e9;
+            background: white;
+            color: #0ea5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+        .nav-btn:hover {
+            background: #0ea5e9;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(14,165,233,0.4);
+        }
+        .nav-btn.active {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-title {
+            font-size: 2em;
+            color: #0ea5e9;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0ea5e9;
+        }
+        .purpose-box {
+            background: #e0f2fe;
+            border-left: 5px solid #0ea5e9;
+            padding: 25px;
+            margin-bottom: 35px;
+            border-radius: 8px;
+        }
+        .purpose-box h3 { color: #0ea5e9; margin-bottom: 15px; font-size: 1.25em; font-weight: 700; }
+        .purpose-box p { color: #111827; line-height: 1.8; font-size: 1.02em; }
+
+        .code-explanation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            overflow-x: auto;
+            min-width: 900px;
+        }
+        .code-explanation-stacked { grid-template-columns: 1fr; }
+        .code-column {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .code-column h4 {
+            color: #0ea5e9;
+            margin-bottom: 18px;
+            font-size: 1.15em;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0ea5e9;
+            font-weight: 700;
+        }
+        .code-block {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 18px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre;
+        }
+        .code-block .line-num {
+            color: #9ca3af;
+            margin-right: 15px;
+            display: inline-block;
+            width: 35px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .keyword { color: #38bdf8; font-weight: bold; }
+        .string { color: #facc15; }
+        .comment { color: #6b7280; font-style: italic; }
+        .class-name { color: #22c55e; font-weight: bold; }
+        .method { color: #f97316; }
+        .number { color: #a855f7; }
+
+        .explanation { color: #111827; line-height: 2; font-size: 0.98em; }
+        .explanation strong { color: #0ea5e9; font-weight: 700; }
+        .explanation p { margin-bottom: 10px; }
+
+        .footer {
+            background: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        @media (max-width: 1024px) {
+            .code-explanation { grid-template-columns: 1fr; min-width: auto; }
+            .header h1 { font-size: 1.8em; }
+            .nav-buttons { flex-direction: column; }
+            .nav-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Documentación Notificaciones Deportista</h1>
+            <p>Cómo se generan y muestran las notificaciones del deportista (API REST + campana + tarjeta en "Mi Perfil")</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('notif-controller-imports'); return false;">1. Controller - Clase y Dependencias</button>
+            <button class="nav-btn" onclick="showSection('notif-controller-endpoint'); return false;">2. Controller - GET /api/deportista/notificaciones</button>
+            <button class="nav-btn" onclick="showSection('notif-html-perfil'); return false;">3. HTML/JS - Campana y tarjeta en Mi Perfil</button>
+        </div>
+
+        <!-- SECCIÓN 1: CONTROLLER IMPORTS Y CLASE -->
+        <div id="notif-controller-imports" class="content active">
+            <h2 class="section-title">1️⃣ Controller - Clase, ruta base y dependencias</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define el controlador <strong>NotificacionesDeportistaController</strong> como un <code>@RestController</code> bajo la ruta base
+                    <code>/api/deportista</code>. Inyecta los repositorios necesarios para construir notificaciones "on the fly" a partir del estado
+                    actual de la base de datos.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="comment">/** API de notificaciones para el panel del deportista. */</span>
+<span class="line-num">2</span> <span class="keyword">@RestController</span>
+<span class="line-num">3</span> <span class="keyword">@RequestMapping</span>(<span class="string">"/api/deportista"</span>)
+<span class="line-num">4</span> <span class="keyword">public class</span> <span class="class-name">NotificacionesDeportistaController</span> {
+<span class="line-num">6</span>     <span class="keyword">private final</span> PersonaRepository personaRepository;
+<span class="line-num">7</span>     <span class="keyword">private final</span> SuscripcionRepository suscripcionRepository;
+<span class="line-num">8</span>     <span class="keyword">private final</span> ReservaClaseRepository reservaClaseRepository;
+<span class="line-num">9</span>     <span class="keyword">private final</span> PromocionRepository promocionRepository;
+<span class="line-num">10</span>     <span class="keyword">private final</span> ClaseRepository claseRepository;
+<span class="line-num">11</span>     <span class="keyword">private final</span> NotificacionMasivaRepository notificacionMasivaRepository;
+<span class="line-num">13</span>     <span class="keyword">public</span> <span class="method">NotificacionesDeportistaController</span>(
+<span class="line-num">14</span>             PersonaRepository personaRepository,
+<span class="line-num">15</span>             SuscripcionRepository suscripcionRepository,
+<span class="line-num">16</span>             ReservaClaseRepository reservaClaseRepository,
+<span class="line-num">17</span>             PromocionRepository promocionRepository,
+<span class="line-num">18</span>             ClaseRepository claseRepository,
+<span class="line-num">19</span>             NotificacionMasivaRepository notificacionMasivaRepository) { ... }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 1:</strong> Comentario que documenta que esta clase expone la API de notificaciones para el panel del deportista.</p>
+                        <p><strong>Líneas 2-3:</strong> <code>@RestController</code> indica que los métodos devuelven JSON y <code>@RequestMapping("/api/deportista")</code>
+                            fija el prefijo de todas las rutas del controlador.</p>
+                        <p><strong>Líneas 6-11:</strong> Se definen los repositorios inyectados por Spring para leer la información necesaria: persona, suscripción,
+                            reservas de clase, promociones, clases y anuncios masivos.</p>
+                        <p><strong>Líneas 13-19:</strong> Constructor con inyección de dependencias: recibe los repositorios y los asigna a campos <em>final</em>,
+                            siguiendo el patrón recomendado en Spring.</p>
+                        <p><strong>Resumen:</strong> Este bloque prepara el contexto del controlador: qué datos puede consultar y bajo qué prefijo de URL se
+                            publicarán los endpoints.</p>
+                        <p><strong>Nota:</strong> En el código real hay declaraciones de <code>package</code> e importaciones encima de esta clase; aquí se omiten
+                            para mantener la documentación más clara.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: GET /api/deportista/notificaciones -->
+        <div id="notif-controller-endpoint" class="content">
+            <h2 class="section-title">2️⃣ Controller - GET /api/deportista/notificaciones</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Construye un listado de notificaciones calculadas dinámicamente para el deportista autenticado y las devuelve como JSON. No hay una tabla
+                    de notificaciones persistentes: todo se genera en el momento en base al estado de suscripción, promociones y clases.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código (resumen)</h4>
+                    <div class="code-block">
+<span class="line-num">86</span> <span class="keyword">@GetMapping</span>(<span class="string">"/notificaciones"</span>)
+<span class="line-num">87</span> <span class="keyword">public ResponseEntity&lt;?&gt;</span> <span class="method">obtenerNotificaciones</span>(Principal principal) {
+<span class="line-num">88</span>     <span class="keyword">if</span> (principal == <span class="keyword">null</span>) {
+<span class="line-num">89</span>         <span class="keyword">return</span> ResponseEntity.status(401).body(Map.of(<span class="string">"error"</span>, <span class="string">"No autenticado"</span>));
+<span class="line-num">90</span>     }
+<span class="line-num">92</span>     Optional&lt;Persona&gt; personaOpt = personaRepository.findByEmail(principal.getName());
+<span class="line-num">93</span>     <span class="keyword">if</span> (personaOpt.isEmpty()) {
+<span class="line-num">94</span>         <span class="keyword">return</span> ResponseEntity.status(404).body(Map.of(<span class="string">"error"</span>, <span class="string">"Deportista no encontrado"</span>));
+<span class="line-num">95</span>     }
+<span class="line-num">97</span>     Persona persona = personaOpt.get();
+<span class="line-num">98</span>     LocalDate hoy = LocalDate.now();
+<span class="line-num">99</span>     List&lt;Map&lt;String,Object&gt;&gt; items = <span class="keyword">new</span> ArrayList<>();
+<span class="line-num">101</span>    DateTimeFormatter fechaFormatter = DateTimeFormatter.ofPattern(<span class="string">"dd/MM/yyyy"</span>) ...;
+<span class="line-num">104</span>    Optional&lt;Suscripcion&gt; suscripcionOpt = suscripcionRepository.findActiveByDeportistaId(persona.getId());
+<span class="line-num">107</span>    List&lt;NotificacionMasiva&gt; anunciosRecientes = notificacionMasivaRepository
+<span class="line-num">108</span>            .findByFechaEnvioAfterOrderByFechaEnvioDesc(haceTreintaDias);
+<span class="line-num">150</span>    <span class="comment">// Bloque 1: notificaciones relacionadas a la suscripción actual</span>
+<span class="line-num">151</span>    <span class="keyword">if</span> (suscripcionOpt.isPresent()) { ... SUSCRIPCION_VENCIDA / PROXIMA_VENCER / PAGO_PROXIMO ... }
+<span class="line-num">188</span>    <span class="keyword">else</span> { ... SIN_SUSCRIPCION ... }
+<span class="line-num">200</span>    <span class="comment">// Bloque 2: nuevas promociones creadas recientemente</span>
+<span class="line-num">205</span>    <span class="keyword">for</span> (Promocion p : promocionesActivas) { ... tipo PROMOCION_NUEVA, url "/deportista/promociones" ... }
+<span class="line-num">236</span>    <span class="comment">// Bloque 3: clases nuevas disponibles próximos 7 días</span>
+<span class="line-num">243</span>    <span class="keyword">for</span> (Clase c : clasesProximasDisponibles) { ... tipo CLASE_NUEVA, url "/reservas?fecha=..." ... }
+<span class="line-num">270</span>    <span class="comment">// Bloque 4: próximas clases ya reservadas por el deportista</span>
+<span class="line-num">274</span>    <span class="keyword">for</span> (ReservaClase r : proximas) { ... tipo CLASE_PROXIMA, url "/reservas?fecha=..." ... }
+<span class="line-num">295</span>    Map&lt;String,Object&gt; respuesta = <span class="keyword">new</span> LinkedHashMap<>();
+<span class="line-num">296</span>    respuesta.put(<span class="string">"total"</span>, items.size());
+<span class="line-num">297</span>    respuesta.put(<span class="string">"items"</span>, items);
+<span class="line-num">298</span>    <span class="keyword">return</span> ResponseEntity.ok(respuesta);
+<span class="line-num">299</span> }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Autenticación y deportista:</strong></p>
+                        <p>- Si <code>principal</code> es <code>null</code> se responde 401 (no autenticado).</p>
+                        <p>- Se busca la <code>Persona</code> por el email del principal; si no existe se responde 404.</p>
+
+                        <p><strong>Estructura base de respuesta:</strong></p>
+                        <p>- Se crea una lista <code>items</code> que contendrá mapas con los campos: <code>tipo</code>, <code>id</code>, <code>titulo</code>,
+                            <code>mensaje</code>, <code>fechaReferencia</code> y <code>url</code>.</p>
+
+                        <p><strong>Anuncios generales recientes:</strong></p>
+                        <p>- Lee los últimos anuncios (<code>NotificacionMasiva</code>) enviados en los últimos 30 días.</p>
+                        <p>- Aplica filtros por plan (TODOS o un plan concreto) y crea notificaciones de tipo <code>ANUNCIO_GENERAL</code> enlazadas a <code>/perfil</code>.</p>
+
+                        <p><strong>Bloque 1 - Suscripción:</strong></p>
+                        <p>- Si existe suscripción activa, genera:</p>
+                        <p>  • <code>SUSCRIPCION_VENCIDA</code> si la fecha de fin ya pasó.</p>
+                        <p>  • <code>SUSCRIPCION_PROXIMA_VENCER</code> cuando faltan ≤ 7 días.</p>
+                        <p>  • <code>PAGO_PROXIMO</code> si el próximo pago es en ≤ 7 días.</p>
+                        <p>- Todas estas notificaciones apuntan a <code>/planes?usuario=correo</code>.</p>
+                        <p>- Si no hay suscripción activa, se genera <code>SIN_SUSCRIPCION</code> invitando a contratar un plan.</p>
+
+                        <p><strong>Bloque 2 - Promociones nuevas:</strong></p>
+                        <p>- Recorre promociones activas creadas en los últimos 7 días y aún vigentes.</p>
+                        <p>- Crea notificaciones <code>PROMOCION_NUEVA</code> con mensaje y, si aplica, fecha límite.</p>
+                        <p>- La <code>url</code> apunta a <code>/deportista/promociones</code> para que el usuario vea todas las promos.</p>
+
+                        <p><strong>Bloque 3 - Clases nuevas disponibles:</strong></p>
+                        <p>- Busca clases programadas en los próximos 7 días que el usuario todavía no haya reservado.</p>
+                        <p>- Genera notificaciones <code>CLASE_NUEVA</code> con nombre y fecha/hora de la clase, enlazando a <code>/reservas?fecha=...</code>.</p>
+
+                        <p><strong>Bloque 4 - Próximas clases reservadas:</strong></p>
+                        <p>- Obtiene las reservas futuras del deportista y crea notificaciones <code>CLASE_PROXIMA</code> con nombre de la clase y fecha.</p>
+
+                        <p><strong>Cierre de la respuesta:</strong></p>
+                        <p>- Empaqueta el total de notificaciones en <code>total</code> y la lista en <code>items</code> y devuelve <code>200 OK</code> con JSON.</p>
+                        <p><strong>Resumen:</strong> Este endpoint es la única fuente de datos de notificaciones para el frontend. La UI (campana y tarjeta)
+                            se limitan a consumir este JSON y dibujar los elementos en pantalla.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: HTML/JS EN PERFIL-USUARIO -->
+        <div id="notif-html-perfil" class="content">
+            <h2 class="section-title">3️⃣ HTML/JS - Campana y tarjeta de notificaciones en "Mi Perfil"</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define la campana de notificaciones en el header de <strong>perfil-usuario.html</strong>, el dropdown flotante con la lista breve de
+                    notificaciones y la tarjeta de <strong>"Notificaciones"</strong> dentro del contenido del perfil. Un script JavaScript consume el endpoint
+                    <code>/api/deportista/notificaciones</code>, construye los elementos HTML y maneja el contador/badge de no leídas.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código HTML/JS (resumen)</h4>
+                    <div class="code-block">
+<span class="line-num">30</span> &lt;<span class="keyword">header</span> class=<span class="string">"flex justify-between items-center p-4 bg-white border-b shadow-sm"</span>&gt;
+<span class="line-num">39</span>   &lt;div class=<span class="string">"flex items-center gap-4"</span>&gt;
+<span class="line-num">40</span>     &lt;div class=<span class="string">"relative"</span>&gt;
+<span class="line-num">41</span>       &lt;button id=<span class="string">"notif-bell"</span>
+<span class="line-num">42</span>               class=<span class="string">"relative text-gray-600 hover:text-gray-800 focus:outline-none"</span>&gt;... icono ...&lt;/button&gt;
+<span class="line-num">45</span>       &lt;span id=<span class="string">"notif-badge"</span>
+<span class="line-num">46</span>             class=<span class="string">"hidden absolute -top-1 -right-1 ... bg-red-500 rounded-full"</span>&gt;&lt;/span&gt;
+<span class="line-num">47</span>       &lt;div id=<span class="string">"notif-dropdown"</span>
+<span class="line-num">48</span>            class=<span class="string">"hidden absolute right-0 mt-2 w-80 bg-white border ..."</span>&gt;
+<span class="line-num">49</span>         &lt;div class=<span class="string">"notif-dropdown-header ..."</span>&gt;Notificaciones&lt;/div&gt;
+<span class="line-num">50</span>         &lt;div id=<span class="string">"notif-dropdown-body"</span>
+<span class="line-num">51</span>              class=<span class="string">"max-h-80 overflow-y-auto text-sm text-gray-700"</span>&gt;
+<span class="line-num">52</span>            &lt;p&gt;Cargando notificaciones...&lt;/p&gt;
+<span class="line-num">53</span>         &lt;/div&gt;
+<span class="line-num">54</span>       &lt;/div&gt;
+<span class="line-num">55</span>     &lt;/div&gt;
+
+<span class="line-num">238</span> &lt;<span class="keyword">section</span> class=<span class="string">"profile-card notifications-card"</span>&gt;
+<span class="line-num">240</span>   &lt;h2 class=<span class="string">"card-title"</span>&gt;... Notificaciones ...&lt;/h2&gt;
+<span class="line-num">244</span>   &lt;div id=<span class="string">"notificaciones-container"</span>
+<span class="line-num">245</span>        class=<span class="string">"text-sm text-gray-700"</span>&gt;
+<span class="line-num">246</span>      &lt;p class=<span class="string">"text-gray-500 text-sm"</span>&gt;Cargando notificaciones...&lt;/p&gt;
+<span class="line-num">247</span>   &lt;/div&gt;
+<span class="line-num">248</span> &lt;/section&gt;
+
+<span class="line-num">254</span> &lt;<span class="keyword">script</span>&gt;
+<span class="line-num">255</span> document.addEventListener(<span class="string">'DOMContentLoaded'</span>, function () {
+<span class="line-num">256</span>   var container = document.getElementById(<span class="string">'notificaciones-container'</span>);
+<span class="line-num">257</span>   var bell = document.getElementById(<span class="string">'notif-bell'</span>);
+<span class="line-num">258</span>   var dropdown = document.getElementById(<span class="string">'notif-dropdown'</span>);
+<span class="line-num">259</span>   var dropdownBody = document.getElementById(<span class="string">'notif-dropdown-body'</span>);
+<span class="line-num">260</span>   var badge = document.getElementById(<span class="string">'notif-badge'</span>);
+<span class="line-num">261</span>   var storageKey = <span class="string">'fitgym_notif_leidas'</span>;
+<span class="line-num">262</span>   var readMap = {};
+<span class="line-num">263</span>   var unreadCount = 0;
+<span class="line-num">265</span>   <span class="keyword">function</span> loadRead() { ... lee ids de notificaciones leídas desde localStorage ... }
+<span class="line-num">282</span>   <span class="keyword">function</span> saveRead() { ... guarda ids en localStorage ... }
+<span class="line-num">289</span>   <span class="keyword">function</span> updateBadge() { ... actualiza número del badge rojo ... }
+<span class="line-num">302</span>   <span class="keyword">function</span> markAsRead(id) { ... marca como leída, decrementa <span class="number">unreadCount</span> ... }
+<span class="line-num">316</span>   <span class="keyword">function</span> renderEmpty() { ... mensaje "No tienes notificaciones" ... }
+<span class="line-num">327</span>   <span class="keyword">function</span> renderError() { ... mensaje de error ... }
+<span class="line-num">338</span>   loadRead();
+<span class="line-num">340</span>   fetch(<span class="string">'/api/deportista/notificaciones'</span>, { credentials: <span class="string">'same-origin'</span> })
+<span class="line-num">347</span>       .then(<span class="keyword">function</span> (data) {
+<span class="line-num">348</span>           var items = Array.isArray(data.items) ? data.items : [];
+<span class="line-num">354</span>           <span class="keyword">if</span> (!items.length) { renderEmpty(); <span class="keyword">return</span>; }
+<span class="line-num">361</span>           unreadCount = 0;
+<span class="line-num">363</span>           items.forEach(<span class="keyword">function</span> (n) {
+<span class="line-num">364</span>               var id = typeof n.id === <span class="string">'string'</span> ? n.id : <span class="keyword">null</span>;
+<span class="line-num">365</span>               var titulo = n.titulo || <span class="string">'Notificación'</span>;
+<span class="line-num">366</span>               var mensaje = n.mensaje || <span class="string">''</span>;
+<span class="line-num">367</span>               var url = typeof n.url === <span class="string">'string'</span> ? n.url : <span class="keyword">null</span>;
+<span class="line-num">368</span>               var isRead = id &amp;&amp; readMap[id] === <span class="keyword">true</span>;
+<span class="line-num">370</span>               <span class="keyword">if</span> (!isRead) { unreadCount++; }
+<span class="line-num">374</span>               <span class="comment">// Crear item grande dentro de notificaciones-container</span>
+<span class="line-num">375</span>               ... <span class="comment">div.notifications-list-item con título, mensaje y botón cerrar</span> ...
+<span class="line-num">419</span>               <span class="comment">// Crear fila pequeña en notif-dropdown-body</span>
+<span class="line-num">420</span>               ... <span class="comment">div con título y mensaje, clic navega a url</span> ...
+<span class="line-num">447</span>           updateBadge();
+<span class="line-num">449</span>       })
+<span class="line-num">450</span>       .catch(<span class="keyword">function</span> () { renderError(); });
+<span class="line-num">453</span>   <span class="keyword">if</span> (bell &amp;&amp; dropdown) {
+<span class="line-num">454</span>       bell.addEventListener(<span class="string">'click'</span>, <span class="keyword">function</span> (e) {
+<span class="line-num">456</span>           dropdown.classList.toggle(<span class="string">'hidden'</span>);
+<span class="line-num">459</span>           document.addEventListener(<span class="string">'click'</span>, <span class="keyword">function</span> () {
+<span class="line-num">460</span>               dropdown.classList.add(<span class="string">'hidden'</span>);
+<span class="line-num">461</span>           });
+<span class="line-num">462</span>   }
+<span class="line-num">463</span> });
+<span class="line-num">464</span> &lt;/script&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Campana y dropdown (header):</strong></p>
+                        <p>- El botón con <code>id="notif-bell"</code> muestra el icono de campana en la esquina superior derecha de "Mi Perfil".</p>
+                        <p>- El <code>span</code> con <code>id="notif-badge"</code> es el circulito rojo con el número de no leídas.</p>
+                        <p>- El contenedor <code>id="notif-dropdown"</code> es el cuadro flotante con scroll que se abre al hacer clic en la campana; su cuerpo es
+                            <code>id="notif-dropdown-body"</code>.</p>
+
+                        <p><strong>Tarjeta "Notificaciones" en el perfil:</strong></p>
+                        <p>- La sección <code>notifications-card</code> contiene un <code>div</code> con <code>id="notificaciones-container"</code> donde se dibuja la
+                            lista larga de notificaciones (como en tu segunda captura de pantalla).</p>
+
+                        <p><strong>Script de carga y estado de lectura:</strong></p>
+                        <p>- Al cargar la página (<code>DOMContentLoaded</code>) el script busca los elementos clave: campana, dropdown, badge y contenedor.</p>
+                        <p>- Usa <code>localStorage</code> con la clave <code>fitgym_notif_leidas</code> para recordar qué IDs de notificación ya se marcaron como leídas.</p>
+                        <p>- Las funciones <code>loadRead</code> y <code>saveRead</code> sincronizan ese mapa <code>readMap</code> con el almacenamiento local.</p>
+                        <p>- <code>updateBadge()</code> actualiza el número del badge rojo según <code>unreadCount</code> (mostrando "9+" si hay muchas).</p>
+
+                        <p><strong>Llamada a la API:</strong></p>
+                        <p>- Se hace un <code>fetch('/api/deportista/notificaciones')</code> con <code>credentials: 'same-origin'</code> para enviar la sesión actual.</p>
+                        <p>- Si la respuesta no es OK se muestra un mensaje de error; si la lista viene vacía, se muestra "No tienes notificaciones".</p>
+
+                        <p><strong>Renderizado de notificaciones:</strong></p>
+                        <p>- Para cada elemento del JSON:</p>
+                        <p>  • Se calcula si está leída en base a su <code>id</code> y <code>readMap</code>.</p>
+                        <p>  • Si no está leída, incrementa <code>unreadCount</code> para que el badge la tenga en cuenta.</p>
+                        <p>  • Crea un bloque grande en <code>notificaciones-container</code> con punto naranja, título, mensaje y una "x" para marcar como leída.</p>
+                        <p>  • Crea una fila compacta en <code>notif-dropdown-body</code> para el dropdown de la campana.</p>
+                        <p>- Cuando hay una <code>url</code> asociada, hacer clic en la tarjeta o la fila navega a la pantalla correspondiente
+                            (<code>/planes</code>, <code>/deportista/promociones</code>, <code>/reservas</code>, etc.).</p>
+
+                        <p><strong>Comportamiento de la campana:</strong></p>
+                        <p>- Al hacer clic en la campana se alterna la clase <code>hidden</code> en el dropdown para mostrarlo/ocultarlo.</p>
+                        <p>- Un listener global en <code>document</code> vuelve a ocultar el dropdown cuando se hace clic fuera.</p>
+
+                        <p><strong>Resumen:</strong> El HTML de perfil sólo define contenedores vacíos para la campana, el dropdown y la tarjeta de notificaciones. Toda la
+                            lógica de qué mostrar viene de la API <code>/api/deportista/notificaciones</code> y del JavaScript que construye dinámicamente
+                            las tarjetas y actualiza el contador de no leídas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📖 Documentación interactiva - Usa los botones superiores para navegar entre secciones del sistema de notificaciones del deportista</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content').forEach(function (el) {
+                el.classList.remove('active');
+            });
+
+            // Desactivar todos los botones
+            document.querySelectorAll('.nav-btn').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

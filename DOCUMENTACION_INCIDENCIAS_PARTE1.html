@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Incidencias Controller & HTML</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .nav-buttons { display: flex; gap: 10px; justify-content: center; padding: 20px; background: #f8f9fa; border-bottom: 2px solid #e9ecef; flex-wrap: wrap; }
+        .nav-btn { padding: 12px 24px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 1em; }
+        .nav-btn:hover { background: #667eea; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+        .nav-btn.active { background: #667eea; color: white; }
+        .content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .section-title { font-size: 2em; color: #667eea; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #667eea; }
+        .purpose-box { background: #e7f3ff; border-left: 5px solid #667eea; padding: 25px; margin-bottom: 35px; border-radius: 8px; }
+        .purpose-box h3 { color: #667eea; margin-bottom: 15px; font-size: 1.3em; font-weight: 700; }
+        .purpose-box p { color: #333; line-height: 1.8; font-size: 1.05em; }
+        .code-explanation { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; background: #f8f9fa; padding: 30px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; min-width: 900px; }
+        /* Versión apilada: código arriba, explicación abajo (para bloques muy anchos) */
+        .code-explanation-stacked { grid-template-columns: 1fr; }
+        .code-column { background: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; }
+        .code-column h4 { color: #667eea; margin-bottom: 20px; font-size: 1.2em; padding-bottom: 12px; border-bottom: 3px solid #667eea; font-weight: 700; }
+        .code-block { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 6px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 1em; line-height: 1.6; margin-bottom: 15px; white-space: pre; }
+        .code-block .line-num { color: #888; margin-right: 15px; display: inline-block; width: 35px; text-align: right; font-weight: bold; }
+        .keyword { color: #ff79c6; font-weight: bold; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .class-name { color: #8be9fd; font-weight: bold; }
+        .method { color: #50fa7b; }
+        .number { color: #bd93f9; }
+        .explanation { color: #333; line-height: 2; font-size: 1em; }
+        .explanation strong { color: #667eea; font-weight: 700; }
+        .explanation p { margin-bottom: 12px; }
+        .line-item { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e9ecef; }
+        .line-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .line-number { display: inline-block; background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right: 10px; font-size: 0.9em; }
+        .responsive-note { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 8px; color: #856404; }
+        .responsive-note strong { color: #664d03; }
+        @media (max-width: 1024px) { .code-explanation { grid-template-columns: 1fr; min-width: auto; } .header h1 { font-size: 1.8em; } .nav-buttons { flex-direction: column; } .nav-btn { width: 100%; } }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Documentación Incidencias</h1>
+            <p>Análisis línea por línea del Controller y Template HTML</p>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('controller-imports')">1. Controller - Imports</button>
+            <button class="nav-btn" onclick="showSection('controller-class')">2. Controller - Clase</button>
+            <button class="nav-btn" onclick="showSection('controller-listar')">3. Controller - Listar</button>
+            <button class="nav-btn" onclick="showSection('controller-crear')">4. Controller - Crear</button>
+            <button class="nav-btn" onclick="showSection('controller-estado')">5. Controller - Estado</button>
+            <button class="nav-btn" onclick="showSection('html-estructura')">6. HTML - Estructura</button>
+            <button class="nav-btn" onclick="showSection('html-filtros')">7. HTML - Filtros</button>
+            <button class="nav-btn" onclick="showSection('html-modal')">8. HTML - Modal</button>
+            <button class="nav-btn" onclick="showSection('html-javascript')">9. HTML - JavaScript</button>
+        </div>
+        
+        <!-- SECCIÓN 1: CONTROLLER IMPORTS -->
+        <div id="controller-imports" class="content active">
+            <h2 class="section-title">1️⃣ Controller - Importaciones y Anotaciones</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Las importaciones traen las clases necesarias desde librerías externas y del proyecto. Las anotaciones son instrucciones que le dicen a Spring qué hacer con esta clase.</p>
+            </div>
+            
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="comment">/** Controller de incidencias: gestiona listado, creación y cambio de estado. */</span>
+<span class="line-num">2</span> <span class="keyword">@Controller</span>
+<span class="line-num">3</span> <span class="keyword">public class</span> <span class="class-name">IncidenciaController</span> { }
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 1:</strong> Comentario de documentación que resume la responsabilidad del controlador de incidencias.</p>
+                        <p><strong>Línea 2:</strong> <code>@Controller</code> marca esta clase como un controlador MVC de Spring.</p>
+                        <p><strong>Línea 3:</strong> Definición de la clase <code>IncidenciaController</code>, que agrupa todos los endpoints relacionados con incidencias.</p>
+                        <p><strong>Nota:</strong> En el código real, antes de esta clase se declaran las importaciones necesarias (DTOs, modelos y anotaciones de Spring), pero aquí se omiten para mantener el ejemplo más limpio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 2: CONTROLLER CLASS -->
+        <div id="controller-class" class="content">
+            <h2 class="section-title">2️⃣ Controller - Definición de Clase y Constructor</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define la clase controladora y sus dependencias. El constructor inyecta (recibe) los repositorios y servicios necesarios para acceder a la base de datos.</p>
+            </div>
+            
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">18</span> <span class="keyword">@Controller</span>
+<span class="line-num">19</span> <span class="keyword">public class</span> <span class="class-name">IncidenciaController</span> {
+<span class="line-num">20</span>     <span class="keyword">private final</span> IncidenciaRepository incidenciaRepository;
+<span class="line-num">21</span>     <span class="keyword">private final</span> PersonaRepository personaRepository;
+<span class="line-num">22</span>     <span class="keyword">private final</span> UsuarioRepository usuarioRepository;
+<span class="line-num">23</span>     <span class="keyword">private final</span> IncidenciaViewService incidenciaViewService;
+<span class="line-num">25</span>     <span class="keyword">public</span> <span class="method">IncidenciaController</span>(
+<span class="line-num">26</span>             IncidenciaRepository incidenciaRepository,
+<span class="line-num">27</span>             PersonaRepository personaRepository,
+<span class="line-num">28</span>             UsuarioRepository usuarioRepository,
+<span class="line-num">29</span>             IncidenciaViewService incidenciaViewService) {
+<span class="line-num">30</span>         <span class="keyword">this</span>.incidenciaRepository = incidenciaRepository;
+<span class="line-num">31</span>         <span class="keyword">this</span>.personaRepository = personaRepository;
+<span class="line-num">32</span>         <span class="keyword">this</span>.usuarioRepository = usuarioRepository;
+<span class="line-num">33</span>         <span class="keyword">this</span>.incidenciaViewService = incidenciaViewService;
+<span class="line-num">34</span>     }
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 20-21:</strong> Declaran campos privados y <em>final</em>, es decir, referencias que se asignan una sola vez en el constructor y luego no cambian. Aquí se guardan los repositorios y servicios que el controller necesita para trabajar.</p>
+                        <p><strong>IncidenciaRepository:</strong> Accede a la tabla de incidencias en la base de datos (guardar, buscar, filtrar incidencias).</p>
+                        <p><strong>PersonaRepository / UsuarioRepository:</strong> Permiten encontrar a la persona o usuario que reporta o a quien se asigna una incidencia, típicamente por email u otros campos.</p>
+                        <p><strong>IncidenciaViewService:</strong> Convierte la entidad <span class="class-name">Incidencia</span> en un <span class="class-name">IncidenciaViewDTO</span> listo para la vista, separando la lógica de presentación (nombres, imágenes, textos) de la entidad de base de datos.</p>
+                        <p><strong>Línea 25:</strong> Define el constructor público que recibe todas estas dependencias como parámetros. Spring se encarga de pasar instancias reales cuando crea el controller.</p>
+                        <p><strong>Línea 30-31:</strong> Asignan los parámetros recibidos a las variables de la clase usando <span class="keyword">this</span>, quedando disponibles para usarse en los demás métodos del controller.</p>
+                        <p><strong>Concepto (para qué sirve):</strong> Esto implementa el patrón de <strong>inyección de dependencias</strong>. El controller no crea directamente los repositorios, sino que los recibe ya construidos por Spring, lo que hace el código más fácil de probar, mantener y extender.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 3: CONTROLLER LISTAR -->
+        <div id="controller-listar" class="content">
+            <h2 class="section-title">3️⃣ Controller - Método Listar (GET /incidencias)</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Maneja las peticiones GET a /incidencias. Filtra incidencias por estado, prioridad y búsqueda, luego envía los datos al HTML.</p>
+            </div>
+            
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">35</span> <span class="keyword">@GetMapping</span>(<span class="string">"/incidencias"</span>)
+<span class="line-num">36</span> <span class="keyword">public String</span> <span class="method">listar</span>(
+<span class="line-num">37</span>     <span class="keyword">@RequestParam</span>(required = <span class="keyword">false</span>, defaultValue = <span class="string">"todos"</span>) String estado,
+<span class="line-num">38</span>     <span class="keyword">@RequestParam</span>(required = <span class="keyword">false</span>, defaultValue = <span class="string">"todas"</span>) String prioridad,
+<span class="line-num">39</span>     <span class="keyword">@RequestParam</span>(required = <span class="keyword">false</span>) String buscar,
+<span class="line-num">40</span>     Model model) {
+<span class="line-num">42</span>     <span class="comment">// Mapear valores UI -> BD</span>
+<span class="line-num">43</span>     String estadoDb = <span class="keyword">null</span>;
+<span class="line-num">44</span>     <span class="keyword">if</span> (<span class="string">"ABIERTO"</span>.equalsIgnoreCase(estado)) estadoDb = <span class="string">"Abierta"</span>;
+<span class="line-num">45</span>     <span class="keyword">else if</span> (<span class="string">"RESUELTO"</span>.equalsIgnoreCase(estado)) estadoDb = <span class="string">"Resuelto"</span>;
+<span class="line-num">47</span>     String prioridadDb = <span class="keyword">null</span>;
+<span class="line-num">48</span>     <span class="keyword">if</span> (<span class="string">"ALTA"</span>.equalsIgnoreCase(prioridad)) prioridadDb = <span class="string">"Alta"</span>;
+<span class="line-num">49</span>     <span class="keyword">else if</span> (<span class="string">"MEDIA"</span>.equalsIgnoreCase(prioridad)) prioridadDb = <span class="string">"Media"</span>;
+<span class="line-num">50</span>     <span class="keyword">else if</span> (<span class="string">"BAJA"</span>.equalsIgnoreCase(prioridad)) prioridadDb = <span class="string">"Baja"</span>;
+<span class="line-num">52</span>     List&lt;Incidencia&gt; list = incidenciaRepository.<span class="method">findFiltered</span>(
+<span class="line-num">53</span>             estado == <span class="keyword">null</span> ? <span class="string">"todos"</span> : estado,
+<span class="line-num">54</span>             estadoDb,
+<span class="line-num">55</span>             prioridad == <span class="keyword">null</span> ? <span class="string">"todas"</span> : prioridad,
+<span class="line-num">56</span>             prioridadDb,
+<span class="line-num">57</span>             buscar == <span class="keyword">null</span> ? <span class="string">""</span> : buscar.trim());
+<span class="line-num">60</span>     List&lt;IncidenciaViewDTO&gt; viewList = list.<span class="method">stream</span>()
+<span class="line-num">61</span>         .<span class="method">map</span>(incidenciaViewService::<span class="method">toView</span>)
+<span class="line-num">62</span>         .<span class="method">collect</span>(Collectors.<span class="method">toList</span>());
+<span class="line-num">64</span>     <span class="keyword">long</span> totalInc = incidenciaRepository.<span class="method">total</span>();
+<span class="line-num">65</span>     <span class="keyword">long</span> abiertas = incidenciaRepository.<span class="method">abiertas</span>();
+<span class="line-num">66</span>     <span class="keyword">long</span> resueltas = incidenciaRepository.<span class="method">resueltas</span>();
+<span class="line-num">68</span>     model.<span class="method">addAttribute</span>(<span class="string">"incidencias"</span>, viewList);
+<span class="line-num">69</span>     model.<span class="method">addAttribute</span>(<span class="string">"totalIncidencias"</span>, totalInc);
+<span class="line-num">70</span>     model.<span class="method">addAttribute</span>(<span class="string">"abiertas"</span>, abiertas);
+<span class="line-num">71</span>     model.<span class="method">addAttribute</span>(<span class="string">"resueltas"</span>, resueltas);
+<span class="line-num">72</span>     model.<span class="method">addAttribute</span>(<span class="string">"buscarActual"</span>, buscar == <span class="keyword">null</span> ? <span class="string">""</span> : buscar);
+<span class="line-num">73</span>     model.<span class="method">addAttribute</span>(<span class="string">"estadoActual"</span>, estado == <span class="keyword">null</span> ? <span class="string">"todos"</span> : estado);
+<span class="line-num">74</span>     model.<span class="method">addAttribute</span>(<span class="string">"prioridadActual"</span>, prioridad == <span class="keyword">null</span> ? <span class="string">"todas"</span> : prioridad);
+<span class="line-num">76</span>     <span class="keyword">return</span> <span class="string">"incidencias"</span>;
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 35:</strong> @GetMapping mapea peticiones GET a /incidencias a este método.</p>
+                        <p><strong>Línea 37-39:</strong> @RequestParam recibe parámetros de la URL. Si no vienen, usan valores por defecto.</p>
+                        <p><strong>Línea 44-45:</strong> Convierten valores de la UI (mayúsculas) a valores de BD (con mayúscula inicial).</p>
+                        <p><strong>Línea 60-62:</strong> Usa Streams de Java para convertir cada Incidencia a IncidenciaViewDTO.</p>
+                        <p><strong>Línea 68:</strong> Agrega datos al Model con addAttribute. Estos datos estarán disponibles en el HTML.</p>
+                        <p><strong>Línea 76:</strong> Retorna "incidencias" (nombre del template HTML a renderizar).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 4: CONTROLLER CREAR -->
+        <div id="controller-crear" class="content">
+            <h2 class="section-title">4️⃣ Controller - Método Crear (POST /incidencias)</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Maneja las peticiones POST para crear una nueva incidencia. Recibe datos del formulario, los procesa y los guarda en la BD.</p>
+            </div>
+            
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">79</span> <span class="keyword">@PostMapping</span>({<span class="string">"/incidencias"</span>, <span class="string">"/incidencias/crear"</span>})
+<span class="line-num">80</span> <span class="keyword">public String</span> <span class="method">crear</span>(
+<span class="line-num">81</span>     <span class="keyword">@RequestParam</span> String titulo,
+<span class="line-num">82</span>     <span class="keyword">@RequestParam</span> String descripcion,
+<span class="line-num">86</span>     <span class="keyword">@RequestParam</span>(required = <span class="keyword">false</span>) <span class="keyword">byte</span>[] imagenes
+<span class="line-num">87</span> ) {
+<span class="line-num">88</span>     Incidencia i = <span class="keyword">new</span> <span class="class-name">Incidencia</span>();
+<span class="line-num">89</span>     i.<span class="method">setTitulo</span>(titulo);
+<span class="line-num">100</span>     i.<span class="method">setImagenes</span>(imagenes);
+<span class="line-num">106</span>     i.<span class="method">setPrioridad</span>(pr);
+<span class="line-num">107</span>     i.<span class="method">setEstado</span>(<span class="string">"Abierta"</span>);
+<span class="line-num">119</span>     incidenciaRepository.<span class="method">save</span>(i);
+<span class="line-num">120</span>     <span class="keyword">return</span> <span class="string">"redirect:/incidencias"</span>;
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 79:</strong> @PostMapping mapea peticiones POST a dos rutas.</p>
+                        <p><strong>Línea 81-86:</strong> @RequestParam recibe datos del formulario. required=false significa que es opcional.</p>
+                        <p><strong>Línea 88:</strong> Crea una nueva instancia de Incidencia.</p>
+                        <p><strong>Línea 89:</strong> Asigna el título.</p>
+                        <p><strong>Línea 100:</strong> Asigna las imágenes como datos binarios (byte[]).</p>
+                        <p><strong>Línea 107:</strong> Todas las incidencias nuevas comienzan en estado "Abierta".</p>
+                        <p><strong>Línea 119:</strong> Guarda la incidencia en la BD.</p>
+                        <p><strong>Línea 120:</strong> Redirige a /incidencias (recarga la página).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 5: CONTROLLER ESTADO -->
+        <div id="controller-estado" class="content">
+            <h2 class="section-title">5️⃣ Controller - Método Actualizar Estado (PUT /incidencias/{id}/estado)</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Maneja peticiones PUT/POST para cambiar el estado de una incidencia (Abierta → Resuelto). Retorna JSON con la respuesta.</p>
+            </div>
+            
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">122</span> <span class="keyword">@RequestMapping</span>(value = <span class="string">"/incidencias/{id}/estado"</span>, 
+<span class="line-num">123</span>     method = {RequestMethod.POST, RequestMethod.PUT})
+<span class="line-num">124</span> <span class="keyword">@ResponseBody</span>
+<span class="line-num">125</span> <span class="keyword">public</span> Map&lt;String, Object&gt; <span class="method">actualizarEstado</span>(
+<span class="line-num">126</span>     <span class="keyword">@PathVariable</span> <span class="keyword">long</span> id, 
+<span class="line-num">137</span>     Incidencia i = incidenciaRepository.<span class="method">findById</span>(id).<span class="method">orElse</span>(<span class="keyword">null</span>);
+<span class="line-num">140</span>     <span class="keyword">if</span> (<span class="string">"RESUELTO"</span>.<span class="method">equalsIgnoreCase</span>(nuevoEstado)) {
+<span class="line-num">141</span>         i.<span class="method">setEstado</span>(<span class="string">"Resuelto"</span>);
+<span class="line-num">142</span>         i.<span class="method">setFechaCierre</span>(OffsetDateTime.<span class="method">now</span>(...));
+<span class="line-num">148</span>     incidenciaRepository.<span class="method">save</span>(i);
+<span class="line-num">150</span>     resp.<span class="method">put</span>(<span class="string">"success"</span>, <span class="keyword">true</span>);
+<span class="line-num">152</span>     <span class="keyword">return</span> resp;
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 122-123:</strong> @RequestMapping mapea a /incidencias/{id}/estado. Acepta POST y PUT.</p>
+                        <p><strong>Línea 124:</strong> @ResponseBody convierte el retorno a JSON automáticamente.</p>
+                        <p><strong>Línea 126:</strong> @PathVariable extrae {id} de la URL.</p>
+                        <p><strong>Línea 137:</strong> Busca la incidencia por ID. Si no existe, retorna error.</p>
+                        <p><strong>Línea 140-142:</strong> Si el nuevo estado es "RESUELTO", lo cambia y asigna fecha de cierre.</p>
+                        <p><strong>Línea 148:</strong> Guarda los cambios en la BD.</p>
+                        <p><strong>Línea 150-152:</strong> Retorna un JSON con success=true y el nuevo estado.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 6: HTML ESTRUCTURA -->
+        <div id="html-estructura" class="content">
+            <h2 class="section-title">6️⃣ HTML - Estructura Básica y Headers</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define la estructura HTML, importa estilos y scripts, y crea el header con el título y botón de nueva incidencia.</p>
+            </div>
+            
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="keyword">&lt;!DOCTYPE html&gt;</span>
+<span class="line-num">2</span> <span class="keyword">&lt;html</span> lang=<span class="string">"es"</span> xmlns:th=<span class="string">"http://www.thymeleaf.org"</span><span class="keyword">&gt;</span>
+<span class="line-num">4</span> <span class="keyword">&lt;meta</span> charset=<span class="string">"UTF-8"</span><span class="keyword">&gt;</span>
+<span class="line-num">5</span> <span class="keyword">&lt;meta</span> name=<span class="string">"viewport"</span> content=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="keyword">&gt;</span>
+<span class="line-num">7</span> <span class="keyword">&lt;script</span> src=<span class="string">"https://cdn.tailwindcss.com"</span><span class="keyword">&gt;&lt;/script&gt;</span>
+<span class="line-num">9</span> <span class="keyword">&lt;link</span> rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/Estilos/sidebar-common.css}"</span><span class="keyword">&gt;</span>
+<span class="line-num">22</span> <span class="keyword">&lt;body</span> class=<span class="string">"bg-gray-100 font-sans"</span><span class="keyword">&gt;</span>
+<span class="line-num">24</span> <span class="keyword">&lt;th:block</span> th:replace=<span class="string">"fragments/sidebar :: sidebar('incidencias')"</span><span class="keyword">&gt;&lt;/th:block&gt;</span>
+<span class="line-num">36</span> <span class="keyword">&lt;button</span> id=<span class="string">"btn-nueva-incidencia"</span> class=<span class="string">"px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"</span><span class="keyword">&gt;</span>
+<span class="line-num">40</span>     Nueva Incidencia
+<span class="line-num">41</span> <span class="keyword">&lt;/button&gt;</span>
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 1:</strong> Declara que es un documento HTML5.</p>
+                        <p><strong>Línea 2:</strong> Abre HTML en español. xmlns:th permite usar Thymeleaf (motor de templates de Spring).</p>
+                        <p><strong>Línea 4:</strong> UTF-8 para caracteres especiales.</p>
+                        <p><strong>Línea 5:</strong> Viewport para que sea responsive en móviles.</p>
+                        <p><strong>Línea 7:</strong> Importa Tailwind CSS (estilos).</p>
+                        <p><strong>Línea 9:</strong> th:href usa Thymeleaf para generar URLs dinámicas. @{} es la sintaxis de Thymeleaf.</p>
+                        <p><strong>Línea 24:</strong> th:replace incluye el sidebar (menú lateral) desde otro archivo.</p>
+                        <p><strong>Línea 36:</strong> Botón "Nueva Incidencia" con id para abrir modal.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 7: HTML FILTROS -->
+        <div id="html-filtros" class="content">
+            <h2 class="section-title">7️⃣ HTML - Sección de Filtros y Estadísticas</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Muestra tarjetas con estadísticas (total, abiertas, resueltas) y un formulario para filtrar incidencias por estado, prioridad y búsqueda.</p>
+            </div>
+            
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">49</span> <span class="keyword">&lt;div</span> class=<span class="string">"grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"</span><span class="keyword">&gt;</span>
+<span class="line-num">50</span>     <span class="keyword">&lt;div</span> class=<span class="string">"bg-white p-6 rounded-lg shadow"</span><span class="keyword">&gt;</span>
+<span class="line-num">52</span>         <span class="keyword">&lt;p</span> th:text=<span class="string">"${totalIncidencias}"</span><span class="keyword">&gt;</span>0<span class="keyword">&lt;/p&gt;</span>
+<span class="line-num">57</span>         <span class="keyword">&lt;p</span> class=<span class="string">"text-2xl font-bold text-red-500 mt-2"</span> th:text=<span class="string">"${abiertas}"</span><span class="keyword">&gt;</span>0<span class="keyword">&lt;/p&gt;</span>
+<span class="line-num">62</span>         <span class="keyword">&lt;p</span> class=<span class="string">"text-2xl font-bold text-green-500 mt-2"</span> th:text=<span class="string">"${resueltas}"</span><span class="keyword">&gt;</span>0<span class="keyword">&lt;/p&gt;</span>
+<span class="line-num">69</span>     <span class="keyword">&lt;form</span> th:action=<span class="string">"@{/incidencias}"</span> method=<span class="string">"get"</span><span class="keyword">&gt;</span>
+<span class="line-num">72</span>         <span class="keyword">&lt;input</span> type=<span class="string">"text"</span> name=<span class="string">"buscar"</span> th:value=<span class="string">"${buscarActual}"</span> <span class="keyword">&gt;</span>
+<span class="line-num">79</span>         <span class="keyword">&lt;select</span> name=<span class="string">"estado"</span> th:value=<span class="string">"${estadoActual}"</span><span class="keyword">&gt;</span>
+<span class="line-num">81</span>             <span class="keyword">&lt;option</span> value=<span class="string">"ABIERTO"</span> th:selected=<span class="string">"${estadoActual == 'ABIERTO'}"</span><span class="keyword">&gt;</span>Abierto<span class="keyword">&lt;/option&gt;</span>
+<span class="line-num">98</span>         <span class="keyword">&lt;button</span> type=<span class="string">"submit"</span> class=<span class="string">"px-4 py-2 bg-orange-500 text-white rounded-md"</span><span class="keyword">&gt;</span>Filtrar<span class="keyword">&lt;/button&gt;</span>
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 49:</strong> grid grid-cols-1 md:grid-cols-3 crea 3 columnas en pantallas medianas, 1 en móviles.</p>
+                        <p><strong>Línea 52:</strong> th:text="${totalIncidencias}" reemplaza el contenido con el valor del controller.</p>
+                        <p><strong>Línea 57:</strong> Muestra incidencias abiertas en rojo (text-red-500).</p>
+                        <p><strong>Línea 62:</strong> Muestra incidencias resueltas en verde (text-green-500).</p>
+                        <p><strong>Línea 69:</strong> Formulario GET que envía filtros a /incidencias.</p>
+                        <p><strong>Línea 72:</strong> Campo de búsqueda. th:value mantiene el valor anterior.</p>
+                        <p><strong>Línea 79-81:</strong> Select con opciones. th:selected marca la opción actual.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 8: HTML MODAL -->
+        <div id="html-modal" class="content">
+            <h2 class="section-title">8️⃣ HTML - Modal de Nueva Incidencia</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Muestra un modal (ventana emergente) con un formulario para crear una nueva incidencia. Incluye campos para título, descripción, imágenes, etc.</p>
+            </div>
+            
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">181</span> <span class="keyword">&lt;div</span> id=<span class="string">"modal-nueva-incidencia"</span> class=<span class="string">"fixed inset-0 bg-black bg-opacity-50 hidden"</span><span class="keyword">&gt;</span>
+<span class="line-num">182</span>     <span class="keyword">&lt;div</span> class=<span class="string">"bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-8"</span><span class="keyword">&gt;</span>
+<span class="line-num">191</span>         <span class="keyword">&lt;form</span> id=<span class="string">"form-nueva-incidencia"</span> th:action=<span class="string">"@{/incidencias}"</span> method=<span class="string">"post"</span><span class="keyword">&gt;</span>
+<span class="line-num">194</span>             <span class="keyword">&lt;input</span> type=<span class="string">"text"</span> id=<span class="string">"inc-titulo"</span> name=<span class="string">"titulo"</span> required<span class="keyword">&gt;</span>
+<span class="line-num">199</span>             <span class="keyword">&lt;textarea</span> id=<span class="string">"inc-descripcion"</span> name=<span class="string">"descripcion"</span> rows=<span class="string">"4"</span> required<span class="keyword">&gt;&lt;/textarea&gt;</span>
+<span class="line-num">234</span>             <span class="keyword">&lt;input</span> type=<span class="string">"file"</span> id=<span class="string">"inc-imagen"</span> accept=<span class="string">"image/*"</span> multiple<span class="keyword">&gt;</span>
+<span class="line-num">237</span>             <span class="keyword">&lt;input</span> type=<span class="string">"hidden"</span> name=<span class="string">"imagenes"</span> id=<span class="string">"inc-imagenes"</span><span class="keyword">&gt;</span>
+<span class="line-num">248</span>             <span class="keyword">&lt;button</span> type=<span class="string">"submit"</span> id=<span class="string">"modal-save"</span> class=<span class="string">"px-6 py-3 bg-orange-500 text-white rounded-lg"</span><span class="keyword">&gt;</span>Guardar Incidencia<span class="keyword">&lt;/button&gt;</span>
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 181:</strong> fixed inset-0 posiciona el modal en toda la pantalla. hidden lo oculta inicialmente.</p>
+                        <p><strong>Línea 182:</strong> max-w-2xl limita el ancho máximo del modal.</p>
+                        <p><strong>Línea 191:</strong> Formulario POST a /incidencias. th:action genera la URL.</p>
+                        <p><strong>Línea 194:</strong> Campo de texto para el título. required lo hace obligatorio.</p>
+                        <p><strong>Línea 199:</strong> Textarea para descripción (múltiples líneas).</p>
+                        <p><strong>Línea 234:</strong> Input file para seleccionar imágenes. accept="image/*" filtra solo imágenes. multiple permite varias.</p>
+                        <p><strong>Línea 237:</strong> Input hidden que guarda las imágenes como JSON.</p>
+                        <p><strong>Línea 248:</strong> Botón submit para enviar el formulario.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SECCIÓN 9: HTML JAVASCRIPT -->
+        <div id="html-javascript" class="content">
+            <h2 class="section-title">9️⃣ HTML - JavaScript (Funcionalidad)</h2>
+            
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>JavaScript maneja la interactividad: abrir/cerrar modales, cambiar estado de incidencias, cargar imágenes, etc.</p>
+            </div>
+            
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">273</span> <span class="keyword">const</span> btnNuevaIncidencia = document.<span class="method">getElementById</span>(<span class="string">'btn-nueva-incidencia'</span>);
+<span class="line-num">274</span> <span class="keyword">const</span> modal = document.<span class="method">getElementById</span>(<span class="string">'modal-nueva-incidencia'</span>);
+<span class="line-num">286</span> <span class="keyword">function</span> <span class="method">openModal</span>() {
+<span class="line-num">287</span>     modal.classList.<span class="method">remove</span>(<span class="string">'hidden'</span>);
+<span class="line-num">288</span>     modal.classList.<span class="method">add</span>(<span class="string">'flex'</span>);
+<span class="line-num">289</span>     document.body.style.overflow = <span class="string">'hidden'</span>;
+<span class="line-num">290</span> }
+<span class="line-num">303</span> btnNuevaIncidencia.<span class="method">addEventListener</span>(<span class="string">'click'</span>, openModal);
+<span class="line-num">316</span> inputImagen.<span class="method">addEventListener</span>(<span class="string">'change'</span>, (e) => {
+<span class="line-num">317</span>     <span class="keyword">const</span> files = Array.<span class="method">from</span>(e.target.files);
+<span class="line-num">326</span>     <span class="keyword">if</span> (file.size > <span class="number">5</span> * <span class="number">1024</span> * <span class="number">1024</span>) {
+<span class="line-num">327</span>         alert(<span class="string">`La imagen "${file.name}" es muy grande. Máximo 5MB.`</span>);
+<span class="line-num">334</span>         <span class="keyword">const</span> reader = <span class="keyword">new</span> FileReader();
+<span class="line-num">335</span>         reader.<span class="method">onload</span> = (event) => {
+<span class="line-num">336</span>             <span class="keyword">const</span> dataUrl = event.target.result;
+<span class="line-num">337</span>             imagenesDataUrls.<span class="method">push</span>(dataUrl);
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 273-274:</strong> Obtiene referencias a elementos HTML usando getElementById.</p>
+                        <p><strong>Línea 286-290:</strong> Función openModal que muestra el modal removiendo 'hidden' y agregando 'flex'.</p>
+                        <p><strong>Línea 289:</strong> Oculta el scroll del body para que no se pueda desplazar.</p>
+                        <p><strong>Línea 303:</strong> addEventListener agrega un listener al botón. Cuando se hace click, ejecuta openModal.</p>
+                        <p><strong>Línea 316-317:</strong> Cuando el usuario selecciona archivos, convierte FileList a Array.</p>
+                        <p><strong>Línea 326-327:</strong> Valida que las imágenes no superen 5MB.</p>
+                        <p><strong>Línea 334-337:</strong> FileReader lee el archivo y lo convierte a dataUrl (base64) para mostrar preview.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código (Cambio de Estado)</h4>
+                    <div class="code-block">
+<span class="line-num">572</span> document.<span class="method">addEventListener</span>(<span class="string">'change'</span>, (e) => {
+<span class="line-num">573</span>     <span class="keyword">if</span> (e.target.classList.<span class="method">contains</span>(<span class="string">'select-estado'</span>)) {
+<span class="line-num">577</span>         <span class="keyword">if</span> (value === <span class="string">'RESUELTO'</span>) {
+<span class="line-num">607</span>             fetch(<span class="string">`/incidencias/${incidenciaId}/estado`</span>, {
+<span class="line-num">608</span>                 method: <span class="string">'PUT'</span>,
+<span class="line-num">610</span>                 headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+<span class="line-num">612</span>                 body: JSON.<span class="method">stringify</span>(<span class="string">'RESUELTO'</span>)
+<span class="line-num">613</span>             })
+<span class="line-num">614</span>             .<span class="method">then</span>(response => response.<span class="method">json</span>())
+<span class="line-num">615</span>             .<span class="method">then</span>(data => {
+<span class="line-num">620</span>                 statusBadge.textContent = <span class="string">'Resuelto'</span>;
+<span class="line-num">621</span>                 statusBadge.className = <span class="string">'px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full status-badge'</span>;
+                    </div>
+                </div>
+                
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 572-573:</strong> Escucha cambios en selects. Si el select tiene clase 'select-estado'...</p>
+                        <p><strong>Línea 577:</strong> Si el valor seleccionado es 'RESUELTO'...</p>
+                        <p><strong>Línea 607-612:</strong> Usa fetch (AJAX) para enviar PUT a /incidencias/{id}/estado con el nuevo estado en JSON.</p>
+                        <p><strong>Línea 614:</strong> .then(response => response.json()) espera la respuesta y la convierte a JSON.</p>
+                        <p><strong>Línea 615:</strong> .then(data => {...}) procesa los datos recibidos.</p>
+                        <p><strong>Línea 620-621:</strong> Actualiza visualmente el badge del estado a "Resuelto" en verde.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>📖 Documentación interactiva - Haz click en los botones de arriba para navegar entre secciones</p>
+        </div>
+    </div>
+    
+    <script>
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Desactivar todos los botones
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

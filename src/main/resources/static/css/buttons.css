@@ -163,9 +163,10 @@
 
 /* Grupo de botones */
 .btn-group {
-  display: flex;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .btn-group-vertical {

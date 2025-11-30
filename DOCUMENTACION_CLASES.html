@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación - Gestión de Clases</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            color: #111827;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+        .header {
+            margin-bottom: 24px;
+            padding: 20px 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+            border: 1px solid #e5e7eb;
+        }
+        .header h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            color: #111827;
+        }
+        .header p {
+            margin: 0;
+            color: #4b5563;
+        }
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .nav-btn {
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .nav-btn:hover {
+            background: #f97316;
+            border-color: #f97316;
+            color: white;
+        }
+        .section {
+            margin-bottom: 32px;
+            padding: 20px 24px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+        }
+        .section h2 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            color: #111827;
+        }
+        .section h3 {
+            margin: 20px 0 8px;
+            font-size: 15px;
+            color: #16a34a;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #ecfdf3;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            margin-right: 6px;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            margin-right: 4px;
+        }
+        .explanation {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #374151;
+        }
+        .explanation p {
+            margin: 4px 0 8px;
+        }
+        .explanation ul {
+            margin: 4px 0 12px 18px;
+            padding: 0;
+        }
+        .explanation li {
+            margin-bottom: 4px;
+        }
+        .two-columns {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr);
+            gap: 20px;
+            align-items: flex-start;
+            overflow-x: auto;
+            min-width: 900px;
+        }
+        .code-block {
+            width: 100%;
+            min-height: 200px;
+            max-height: 520px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 1px solid #1f2937;
+            background: #020617;
+            color: #e5e7eb;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: auto;
+            resize: vertical;
+        }
+        .code-block:focus {
+            outline: none;
+        }
+        .hint-box {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            font-size: 13px;
+            color: #92400e;
+        }
+        .footer {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #6b7280;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .two-columns {
+                grid-template-columns: minmax(0, 1fr);
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📚 Documentación - Gestión de Clases</h1>
+        <p>Explica el funcionamiento completo del controlador <strong>ClasesController</strong> y la vista <strong>clases.html</strong> (pantalla de cupos de clases), con código línea por línea y comentarios en español.</p>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="location.hash='#sec-controller-overview'">1. Controller - Visión general</button>
+        <button class="nav-btn" onclick="location.hash='#sec-controller-listar'">2. Controller - GET /clases (listar)</button>
+        <button class="nav-btn" onclick="location.hash='#sec-controller-api'">3. Controller - API JSON (crear / editar / eliminar)</button>
+        <button class="nav-btn" onclick="location.hash='#sec-view-layout'">4. Vista clases.html - Layout y filtros</button>
+        <button class="nav-btn" onclick="location.hash='#sec-view-modals-js'">5. Vista clases.html - Modales & JavaScript</button>
+    </div>
+
+    <!-- 1. CONTROLLER - VISIÓN GENERAL -->
+    <section id="sec-controller-overview" class="section">
+        <h2><span class="badge">1</span>Controller <code>ClasesController</code> - Visión general</h2>
+        <div class="explanation">
+            <p>Este controlador se encarga de <strong>toda la gestión de clases grupales</strong> dentro del sistema:</p>
+            <ul>
+                <li><strong>Listado de clases</strong> con filtros por texto y período de fechas (hoy, semana, mes, todas).</li>
+                <li><strong>Estadísticas</strong> en la cabecera: total de clases, clases llenas y total de cupos.</li>
+                <li><strong>API REST JSON</strong> para crear, actualizar y eliminar clases desde el modal de la vista.</li>
+                <li><strong>Conversión de fechas</strong> entre <code>LocalDate</code> / <code>LocalTime</code> y <code>OffsetDateTime</code> para guardar en BD.</li>
+                <li><strong>Relación con otras entidades</strong>: tipos de clase, entrenadores (usuarios) y reservas.</li>
+            </ul>
+            <p>A continuación se muestra el código completo de la clase (sin imports) y después se desglosa cada método.</p>
+        </div>
+
+        <h3>Código completo de <code>ClasesController</code> (sin imports)</h3>
+        <textarea class="code-block" readonly>
+/**
+ * Controlador de Clases - Gestión de clases grupales
+ * Ruta: /clases | Acceso: ADMIN, RECEPCIONISTA, ENTRENADOR
+ * Tablas: clases, reserva_clase, usuarios (entrenadores)
+ * CRUD completo + API REST JSON
+ */
+@Controller
+public class ClasesController {
+
+    // [1] Dependencias del controlador (repositorios y servicios)
+    private final ClaseRepository claseRepository;
+    private final ReservaClaseRepository reservaClaseRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final ClaseViewService claseViewService;
+    private final TipoClaseRepository tipoClaseRepository;
+
+    public ClasesController(ClaseRepository claseRepository,
+                            ReservaClaseRepository reservaClaseRepository,
+                            UsuarioRepository usuarioRepository,
+                            ClaseViewService claseViewService,
+                            TipoClaseRepository tipoClaseRepository) {
+        this.claseRepository = claseRepository;
+        this.reservaClaseRepository = reservaClaseRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.claseViewService = claseViewService;
+        this.tipoClaseRepository = tipoClaseRepository;
+    }
+
+    // [2] Método listar (/clases) - vista principal con filtros, totales y paginación
+
+    /**
+     * GET /clases - Lista todas las clases con estadísticas
+     * Permite búsqueda por nombre/descripción
+     * Muestra: total clases, clases llenas, total cupos
+     */
+    @GetMapping("/clases")
+    public String listar(@RequestParam(required = false) String buscar,
+                         @RequestParam(defaultValue = "hoy") String periodo,
+                         @RequestParam(required = false) String fechaInicio,
+                         @RequestParam(defaultValue = "0") int page,
+                         Model model) {
+        // Calcular rango de fechas según el periodo
+        LocalDate hoy = LocalDate.now();
+        if (periodo == null || periodo.isBlank()) {
+            periodo = "hoy";
+        }
+        LocalDate inicio = null;
+        LocalDate fin = null;
+
+        // Calcular rango de fechas según el período
+        switch (periodo) {
+            case "hoy":
+                inicio = hoy;
+                fin = hoy;
+                break;
+            case "semana":
+                // Si hay fechaInicio, usarla; si no, usar la semana actual
+                if (fechaInicio != null && !fechaInicio.isEmpty()) {
+                    try {
+                        inicio = LocalDate.parse(fechaInicio);
+                    } catch (Exception e) {
+                        inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                    }
+                } else {
+                    inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                }
+                fin = inicio.plusDays(6);
+                break;
+            case "mes":
+                inicio = hoy.withDayOfMonth(1);
+                fin = hoy.withDayOfMonth(hoy.lengthOfMonth());
+                break;
+            case "todos":
+            default:
+                // No se establecen fechas para mostrar todas las clases
+                inicio = null;
+                fin = null;
+                break;
+        }
+
+        List&lt;Clase&gt; clases;
+        if (inicio != null &amp;&amp; fin != null) {
+            OffsetDateTime inicioOdt = inicio.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+            OffsetDateTime finOdt = fin.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+
+            clases = (buscar == null || buscar.isBlank())
+                    ? claseRepository.findByFechaBetweenOrderByFechaAsc(inicioOdt, finOdt)
+                    : claseRepository.findByFechaBetweenAndTipoLike(inicioOdt, finOdt, buscar.trim());
+        } else {
+            // Para el caso de "todos", no aplicamos filtro de fecha
+            clases = (buscar == null || buscar.isBlank())
+                    ? claseRepository.findAllByOrderByFechaAsc()
+                    : claseRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseOrderByFechaAsc(
+                            buscar.trim(), buscar.trim());
+        }
+
+        // Mapear a DTOs para la vista y reforzar el filtro de fechas en memoria
+        final LocalDate filtroInicio = inicio;
+        final LocalDate filtroFin = fin;
+        List&lt;ClaseViewDTO&gt; view = clases.stream()
+                .map(claseViewService::toView)
+                .filter(v -&gt; {
+                    if (filtroInicio == null || filtroFin == null || v.getFecha() == null) {
+                        return true; // sin filtro de fecha ("todos")
+                    }
+                    LocalDate f = v.getFecha();
+                    // Incluir fechas que están dentro del rango [filtroInicio, filtroFin]
+                    return !f.isBefore(filtroInicio) &amp;&amp; !f.isAfter(filtroFin);
+                })
+                .collect(Collectors.toList());
+
+        // Calcular totales basados en la lista YA FILTRADA
+        long totalClases = view.size();
+
+        // Paginación simple en memoria: 25 clases por página
+        int pageSize = 25;
+        int totalPages = (int) Math.ceil(totalClases / (double) pageSize);
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+        if (page &lt; 0) {
+            page = 0;
+        }
+        if (page &gt;= totalPages) {
+            page = totalPages - 1;
+        }
+        int fromIndex = page * pageSize;
+        int toIndex = (int) Math.min(fromIndex + pageSize, totalClases);
+        List&lt;ClaseViewDTO&gt; pageContent = view.subList(fromIndex, toIndex);
+
+        int pageStart = (totalClases == 0) ? 0 : fromIndex + 1;
+        int pageEnd = (totalClases == 0) ? 0 : toIndex;
+        long clasesLlenas = view.stream()
+                .filter(v -&gt; (v.getOcupadosPremium() + v.getOcupadosElite()) &gt;= (v.getCuposPremium() + v.getCuposElite()))
+                .count();
+        int totalCupos = view.stream().mapToInt(v -&gt; v.getCuposPremium() + v.getCuposElite()).sum();
+
+        model.addAttribute("clases", pageContent);
+        model.addAttribute("totalClases", totalClases);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageStart", pageStart);
+        model.addAttribute("pageEnd", pageEnd);
+        model.addAttribute("clasesLlenas", clasesLlenas);
+        model.addAttribute("totalCupos", totalCupos);
+        model.addAttribute("buscarActual", buscar == null ? "" : buscar);
+        // Pasar el período actual a la vista
+        model.addAttribute("periodo", periodo);
+
+        // Pasar fechas de la semana actual para navegación
+        if (periodo != null &amp;&amp; periodo.equals("semana") &amp;&amp; inicio != null) {
+            model.addAttribute("fechaInicio", inicio);
+            model.addAttribute("fechaFin", fin);
+            model.addAttribute("siguienteSemana", inicio.plusWeeks(1));
+            model.addAttribute("semanaAnterior", inicio.minusWeeks(1));
+        } else {
+            // Valores por defecto para evitar errores en la vista
+            model.addAttribute("fechaInicio", hoy);
+            model.addAttribute("fechaFin", hoy);
+            model.addAttribute("siguienteSemana", hoy.plusWeeks(1));
+            model.addAttribute("semanaAnterior", hoy.minusWeeks(1));
+        }
+        // Pasar instructores activos (rol ENTRENADOR) para poblar el selector en el modal
+        List&lt;Usuario&gt; instructores = usuarioRepository.findActiveEntrenadores();
+        if (instructores != null) {
+            instructores.sort(Comparator.comparing(Usuario::getNombre).thenComparing(Usuario::getApellido));
+        }
+        model.addAttribute("instructores", instructores);
+        // Pasar tipos de clase activos para el selector
+        model.addAttribute("tiposClase", tipoClaseRepository.findByActivoTrueOrderByNombreAsc());
+        return "clases";
+    }
+
+    /**
+     * POST /clases/crear - API REST: Crea nueva clase
+     * Content-Type: application/json
+     * Body: {nombre, duracion, cuposPremium, cuposElite, fecha, hora, instructor}
+     */
+    @PostMapping(value = "/clases/crear", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> crear(@RequestBody Map<String, Object> body) {
+        Clase c = new Clase();
+        applyFromBody(c, body);
+        claseRepository.save(c);
+        return toJson(c);
+    }
+
+    /**
+     * PUT /clases/{id} - API REST: Actualiza clase existente
+     * Content-Type: application/json
+     */
+    @PutMapping(value = "/clases/{id}", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> actualizar(@PathVariable long id, @RequestBody Map<String, Object> body) {
+        Clase c = claseRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Clase no encontrada"));
+        applyFromBody(c, body);
+        claseRepository.save(java.util.Objects.requireNonNull(c));
+        return toJson(c);
+    }
+
+    /**
+     * DELETE /clases/{id} - API REST: Elimina clase
+     * Elimina primero las reservas asociadas
+     */
+    @DeleteMapping("/clases/{id}")
+    @ResponseBody
+    public void eliminar(@PathVariable long id) {
+        reservaClaseRepository.deleteByClase_Id(id);
+        claseRepository.deleteById(id);
+    }
+
+    // [3] API REST: crear, actualizar y eliminar clases
+
+    // [4] applyFromBody: mapea datos del JSON al objeto Clase
+    private void applyFromBody(Clase c, Map<String, Object> body) {
+        c.setDescripcion(null);
+        c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
+
+        int cuposPremium = parseInt(body.get("cuposPremium"), 0);
+        int cuposElite = parseInt(body.get("cuposElite"), 0);
+        int cuposBasico = parseInt(body.get("cuposBasico"), 0);
+
+        c.setCuposBasico(cuposBasico);
+        // Capacidad total = cupos para todos los tipos de usuario
+        c.setCapacidad(cuposPremium + cuposElite + cuposBasico);
+
+        // Tipo de clase (obligatorio en BD)
+        Long tipoId = null;
+        try {
+            Object t = body.get("tipoClaseId");
+            if (t != null) tipoId = Long.parseLong(String.valueOf(t));
+        } catch (Exception ignored) {}
+
+        TipoClase tipo = null;
+        if (tipoId != null) {
+            tipo = tipoClaseRepository.findById(tipoId).orElse(null);
+        }
+        if (tipo == null) {
+            // fallback: si viene nombre de tipo nuevo
+            String tipoNombre = String.valueOf(body.getOrDefault("tipoClaseNombre", "")).trim();
+            if (!tipoNombre.isBlank()) {
+                tipo = tipoClaseRepository.findByNombreIgnoreCase(tipoNombre).orElseGet(() -> {
+                    TipoClase nt = new TipoClase();
+                    nt.setNombre(tipoNombre);
+                    nt.setActivo(true);
+                    return tipoClaseRepository.save(nt);
+                });
+            }
+        }
+        if (tipo == null) {
+            throw new IllegalArgumentException("Tipo de clase requerido");
+        }
+        c.setTipoClase(tipo);
+        // El nombre de la clase se deriva del tipo seleccionado
+        c.setNombre(tipo.getNombre());
+
+        String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
+        String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
+
+        if (!fechaStr.isBlank()) {
+            try {
+                // Parsear fecha y hora en la zona horaria local
+                LocalDate ld = LocalDate.parse(fechaStr);
+                LocalTime lt = horaStr.isBlank() ? LocalTime.of(0, 0) : LocalTime.parse(horaStr);
+
+                // Crear OffsetDateTime usando la zona horaria del sistema
+                ZoneId zone = ZoneId.systemDefault();
+                ZonedDateTime zdt = ZonedDateTime.of(ld, lt, zone);
+                OffsetDateTime odt = zdt.toOffsetDateTime();
+
+                c.setFecha(odt);
+                System.out.println("Hora guardada (UTC): " + odt);
+            } catch (Exception e) {
+                System.err.println("Error al parsear fecha/hora: " + e.getMessage());
+            }
+        }
+
+        // Buscar entrenador por nombre y apellido en tabla usuarios
+        String instructor = String.valueOf(body.getOrDefault("instructor", ""));
+        if (!instructor.isBlank()) {
+            String[] parts = instructor.trim().split(" ", 2);
+            String nombre = parts[0];
+            String apellido = parts.length > 1 ? parts[1] : "";
+            Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
+                    .filter(u -> u.getNombre().equalsIgnoreCase(nombre) &&
+                                 (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
+                    .findFirst().orElse(null);
+            c.setEntrenador(entren);
+        } else {
+            c.setEntrenador(null);
+        }
+
+        // Estado por defecto
+        if (c.getEstado() == null || c.getEstado().isBlank()) {
+            c.setEstado("Programada");
+        }
+
+        // Clases de pago y disponibilidad
+        Object esPagoObj = body.get("esPago");
+        boolean esPago = esPagoObj != null && Boolean.parseBoolean(String.valueOf(esPagoObj));
+        c.setEsPago(esPago);
+
+        Object paraTodosObj = body.get("paraTodos");
+        boolean paraTodos = paraTodosObj != null && Boolean.parseBoolean(String.valueOf(paraTodosObj));
+        c.setParaTodos(paraTodos);
+
+        // Precio solo aplica si la clase es de pago
+        if (esPago) {
+            Object precioObj = body.get("precio");
+            if (precioObj != null) {
+                try {
+                    java.math.BigDecimal precio = new java.math.BigDecimal(String.valueOf(precioObj));
+                    c.setPrecio(precio);
+                } catch (NumberFormatException e) {
+                    c.setPrecio(null);
+                }
+            } else {
+                c.setPrecio(null);
+            }
+        } else {
+            c.setPrecio(null);
+        }
+    }
+
+    // [5] Utilidades de apoyo (parseInt y toJson)
+
+    // Convierte Object a int con valor por defecto
+    private int parseInt(Object v, int def) {
+        try { return v == null ? def : Integer.parseInt(String.valueOf(v)); } catch (Exception e) { return def; }
+    }
+
+    // Convierte Clase a JSON para respuesta API
+    private Map<String, Object> toJson(Clase c) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", c.getId());
+        m.put("nombre", c.getNombre());
+        m.put("duracion", c.getDuracionMinutos());
+        m.put("capacidad", c.getCapacidad());
+        OffsetDateTime odt = c.getFecha();
+        if (odt != null) {
+            m.put("fecha", odt.toLocalDate().toString());
+            m.put("hora", odt.toLocalTime().toString());
+        }
+        m.put("estado", c.getEstado());
+        m.put("esPago", c.getEsPago());
+        m.put("paraTodos", c.getParaTodos());
+        m.put("precio", c.getPrecio());
+        return m;
+    }
+}
+        </textarea>
+
+        <div class="hint-box">
+            <strong>Nota:</strong> El código anterior es una copia directa del controlador real, sin imports.
+            Las etiquetas <strong>[1]</strong> a <strong>[5]</strong> te ayudan a ubicar los bloques principales al comparar con el archivo real:
+            <ul>
+                <li><strong>[1]</strong> Campos privados e inyección de dependencias del controlador.</li>
+                <li><strong>[2]</strong> Método <code>listar</code> (<code>GET /clases</code>) con filtros, totales y paginación.</li>
+                <li><strong>[3]</strong> API REST JSON: métodos <code>crear</code>, <code>actualizar</code> y <code>eliminar</code>.</li>
+                <li><strong>[4]</strong> Método <code>applyFromBody</code>: mapea el JSON del formulario al objeto <code>Clase</code>.</li>
+                <li><strong>[5]</strong> Métodos de utilidad <code>parseInt</code> y <code>toJson</code>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 2. LISTAR /CLASES -->
+    <section id="sec-controller-listar" class="section">
+        <h2><span class="badge">2</span>Método <code>listar</code> - GET <code>/clases</code></h2>
+        <div class="two-columns">
+            <div class="explanation">
+                <h3>Responsabilidad principal</h3>
+                <p>Este método construye <strong>toda la información necesaria para la pantalla de "Cupos de Clases"</strong>:</p>
+                <ul>
+                    <li>Lee parámetros de filtro: <code>buscar</code>, <code>periodo</code>, <code>fechaInicio</code>, <code>page</code>.</li>
+                    <li>Calcula el rango de fechas (<code>inicio</code>, <code>fin</code>) según el período seleccionado.</li>
+                    <li>Consulta la base de datos con filtros de fecha y texto.</li>
+                    <li>Mapea a DTOs de vista (<code>ClaseViewDTO</code>) y refuerza el filtro de fechas en memoria.</li>
+                    <li>Calcula estadísticas y paginación (total, clases llenas, cupos).</li>
+                    <li>Rellena el <code>Model</code> con todos los atributos usados por <code>clases.html</code>.</li>
+                </ul>
+
+                <h3>Parámetros</h3>
+                <ul>
+                    <li><code>buscar</code>: texto libre para buscar por tipo/nombre de clase.</li>
+                    <li><code>periodo</code>: uno de <code>"hoy"</code>, <code>"semana"</code>, <code>"mes"</code>, <code>"todos"</code>. Default: <code>"hoy"</code>.</li>
+                    <li><code>fechaInicio</code>: solo se usa cuando el período es <code>"semana"</code> para navegar entre semanas.</li>
+                    <li><code>page</code>: número de página (0-based) para la paginación en memoria.</li>
+                </ul>
+
+                <h3>Cálculo del rango de fechas</h3>
+                <p>El <code>switch (periodo)</code> define claramente qué rango se usará:</p>
+                <ul>
+                    <li><strong>"hoy"</strong>: <code>inicio = fin = hoy</code>. Ignora cualquier <code>fechaInicio</code> en la URL.</li>
+                    <li><strong>"semana"</strong>:
+                        <ul>
+                            <li>Si llega <code>fechaInicio</code>, intenta parsearla (por ejemplo al navegar a la semana siguiente/anterior).</li>
+                            <li>Si hay error o viene vacía, usa el lunes de la semana actual.</li>
+                            <li><code>fin = inicio.plusDays(6)</code> para cubrir de lunes a domingo.</li>
+                        </ul>
+                    </li>
+                    <li><strong>"mes"</strong>: del primer al último día del mes actual.</li>
+                    <li><strong>"todos"</strong>: no se aplica filtro de fecha (se listan todas las clases).</li>
+                </ul>
+
+                <h3>Consulta a BD y filtro en memoria</h3>
+                <ul>
+                    <li>Si hay rango de fechas, se construyen <code>inicioOdt</code> y <code>finOdt</code> en <code>OffsetDateTime</code> usando la zona horaria del sistema.</li>
+                    <li>Se consulta:
+                        <ul>
+                            <li><code>findByFechaBetweenOrderByFechaAsc</code> si no hay texto.</li>
+                            <li><code>findByFechaBetweenAndTipoLike</code> si hay texto en <code>buscar</code>.</li>
+                        </ul>
+                    </li>
+                    <li>Si el período es <code>"todos"</code>, se usan métodos sin filtro de fecha.</li>
+                    <li>Luego se convierte a <code>ClaseViewDTO</code> y se refuerza el rango en memoria con:
+                        <code>!f.isBefore(filtroInicio) &amp;&amp; !f.isAfter(filtroFin)</code>.</li>
+                    <li><strong>Importante:</strong> el tamaño de la lista filtrada (<code>view.size()</code>) se usa como <code>totalClases</code>. Esto asegura que la paginación y el mensaje de "sin resultados" respeten el período + texto.</li>
+                </ul>
+
+                <h3>Paginación y estadísticas</h3>
+                <ul>
+                    <li>Se fija un <strong>pageSize</strong> de 25 clases por página.</li>
+                    <li>Se calcula <code>totalPages</code> con <code>Math.ceil</code> y se corrigen casos extremos (0, negativo, mayor al total).</li>
+                    <li>Se obtienen los índices <code>fromIndex</code> y <code>toIndex</code> para hacer <code>subList</code> sobre la lista filtrada.</li>
+                    <li><code>pageStart</code> y <code>pageEnd</code> se usan en el texto "Mostrando X - Y de Z clases".</li>
+                    <li><code>clasesLlenas</code> cuenta cuántas clases de la lista filtrada están completamente llenas.</li>
+                    <li><code>totalCupos</code> suma los cupos premium + elite de todas las clases filtradas.</li>
+                </ul>
+
+                <h3>Atributos para la vista</h3>
+                <ul>
+                    <li><code>clases</code>: solo la página actual de <code>ClaseViewDTO</code>.</li>
+                    <li><code>totalClases</code>, <code>clasesLlenas</code>, <code>totalCupos</code>: tarjetas de resumen.</li>
+                    <li><code>currentPage</code>, <code>totalPages</code>, <code>pageStart</code>, <code>pageEnd</code>: paginación.</li>
+                    <li><code>buscarActual</code>: valor actual del buscador, para mantenerlo entre navegaciones.</li>
+                    <li><code>periodo</code>, <code>fechaInicio</code>, <code>fechaFin</code>, <code>siguienteSemana</code>, <code>semanaAnterior</code>: control de pestañas y navegación semanal.</li>
+                    <li><code>instructores</code> y <code>tiposClase</code>: listas para poblar los <code>&lt;select&gt;</code> del modal.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Fragmento clave: cálculo de fechas, filtros y paginación</h3>
+                <textarea class="code-block" readonly>
+// Parámetros de entrada y normalización del período
+LocalDate hoy = LocalDate.now();
+if (periodo == null || periodo.isBlank()) {
+    periodo = "hoy";
+}
+LocalDate inicio = null;
+LocalDate fin = null;
+
+// Calcular rango de fechas según el período
+switch (periodo) {
+    case "hoy":
+        inicio = hoy;
+        fin = hoy;
+        break;
+    case "semana":
+        // Si hay fechaInicio, usarla; si no, usar la semana actual
+        if (fechaInicio != null && !fechaInicio.isEmpty()) {
+            try {
+                inicio = LocalDate.parse(fechaInicio);
+            } catch (Exception e) {
+                inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            }
+        } else {
+            inicio = hoy.with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        }
+        fin = inicio.plusDays(6);
+        break;
+    case "mes":
+        inicio = hoy.withDayOfMonth(1);
+        fin = hoy.withDayOfMonth(hoy.lengthOfMonth());
+        break;
+    case "todos":
+    default:
+        // No se establecen fechas para mostrar todas las clases
+        inicio = null;
+        fin = null;
+        break;
+}
+
+List&lt;Clase&gt; clases;
+if (inicio != null && fin != null) {
+    OffsetDateTime inicioOdt = inicio.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+    OffsetDateTime finOdt = fin.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+
+    clases = (buscar == null || buscar.isBlank())
+            ? claseRepository.findByFechaBetweenOrderByFechaAsc(inicioOdt, finOdt)
+            : claseRepository.findByFechaBetweenAndTipoLike(inicioOdt, finOdt, buscar.trim());
+} else {
+    // Para el caso de "todos", no aplicamos filtro de fecha
+    clases = (buscar == null || buscar.isBlank())
+            ? claseRepository.findAllByOrderByFechaAsc()
+            : claseRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseOrderByFechaAsc(
+                    buscar.trim(), buscar.trim());
+}
+
+// Mapear a DTOs para la vista y reforzar el filtro de fechas en memoria
+final LocalDate filtroInicio = inicio;
+final LocalDate filtroFin = fin;
+List&lt;ClaseViewDTO&gt; view = clases.stream()
+        .map(claseViewService::toView)
+        .filter(v -> {
+            if (filtroInicio == null || filtroFin == null || v.getFecha() == null) {
+                return true; // sin filtro de fecha ("todos")
+            }
+            LocalDate f = v.getFecha();
+            return !f.isBefore(filtroInicio) && !f.isAfter(filtroFin);
+        })
+        .collect(Collectors.toList());
+
+// Calcular totales basados en la lista YA FILTRADA
+long totalClases = view.size();
+
+// Paginación simple en memoria: 25 clases por página
+int pageSize = 25;
+int totalPages = (int) Math.ceil(totalClases / (double) pageSize);
+if (totalPages == 0) {
+    totalPages = 1;
+}
+if (page < 0) {
+    page = 0;
+}
+if (page >= totalPages) {
+    page = totalPages - 1;
+}
+int fromIndex = page * pageSize;
+int toIndex = (int) Math.min(fromIndex + pageSize, totalClases);
+List&lt;ClaseViewDTO&gt; pageContent = view.subList(fromIndex, toIndex);
+                </textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. API JSON -->
+    <section id="sec-controller-api" class="section">
+        <h2><span class="badge">3</span>API JSON - Crear / Actualizar / Eliminar clases</h2>
+        <div class="two-columns">
+            <div class="explanation">
+                <h3>Métodos REST</h3>
+                <ul>
+                    <li><strong><code>POST /clases/crear</code></strong>: crea una nueva clase a partir de los datos del modal.</li>
+                    <li><strong><code>PUT /clases/{id}</code></strong>: actualiza una clase existente.</li>
+                    <li><strong><code>DELETE /clases/{id}</code></strong>: elimina una clase y sus reservas asociadas.</li>
+                </ul>
+                <p>Todos los métodos de creación/actualización comparten una misma rutina: <code>applyFromBody</code>, que se encarga de mapear el <code>Map&lt;String,Object&gt;</code> recibido a una entidad <code>Clase</code> lista para ser persistida.</p>
+
+                <h3>Método <code>applyFromBody</code></h3>
+                <ul>
+                    <li>Normaliza duración y cupos (<code>cuposBasico</code>, <code>cuposPremium</code>, <code>cuposElite</code>).</li>
+                    <li>Calcula la capacidad total.</li>
+                    <li>Resuelve el <strong>tipo de clase</strong> por id o creando uno nuevo si solo se envía el nombre.</li>
+                    <li>Convierte la combinación <code>fecha</code> + <code>hora</code> en un <code>OffsetDateTime</code> usando la zona horaria del sistema.</li>
+                    <li>Busca al <strong>entrenador</strong> por nombre y apellido en la lista de entrenadores activos.</li>
+                    <li>Define el estado por defecto <code>"Programada"</code> si no viene definido.</li>
+                    <li>Configura si la clase es de pago y, en ese caso, el <code>precio</code>.</li>
+                </ul>
+
+                <h3>Respuesta JSON</h3>
+                <p>La función <code>toJson</code> transforma la entidad <code>Clase</code> en un <code>Map</code> que luego Spring convierte a JSON. Se incluyen campos clave como id, nombre, duración, capacidad, fecha, hora, estado, flags de pago y precio.</p>
+            </div>
+            <div>
+                <h3>Código de la API JSON</h3>
+                <textarea class="code-block" readonly>
+// Crear clase
+@PostMapping(value = "/clases/crear", consumes = "application/json", produces = "application/json")
+@ResponseBody
+public Map&lt;String, Object&gt; crear(@RequestBody Map&lt;String, Object&gt; body) {
+    Clase c = new Clase();
+    applyFromBody(c, body);
+    claseRepository.save(c);
+    return toJson(c);
+}
+
+// Actualizar clase existente
+@PutMapping(value = "/clases/{id}", consumes = "application/json", produces = "application/json")
+@ResponseBody
+public Map&lt;String, Object&gt; actualizar(@PathVariable long id, @RequestBody Map&lt;String, Object&gt; body) {
+    Clase c = claseRepository.findById(id).orElseThrow(() -&gt; new IllegalArgumentException("Clase no encontrada"));
+    applyFromBody(c, body);
+    claseRepository.save(java.util.Objects.requireNonNull(c));
+    return toJson(c);
+}
+
+// Eliminar clase (y sus reservas)
+@DeleteMapping("/clases/{id}")
+@ResponseBody
+public void eliminar(@PathVariable long id) {
+    reservaClaseRepository.deleteByClase_Id(id);
+    claseRepository.deleteById(id);
+}
+
+// Mapear JSON a entidad Clase
+private void applyFromBody(Clase c, Map&lt;String, Object&gt; body) {
+    c.setDescripcion(null);
+    c.setDuracionMinutos(parseInt(body.get("duracion"), 60));
+
+    int cuposPremium = parseInt(body.get("cuposPremium"), 0);
+    int cuposElite = parseInt(body.get("cuposElite"), 0);
+    int cuposBasico = parseInt(body.get("cuposBasico"), 0);
+
+    c.setCuposBasico(cuposBasico);
+    c.setCapacidad(cuposPremium + cuposElite + cuposBasico);
+
+    // Resolver tipo de clase
+    Long tipoId = null;
+    try {
+        Object t = body.get("tipoClaseId");
+        if (t != null) tipoId = Long.parseLong(String.valueOf(t));
+    } catch (Exception ignored) {}
+
+    TipoClase tipo = null;
+    if (tipoId != null) {
+        tipo = tipoClaseRepository.findById(tipoId).orElse(null);
+    }
+    if (tipo == null) {
+        String tipoNombre = String.valueOf(body.getOrDefault("tipoClaseNombre", "")).trim();
+        if (!tipoNombre.isBlank()) {
+            tipo = tipoClaseRepository.findByNombreIgnoreCase(tipoNombre).orElseGet(() -&gt; {
+                TipoClase nt = new TipoClase();
+                nt.setNombre(tipoNombre);
+                nt.setActivo(true);
+                return tipoClaseRepository.save(nt);
+            });
+        }
+    }
+    if (tipo == null) {
+        throw new IllegalArgumentException("Tipo de clase requerido");
+    }
+    c.setTipoClase(tipo);
+    c.setNombre(tipo.getNombre());
+
+    // Fecha y hora
+    String fechaStr = String.valueOf(body.getOrDefault("fecha", ""));
+    String horaStr = String.valueOf(body.getOrDefault("hora", "00:00"));
+
+    if (!fechaStr.isBlank()) {
+        try {
+            LocalDate ld = LocalDate.parse(fechaStr);
+            LocalTime lt = horaStr.isBlank() ? LocalTime.of(0, 0) : LocalTime.parse(horaStr);
+            ZoneId zone = ZoneId.systemDefault();
+            ZonedDateTime zdt = ZonedDateTime.of(ld, lt, zone);
+            OffsetDateTime odt = zdt.toOffsetDateTime();
+            c.setFecha(odt);
+        } catch (Exception e) {
+            System.err.println("Error al parsear fecha/hora: " + e.getMessage());
+        }
+    }
+
+    // Entrenador por nombre y apellido
+    String instructor = String.valueOf(body.getOrDefault("instructor", ""));
+    if (!instructor.isBlank()) {
+        String[] parts = instructor.trim().split(" ", 2);
+        String nombre = parts[0];
+        String apellido = parts.length &gt; 1 ? parts[1] : "";
+        Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
+                .filter(u -&gt; u.getNombre().equalsIgnoreCase(nombre) &amp;&amp;
+                             (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
+                .findFirst().orElse(null);
+        c.setEntrenador(entren);
+    } else {
+        c.setEntrenador(null);
+    }
+
+    if (c.getEstado() == null || c.getEstado().isBlank()) {
+        c.setEstado("Programada");
+    }
+
+    Object esPagoObj = body.get("esPago");
+    boolean esPago = esPagoObj != null &amp;&amp; Boolean.parseBoolean(String.valueOf(esPagoObj));
+    c.setEsPago(esPago);
+
+    Object paraTodosObj = body.get("paraTodos");
+    boolean paraTodos = paraTodosObj != null &amp;&amp; Boolean.parseBoolean(String.valueOf(paraTodosObj));
+    c.setParaTodos(paraTodos);
+
+    if (esPago) {
+        Object precioObj = body.get("precio");
+        if (precioObj != null) {
+            try {
+                java.math.BigDecimal precio = new java.math.BigDecimal(String.valueOf(precioObj));
+                c.setPrecio(precio);
+            } catch (NumberFormatException e) {
+                c.setPrecio(null);
+            }
+        } else {
+            c.setPrecio(null);
+        }
+    } else {
+        c.setPrecio(null);
+    }
+}
+                </textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. VISTA - LAYOUT Y FILTROS -->
+    <section id="sec-view-layout" class="section">
+        <h2><span class="badge">4</span>Vista <code>clases.html</code> - Layout principal y filtros</h2>
+        <div class="two-columns">
+            <div class="explanation">
+                <h3>Estructura general</h3>
+                <ul>
+                    <li>Usa TailwindCSS para el diseño y estilos utilitarios.</li>
+                    <li>Incluye un sidebar común mediante <code>th:replace="fragments/sidebar"</code>.</li>
+                    <li>Muestra tarjetas con estadísticas: total de clases, clases llenas y total de cupos.</li>
+                    <li>Incluye pestañas de período (Hoy, Esta semana, Este mes, Todas), navegación semanal y un cuadro de búsqueda.</li>
+                    <li>Tabla principal con las clases programadas y botones de acción (editar/eliminar).</li>
+                </ul>
+
+                <h3>Filtros por período y buscador</h3>
+                <ul>
+                    <li>Cada pestaña de período es un enlace a <code>/clases</code> con el parámetro <code>periodo</code> y el texto de búsqueda actual.</li>
+                    <li>La pestaña activa se resalta con clases de color naranja.</li>
+                    <li>Si el período es "semana", aparece en el centro un control para navegar a la semana anterior/siguiente usando <code>fechaInicio</code>.</li>
+                    <li>El buscador envía siempre <code>periodo</code>, <code>fechaInicio</code> (si aplica) y <code>buscar</code>, de forma que el controlador pueda combinar filtros.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Código: cabecera de filtros y buscador</h3>
+                <textarea class="code-block" readonly>
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Clases Programadas</h2>
+        <div class="flex flex-col gap-4 w-full md:grid md:grid-cols-[auto,1fr,auto] md:items-center md:gap-6">
+            <!-- Grupo izquierda: Filtros -->
+            <div class="flex items-center gap-6">
+                <a th:href="@{/clases(periodo='hoy', buscar=${buscarActual})}"
+                   th:classappend="${periodo == 'hoy' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
+                   class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Hoy</a>
+                <a th:href="@{/clases(periodo='semana', buscar=${buscarActual})}"
+                   th:classappend="${periodo == 'semana' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
+                   class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Esta semana</a>
+                <a th:href="@{/clases(periodo='mes', buscar=${buscarActual})}"
+                   th:classappend="${periodo == 'mes' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
+                   class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Este mes</a>
+                <a th:href="@{/clases(periodo='todos', buscar=${buscarActual})}"
+                   th:classappend="${periodo == 'todos' ? ' text-orange-600 border-orange-500 font-medium' : ' text-gray-600 hover:text-gray-800 border-transparent'}"
+                   class="h-9 inline-flex items-center px-2 text-sm border-b-2 transition-colors whitespace-nowrap">Todas</a>
+            </div>
+
+            <!-- Grupo centro: Navegación semanal -->
+            <div class="hidden md:flex md:justify-center">
+                <div th:if="${periodo == 'semana'}" class="flex items-center gap-2">
+                    <div class="inline-flex items-center bg-gray-50 rounded-lg border border-gray-200 h-9 overflow-hidden">
+                        <a th:href="@{/clases(periodo='semana', buscar=${buscarActual}, fechaInicio=${#temporals.format(semanaAnterior, 'yyyy-MM-dd')})}"
+                           class="h-9 w-9 grid place-items-center hover:bg-gray-100 transition-colors" title="Semana anterior">
+                            <!-- ícono flecha izquierda -->
+                        </a>
+                        <span class="text-sm font-medium text-gray-700 whitespace-nowrap px-3 leading-9 border-l border-r border-gray-200">
+                            <span th:text="${#temporals.format(fechaInicio, 'd MMM')} + ' - ' + ${#temporals.format(fechaFin, 'd MMM yyyy')}"></span>
+                        </span>
+                        <a th:href="@{/clases(periodo='semana', buscar=${buscarActual}, fechaInicio=${#temporals.format(siguienteSemana, 'yyyy-MM-dd')})}"
+                           class="h-9 w-9 grid place-items-center hover:bg-gray-100 transition-colors" title="Siguiente semana">
+                            <!-- ícono flecha derecha -->
+                        </a>
+                    </div>
+                </div>
+                <div th:unless="${periodo == 'semana'}" class="h-9"></div>
+            </div>
+
+            <!-- Grupo derecha: Buscador -->
+            <form th:action="@{/clases}" method="get" class="flex w-full md:w-auto items-stretch h-9">
+                <input type="hidden" name="periodo" th:value="${periodo}">
+                <input type="hidden" name="fechaInicio" th:if="${fechaInicio != null}"
+                       th:value="${#temporals.format(fechaInicio, 'yyyy-MM-dd')}">
+                <div class="flex w-full md:w-72 border rounded-lg overflow-hidden">
+                    <input type="text" name="buscar" th:value="${buscarActual}"
+                           placeholder="Buscar clases..."
+                           class="px-4 flex-1 focus:outline-none h-9">
+                    <button type="submit" class="px-3 bg-orange-500 text-white hover:bg-orange-600 grid place-items-center">
+                        <!-- icono lupa -->
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+                </textarea>
+            </div>
+        </div>
+
+        <h3>Tabla y mensaje de "sin resultados"</h3>
+        <textarea class="code-block" readonly>
+<div class="overflow-x-auto">
+    <table class="w-full text-left">
+        <thead>
+            <tr class="text-xs text-gray-500 uppercase bg-gray-50">
+                <th class="px-4 py-3">Clase</th>
+                <th class="px-4 py-3">Instructor</th>
+                <th class="px-4 py-3">Fecha y Hora</th>
+                <th class="px-4 py-3">Duración</th>
+                <th class="px-4 py-3">Cupos Premium/Elite</th>
+                <th class="px-4 py-3">Ocupación Actual</th>
+                <th class="px-4 py-3">Estado</th>
+                <th class="px-4 py-3">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="text-sm text-gray-700">
+            <!-- Mensaje cuando no hay resultados para el filtro aplicado -->
+            <tr th:if="${#lists.isEmpty(clases)}">
+                <td class="px-4 py-6 text-center text-gray-500" colspan="8"
+                    th:text="${buscarActual != null && !#strings.isEmpty(buscarActual) ?
+                              'No se encontraron clases para el periodo seleccionado que coincidan con ' + buscarActual + '.' :
+                              'No se encontraron clases para el periodo seleccionado.'}">
+                    No se encontraron clases para el periodo seleccionado.
+                </td>
+            </tr>
+
+            <tr th:each="clase : ${clases}" class="border-b hover:bg-gray-50" th:data-id="${clase.id}">
+                <td class="px-4 py-3 font-medium" th:text="${clase.nombre}">Yoga</td>
+                <td class="px-4 py-3" th:text="${clase.instructor}">María</td>
+                <td class="px-4 py-3">
+                    <span th:text="${#temporals.format(clase.fecha, 'dd/MM/yyyy')}">15/02/2025</span>
+                    <span th:text="${#temporals.format(clase.hora, 'HH:mm')}">07:00</span>
+                </td>
+                <td class="px-4 py-3"><span th:text="${clase.duracion}">60</span> min</td>
+                <td class="px-4 py-3">
+                    <span th:text="${clase.cuposPremium}">15</span> /
+                    <span th:text="${clase.cuposElite}">10</span>
+                </td>
+                <td class="px-4 py-3">
+                    <div class="font-semibold">
+                        <span th:text="${clase.ocupadosPremium + clase.ocupadosElite}">20</span>/
+                        <span th:text="${clase.cuposPremium + clase.cuposElite}">25</span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        Premium: <span th:text="${clase.ocupadosPremium}">12</span> |
+                        Elite: <span th:text="${clase.ocupadosElite}">8</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3">
+                    <span th:if="${(clase.ocupadosPremium + clase.ocupadosElite) >= (clase.cuposPremium + clase.cuposElite)}"
+                          class="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Llena</span>
+                    <span th:unless="${(clase.ocupadosPremium + clase.ocupadosElite) >= (clase.cuposPremium + clase.cuposElite)}"
+                          class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Disponible</span>
+                </td>
+                <td class="px-4 py-3">
+                    <!-- Botones editar / eliminar (ver sección JS) -->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+        </textarea>
+    </section>
+
+    <!-- 5. VISTA - MODALES Y JS -->
+    <section id="sec-view-modals-js" class="section">
+        <h2><span class="badge">5</span>Vista <code>clases.html</code> - Modales y JavaScript</h2>
+        <div class="two-columns">
+            <div class="explanation">
+                <h3>Botón flotante (FAB) y modal de clase</h3>
+                <ul>
+                    <li>El texto "Nueva clase" del header se reemplazó por un <strong>botón flotante</strong> naranja con un signo <strong>+</strong> en la esquina inferior derecha.</li>
+                    <li>Este botón abre el modal para crear una nueva clase reutilizando el mismo id <code>btn-nueva-clase</code> que usaba el botón anterior.</li>
+                    <li>El modal contiene un formulario completo con instructor, tipo de clase, fecha, hora, duración, cupos por tipo de membresía y configuración de pago.</li>
+                </ul>
+
+                <h3>JavaScript</h3>
+                <ul>
+                    <li>Abre/cierra el modal de forma accesible, bloqueando el scroll del body cuando está abierto.</li>
+                    <li>Permite crear nuevos tipos de clase "al vuelo" llamando a <code>/clases/tipos</code> y agregando la nueva opción al <code>&lt;select&gt;</code>.</li>
+                    <li>Arma el objeto <code>claseData</code> con todos los campos del formulario y decide si llamar a <code>POST /clases/crear</code> o <code>PUT /clases/{id}</code> según si se está editando.</li>
+                    <li>Precarga el formulario con los datos de la fila seleccionada cuando se edita una clase.</li>
+                    <li>Controla la disponibilidad <strong>Solo miembros</strong> vs <strong>Para todos</strong>, deshabilitando o habilitando automáticamente los campos de <em>cupos Básico</em>, <em>Clase de pago</em> y <em>Precio</em> según la selección.</li>
+                    <li>Muestra un modal de confirmación antes de eliminar una clase y, si se acepta, llama a <code>DELETE /clases/{id}</code>.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Código: FAB y modal principal</h3>
+                <textarea class="code-block" readonly>
+<!-- Botón flotante para crear nueva clase -->
+<button id="btn-nueva-clase"
+        class="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-orange-500 text-white shadow-lg hover:bg-orange-600 focus:outline-none flex items-center justify-center text-3xl"
+        type="button"
+        aria-label="Nueva clase">
+    +
+</button>
+
+<!-- Modal Nueva Clase (estructura) -->
+<div id="modal-nueva-clase" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-40 overflow-y-auto">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-8 z-50">
+        <div class="flex justify-between items-center p-6 border-b">
+            <h2 class="text-2xl font-bold text-gray-800">Configurar Nueva Clase</h2>
+            <button id="modal-close" class="text-gray-500 hover:text-gray-700">
+                <!-- ícono X -->
+            </button>
+        </div>
+        <form id="form-nueva-clase" class="p-6 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
+            <!-- Campos de instructor, tipo, fecha, hora, duración, cupos, flags, precio, disponibilidad -->
+        </form>
+        <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
+            <button type="button" id="modal-cancel" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                Cancelar
+            </button>
+            <button type="button" id="modal-save" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
+                Guardar Clase
+            </button>
+        </div>
+    </div>
+</div>
+                </textarea>
+            </div>
+        </div>
+
+        <h3>JavaScript principal de clases.html</h3>
+        <textarea class="code-block" readonly>
+<script>
+// Referencias principales
+const btnNuevaClase = document.getElementById('btn-nueva-clase');
+const modal = document.getElementById('modal-nueva-clase');
+const modalClose = document.getElementById('modal-close');
+const modalCancel = document.getElementById('modal-cancel');
+const modalSave = document.getElementById('modal-save');
+const form = document.getElementById('form-nueva-clase');
+const tipoSelect = document.getElementById('clase-tipo');
+const nuevoTipoWrapper = document.getElementById('nuevo-tipo-wrapper');
+const nuevoTipoNombre = document.getElementById('nuevo-tipo-nombre');
+const crearTipoBtn = document.getElementById('crear-tipo-btn');
+let claseEditandoId = null;
+
+function openModal(editando = false) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+
+    const titulo = modal.querySelector('h2');
+    const btnGuardar = document.getElementById('modal-save');
+    if (editando) {
+        titulo.textContent = 'Editar Clase';
+        btnGuardar.textContent = 'Actualizar Clase';
+    } else {
+        titulo.textContent = 'Configurar Nueva Clase';
+        btnGuardar.textContent = 'Guardar Clase';
+    }
+
+    // Reset de tipo y flags cuando se crea
+    if (!editando && tipoSelect) {
+        tipoSelect.value = '';
+        if (nuevoTipoWrapper) nuevoTipoWrapper.classList.add('hidden');
+        if (nuevoTipoNombre) nuevoTipoNombre.value = '';
+        const esPagoInput = document.getElementById('clase-es-pago');
+        const precioInput = document.getElementById('clase-precio');
+        const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+        const paraTodosRadio = document.getElementById('clase-para-todos');
+        if (esPagoInput) esPagoInput.checked = false;
+        if (precioInput) precioInput.value = '';
+        if (soloMiembrosRadio) soloMiembrosRadio.checked = true;
+        if (paraTodosRadio) paraTodosRadio.checked = false;
+    }
+}
+
+function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+    form.reset();
+    claseEditandoId = null;
+}
+
+if (btnNuevaClase) btnNuevaClase.addEventListener('click', () => openModal(false));
+if (modalClose) modalClose.addEventListener('click', closeModal);
+if (modalCancel) modalCancel.addEventListener('click', closeModal);
+
+// Crear nuevo tipo de clase "al vuelo"
+if (tipoSelect) {
+    tipoSelect.addEventListener('change', () => {
+        if (tipoSelect.value === 'nuevo') {
+            nuevoTipoWrapper.classList.remove('hidden');
+            nuevoTipoNombre.focus();
+        } else {
+            nuevoTipoWrapper.classList.add('hidden');
+        }
+    });
+}
+if (crearTipoBtn) {
+    crearTipoBtn.addEventListener('click', async () => {
+        const nombre = (nuevoTipoNombre?.value || '').trim();
+        if (!nombre) return;
+        try {
+            const resp = await fetch('/clases/tipos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `nombre=${encodeURIComponent(nombre)}`
+            });
+            if (!resp.ok) throw new Error('Error al crear el tipo');
+            const t = await resp.json();
+            const opt = document.createElement('option');
+            opt.value = String(t.id);
+            opt.textContent = t.nombre;
+            tipoSelect.add(opt);
+            tipoSelect.value = String(t.id);
+            nuevoTipoNombre.value = '';
+            nuevoTipoWrapper.classList.add('hidden');
+        } catch (e) {
+            console.error(e);
+            alert('No se pudo crear el tipo de clase');
+        }
+    });
+}
+
+// Guardar (crear o actualizar) clase
+if (modalSave) {
+    modalSave.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        const claseData = {
+            instructor: document.getElementById('clase-instructor').value,
+            fecha: document.getElementById('clase-fecha').value,
+            hora: document.getElementById('clase-hora').value,
+            duracion: parseInt(document.getElementById('clase-duracion').value),
+            cuposBasico: parseInt(document.getElementById('clase-cupos-basico').value),
+            cuposPremium: parseInt(document.getElementById('clase-cupos-premium').value),
+            cuposElite: parseInt(document.getElementById('clase-cupos-elite').value),
+            ocupadosPremium: 0,
+            ocupadosElite: 0,
+            estado: 'ACTIVA',
+            tipoClaseId: (tipoSelect && tipoSelect.value && tipoSelect.value !== 'nuevo') ? parseInt(tipoSelect.value) : null,
+            tipoClaseNombre: (tipoSelect && tipoSelect.value === 'nuevo') ? (nuevoTipoNombre?.value || '').trim() : undefined,
+            esPago: document.getElementById('clase-es-pago').checked,
+            paraTodos: document.getElementById('clase-para-todos').checked,
+            precio: document.getElementById('clase-precio').value
+        };
+
+        const url = claseEditandoId ? `/clases/${claseEditandoId}` : '/clases/crear';
+        const method = claseEditandoId ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(claseData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('✅ Clase guardada en BD:', data);
+            closeModal();
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('❌ Error al guardar clase:', error);
+            alert('Error al guardar la clase');
+        });
+    });
+}
+
+// Lógica de disponibilidad Solo miembros / Para todos
+// - Cuando la clase es Solo miembros (Premium/Elite):
+//   * cupos Básico se fuerza a 0 y se deshabilita.
+//   * se desactiva la casilla "Clase de pago" y se limpia/bloquea el precio.
+// - Cuando la clase es Para todos: se vuelven a habilitar estos campos.
+
+function actualizarDisponibilidadCampos() {
+    const cuposBasicoInput = document.getElementById('clase-cupos-basico');
+    const esPagoInput = document.getElementById('clase-es-pago');
+    const precioInput = document.getElementById('clase-precio');
+    const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+    const paraTodosRadio = document.getElementById('clase-para-todos');
+
+    if (!soloMiembrosRadio || !paraTodosRadio) {
+        return;
+    }
+
+    const soloMiembros = soloMiembrosRadio.checked;
+
+    if (soloMiembros) {
+        if (cuposBasicoInput) {
+            cuposBasicoInput.value = '0';
+            cuposBasicoInput.disabled = true;
+            cuposBasicoInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        }
+        if (esPagoInput) {
+            esPagoInput.checked = false;
+            esPagoInput.disabled = true;
+        }
+        if (precioInput) {
+            precioInput.value = '';
+            precioInput.disabled = true;
+            precioInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+        }
+    } else {
+        if (cuposBasicoInput) {
+            cuposBasicoInput.disabled = false;
+            cuposBasicoInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        }
+        if (esPagoInput) {
+            esPagoInput.disabled = false;
+        }
+        if (precioInput) {
+            precioInput.disabled = false;
+            precioInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        }
+    }
+}
+
+// Asociar la función a los radios de disponibilidad
+const soloMiembrosRadio = document.getElementById('clase-solo-miembros');
+const paraTodosRadio = document.getElementById('clase-para-todos');
+if (soloMiembrosRadio) soloMiembrosRadio.addEventListener('change', actualizarDisponibilidadCampos);
+if (paraTodosRadio) paraTodosRadio.addEventListener('change', actualizarDisponibilidadCampos);
+
+// Además, se llama a actualizarDisponibilidadCampos() dentro de openModal()
+// y justo después de rellenar el formulario al editar una clase, para que
+// el estado de los campos siempre refleje la disponibilidad actual.
+
+// Editar y eliminar clases (listeners delegados sobre document)
+// ... (el código real rellena el formulario con los data-* y muestra un modal de confirmación antes de eliminar)
+</script>
+        </textarea>
+    </section>
+
+    <div class="footer">
+        Documentación generada automáticamente a partir del código real de <strong>ClasesController</strong> y <strong>clases.html</strong>. Los bloques de código usan scroll horizontal para facilitar la lectura de contenido largo.
+    </div>
+</div>
+</body>
+</html>

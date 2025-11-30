@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Promociones Deportista</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f97316 0%, #fb7185 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #f97316 0%, #fb7185 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.4em; margin-bottom: 10px; }
+        .header p { font-size: 1.05em; opacity: 0.9; }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            padding: 10px 22px;
+            border: 2px solid #f97316;
+            background: white;
+            color: #f97316;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+        .nav-btn:hover {
+            background: #f97316;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(249,115,22,0.4);
+        }
+        .nav-btn.active {
+            background: #f97316;
+            color: white;
+        }
+
+        .content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-title {
+            font-size: 2em;
+            color: #f97316;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f97316;
+        }
+        .purpose-box {
+            background: #fff7ed;
+            border-left: 5px solid #f97316;
+            padding: 25px;
+            margin-bottom: 35px;
+            border-radius: 8px;
+        }
+        .purpose-box h3 { color: #f97316; margin-bottom: 15px; font-size: 1.25em; font-weight: 700; }
+        .purpose-box p { color: #333; line-height: 1.8; font-size: 1.02em; }
+
+        .code-explanation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            overflow-x: auto;
+            min-width: 900px;
+        }
+        .code-explanation-stacked { grid-template-columns: 1fr; }
+        .code-column {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .code-column h4 {
+            color: #f97316;
+            margin-bottom: 18px;
+            font-size: 1.15em;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f97316;
+            font-weight: 700;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 18px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre;
+        }
+        .code-block .line-num {
+            color: #888;
+            margin-right: 15px;
+            display: inline-block;
+            width: 35px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .keyword { color: #ff79c6; font-weight: bold; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .class-name { color: #8be9fd; font-weight: bold; }
+        .method { color: #50fa7b; }
+        .number { color: #bd93f9; }
+
+        .explanation { color: #333; line-height: 2; font-size: 0.98em; }
+        .explanation strong { color: #f97316; font-weight: 700; }
+        .explanation p { margin-bottom: 10px; }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 1024px) {
+            .code-explanation { grid-template-columns: 1fr; min-width: auto; }
+            .header h1 { font-size: 1.8em; }
+            .nav-buttons { flex-direction: column; }
+            .nav-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Documentación Promociones Deportista</h1>
+            <p>Explicación del flujo de promociones para el deportista: controlador y vista Thymeleaf</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('prom-dep-controller-imports'); return false;">1. Controller - Clase y Dependencias</button>
+            <button class="nav-btn" onclick="showSection('prom-dep-controller-promociones'); return false;">2. Controller - GET /deportista/promociones</button>
+            <button class="nav-btn" onclick="showSection('prom-dep-html-promociones'); return false;">3. HTML - deportista/promociones.html</button>
+        </div>
+
+        <!-- SECCIÓN 1: CONTROLLER IMPORTS Y CLASE -->
+        <div id="prom-dep-controller-imports" class="content active">
+            <h2 class="section-title">1️⃣ Controller - Clase, Ruta base y Dependencias</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define el controlador <strong>PromocionesDeportistaController</strong>, la ruta base <code>/deportista</code> y los repositorios que necesita para
+                    calcular las promociones vigentes para el usuario autenticado.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="comment">/** Vista de promociones para el deportista. */</span>
+<span class="line-num">2</span> <span class="keyword">@Controller</span>
+<span class="line-num">3</span> <span class="keyword">@RequestMapping</span>(<span class="string">"/deportista"</span>)
+<span class="line-num">4</span> <span class="keyword">public class</span> <span class="class-name">PromocionesDeportistaController</span> {
+<span class="line-num">6</span>     <span class="keyword">private final</span> PromocionRepository promocionRepository;
+<span class="line-num">7</span>     <span class="keyword">private final</span> PersonaRepository personaRepository;
+<span class="line-num">8</span>     <span class="keyword">private final</span> SuscripcionRepository suscripcionRepository;
+<span class="line-num">10</span>     <span class="keyword">public</span> <span class="method">PromocionesDeportistaController</span>(
+<span class="line-num">11</span>             PromocionRepository promocionRepository,
+<span class="line-num">12</span>             PersonaRepository personaRepository,
+<span class="line-num">13</span>             SuscripcionRepository suscripcionRepository) { ... }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 1:</strong> Comentario de documentación que indica que esta clase se encarga de la vista de promociones para el deportista.</p>
+                        <p><strong>Líneas 2-3:</strong> <code>@Controller</code> y <code>@RequestMapping("/deportista")</code> definen que es un controlador web y que todas
+                            las rutas que expone comienzan con <code>/deportista</code>.</p>
+                        <p><strong>Líneas 6-8:</strong> Se declaran los tres repositorios inyectados por Spring que el controlador utilizará:</p>
+                        <p>- <code>PromocionRepository</code>: para leer promociones según estado/fechas.</p>
+                        <p>- <code>PersonaRepository</code>: para encontrar a la persona por el correo autenticado.</p>
+                        <p>- <code>SuscripcionRepository</code>: para obtener la suscripción activa del deportista y decidir si mostrar promociones de clases.</p>
+                        <p><strong>Líneas 10-13:</strong> Constructor con inyección de dependencias: Spring pasa las implementaciones de los repositorios ya configuradas.</p>
+                        <p><strong>Resumen:</strong> Esta parte solo prepara el contexto: qué repositorios se usarán y bajo qué ruta se expondrán las promociones del deportista.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: GET /deportista/promociones -->
+        <div id="prom-dep-controller-promociones" class="content">
+            <h2 class="section-title">2️⃣ Controller - Método GET /deportista/promociones</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Carga todas las <strong>promociones vigentes</strong> para el día de hoy, las separa en listas para membresías y clases con costo adicional,
+                    decide si debe mostrar las de clases según la suscripción del usuario, y envía todo a la vista <code>deportista/promociones.html</code>.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">57</span> <span class="keyword">@GetMapping</span>(<span class="string">"/promociones"</span>)
+<span class="line-num">58</span> <span class="keyword">public String</span> <span class="method">promocionesVigentes</span>(
+<span class="line-num">59</span>         Model model,
+<span class="line-num">60</span>         @AuthenticationPrincipal UserDetails userDetails) {
+<span class="line-num">61</span>     LocalDate hoy = LocalDate.now();
+<span class="line-num">62</span>     List&lt;Promocion&gt; base =
+<span class="line-num">63</span>             promocionRepository.findByEstado(Promocion.Estado.ACTIVE);
+<span class="line-num">64</span>     List&lt;Promocion&gt; vigentes = base.stream()
+<span class="line-num">65</span>             .filter(p -&gt; (p.getFechaInicio() == <span class="keyword">null</span> || !p.getFechaInicio().isAfter(hoy))
+<span class="line-num">66</span>                     &amp;&amp; (p.getFechaFin() == <span class="keyword">null</span> || !p.getFechaFin().isBefore(hoy)))
+<span class="line-num">67</span>             .collect(Collectors.toList());
+<span class="line-num">69</span>     List&lt;Promocion&gt; promocionesMembresia = vigentes.stream()
+<span class="line-num">70</span>             .filter(p -&gt; p.getMembresias() != <span class="keyword">null</span> &amp;&amp; !p.getMembresias().isEmpty())
+<span class="line-num">71</span>             .collect(Collectors.toList());
+<span class="line-num">73</span>     List&lt;Promocion&gt; promocionesClases = vigentes.stream()
+<span class="line-num">74</span>             .filter(p -&gt; p.getMembresias() == <span class="keyword">null</span> || p.getMembresias().isEmpty())
+<span class="line-num">75</span>             .collect(Collectors.toList());
+<span class="line-num">77</span>     <span class="keyword">boolean</span> mostrarPromocionesClases = <span class="keyword">true</span>;
+<span class="line-num">79</span>     <span class="keyword">if</span> (userDetails != <span class="keyword">null</span> &amp;&amp;
+<span class="line-num">80</span>         userDetails.getUsername() != <span class="keyword">null</span> &amp;&amp;
+<span class="line-num">81</span>         !userDetails.getUsername().isBlank()) {
+<span class="line-num">82</span>         String email = userDetails.getUsername();
+<span class="line-num">83</span>         Optional&lt;Persona&gt; personaOpt = personaRepository.findByEmail(email);
+<span class="line-num">84</span>         <span class="keyword">if</span> (personaOpt.isPresent()) { ... buscar suscripción activa ... }
+<span class="line-num">87</span>         <span class="comment">// Si el plan es premium/elite, ocultar promos de clases</span>
+<span class="line-num">88</span>         <span class="keyword">if</span> (nombrePlan.contains(<span class="string">"premium"</span>) || nombrePlan.contains(<span class="string">"elite"</span>)) {
+<span class="line-num">89</span>             mostrarPromocionesClases = <span class="keyword">false</span>;
+<span class="line-num">90</span>         }
+<span class="line-num">95</span>     model.addAttribute(<span class="string">"promociones"</span>, vigentes);
+<span class="line-num">96</span>     model.addAttribute(<span class="string">"promocionesMembresia"</span>, promocionesMembresia);
+<span class="line-num">97</span>     model.addAttribute(<span class="string">"promocionesClases"</span>, promocionesClases);
+<span class="line-num">98</span>     model.addAttribute(<span class="string">"hoy"</span>, hoy);
+<span class="line-num">99</span>     model.addAttribute(<span class="string">"activeMenu"</span>, <span class="string">"promociones-cliente"</span>);
+<span class="line-num">100</span>    model.addAttribute(<span class="string">"mostrarPromocionesClases"</span>, mostrarPromocionesClases);
+<span class="line-num">101</span>    <span class="keyword">return</span> <span class="string">"deportista/promociones"</span>;
+<span class="line-num">102</span> }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Líneas 57-60:</strong> El método responde a <code>GET /deportista/promociones</code>. Recibe un <code>Model</code> para enviar datos a la vista
+                            y <code>UserDetails</code> con el usuario autenticado.</p>
+                        <p><strong>Líneas 61-67:</strong> Calcula la fecha actual (<code>hoy</code>) y parte de todas las promociones con estado <code>ACTIVE</code>. Luego filtra
+                            solo las que están dentro del rango de fechas (inicio &le; hoy &le; fin) o sin fechas definidas.</p>
+                        <p><strong>Líneas 69-75:</strong> Se generan dos listas a partir de las vigentes:</p>
+                        <p>- <code>promocionesMembresia</code>: tienen una o más <code>membresias</code> asociadas.</p>
+                        <p>- <code>promocionesClases</code>: no tienen membresías (aplican a clases individuales).</p>
+                        <p><strong>Líneas 77-89:</strong> Por defecto se muestran promociones de clases, pero si el usuario autenticado tiene una
+                            <strong>suscripción activa</strong> con un plan cuyo nombre contiene "premium" o "elite", se pone
+                            <code>mostrarPromocionesClases = false</code> para ocultarlas en la vista.</p>
+                        <p><strong>Líneas 95-100:</strong> Se cargan en el modelo todas las listas y banderas que usará el HTML:</p>
+                        <p>- <code>promociones</code>: todas las promociones vigentes.</p>
+                        <p>- <code>promocionesMembresia</code> y <code>promocionesClases</code>: listas separadas por tipo.</p>
+                        <p>- <code>hoy</code>: la fecha actual para mostrarla en la cabecera.</p>
+                        <p>- <code>activeMenu</code>: se usa en el sidebar para resaltar el menú de promociones del cliente.</p>
+                        <p>- <code>mostrarPromocionesClases</code>: controla si la sección de clases con costo adicional se pinta o no.</p>
+                        <p><strong>Línea 101:</strong> Devuelve la vista <code>"deportista/promociones"</code>, que corresponde al archivo
+                            <code>src/main/resources/templates/deportista/promociones.html</code>.</p>
+                        <p><strong>Resumen:</strong> Este método es el único punto de entrada del deportista para ver promociones y prepara todos los datos que el HTML
+                            necesita para mostrarlas correctamente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: HTML DEPORTISTA PROMOCIONES -->
+        <div id="prom-dep-html-promociones" class="content">
+            <h2 class="section-title">3️⃣ HTML - deportista/promociones.html</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Es la pantalla que ve el <strong>deportista</strong> con las promociones vigentes. Muestra un resumen en la parte superior y dos bloques de tarjetas:
+                    promociones que aplican a <strong>membresías</strong> y promociones para <strong>clases con costo adicional</strong>, con botones que enlazan al
+                    flujo de compra correspondiente.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código HTML</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="keyword">&lt;main</span> class=<span class="string">"flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6"</span><span class="keyword">&gt;</span>
+<span class="line-num">2</span>   &lt;div class=<span class="string">"max-w-5xl mx-auto space-y-6"</span>&gt;
+<span class="line-num">3</span>     &lt;div class=<span class="string">"bg-white rounded-lg shadow p-6 flex items-center justify-between"</span>&gt;
+<span class="line-num">4</span>       &lt;div&gt;
+<span class="line-num">5</span>         &lt;h1 class=<span class="string">"text-2xl font-bold text-gray-800"</span>&gt;Descuentos y promociones&lt;/h1&gt;
+<span class="line-num">6</span>         &lt;p class=<span class="string">"text-gray-600 mt-1"</span>&gt;Revisa las promociones sobre tu membresía y las clases con costo adicional.&lt;/p&gt;
+<span class="line-num">7</span>       &lt;/div&gt;
+<span class="line-num">8</span>       &lt;div class=<span class="string">"text-sm text-gray-500"</span>
+<span class="line-num">9</span>            th:text=<span class="string">"${#temporals.format(hoy, 'dd/MM/yyyy')}"</span>&gt;15/11/2025&lt;/div&gt;
+<span class="line-num">10</span>    &lt;/div&gt;
+<span class="line-num">12</span>    &lt;div th:if=<span class="string">"${#lists.isEmpty(promociones)}"</span>
+<span class="line-num">13</span>         class=<span class="string">"bg-white rounded-lg shadow p-8 text-center text-gray-500"</span>&gt;
+<span class="line-num">14</span>      &lt;p class=<span class="string">"text-lg"</span>&gt;No hay promociones vigentes en este momento.&lt;/p&gt;
+<span class="line-num">15</span>    &lt;/div&gt;
+<span class="line-num">17</span>    &lt;div th:if=<span class="string">"${!#lists.isEmpty(promociones)}"</span> class=<span class="string">"space-y-6"</span>&gt;
+<span class="line-num">18</span>      &lt;!-- Promociones de membresía --&gt;
+<span class="line-num">19</span>      &lt;section class=<span class="string">"bg-white rounded-lg shadow p-6"</span>&gt;
+<span class="line-num">20</span>        &lt;div th:if=<span class="string">"${#lists.isEmpty(promocionesMembresia)}"</span>
+<span class="line-num">21</span>             class=<span class="string">"text-sm text-gray-500"</span>&gt;No hay promociones de membresía vigentes.&lt;/div&gt;
+<span class="line-num">22</span>        &lt;div th:if=<span class="string">"${!#lists.isEmpty(promocionesMembresia)}"</span>
+<span class="line-num">23</span>             class=<span class="string">"grid grid-cols-1 md:grid-cols-2 gap-4"</span>&gt;
+<span class="line-num">24</span>          &lt;div th:each=<span class="string">"promo : ${promocionesMembresia}"</span>
+<span class="line-num">25</span>               class=<span class="string">"bg-white rounded-lg border border-gray-200 p-5 flex flex-col justify-between"</span>&gt;
+<span class="line-num">26</span>            &lt;h3 class=<span class="string">"text-base font-semibold text-gray-800"</span>
+<span class="line-num">27</span>                th:text=<span class="string">"${promo.nombre}"</span>&gt;Nombre de promoción&lt;/h3&gt;
+<span class="line-num">28</span>            &lt;p class=<span class="string">"text-sm text-gray-600"</span>
+<span class="line-num">29</span>               th:text=<span class="string">"${promo.descripcion}"</span>&gt;Descripción de la promoción.&lt;/p&gt;
+<span class="line-num">30</span>            &lt;div class=<span class="string">"mt-2"</span>&gt;
+<span class="line-num">31</span>              &lt;div class=<span class="string">"text-sm font-semibold text-gray-800"</span>
+<span class="line-num">32</span>                   th:if=<span class="string">"${promo.tipo != null and promo.tipo.name() == 'PERCENTAGE'}"</span>
+<span class="line-num">33</span>                   th:text=<span class="string">"|${promo.valor} % de descuento|"</span>&gt;&lt;/div&gt;
+<span class="line-num">34</span>              &lt;div class=<span class="string">"text-sm font-semibold text-gray-800"</span>
+<span class="line-num">35</span>                   th:if=<span class="string">"${promo.tipo != null and promo.tipo.name() == 'AMOUNT'}"</span>
+<span class="line-num">36</span>                   th:text=<span class="string">"|S/ ${promo.valor} de descuento|"</span>&gt;&lt;/div&gt;
+<span class="line-num">38</span>            &lt;div class=<span class="string">"mt-2 text-xs text-gray-500"</span>&gt;... fechas de vigencia ...&lt;/div&gt;
+<span class="line-num">39</span>            &lt;div class=<span class="string">"mt-2 text-xs text-gray-500"</span>
+<span class="line-num">40</span>                 th:if=<span class="string">"${promo.membresias != null and !#lists.isEmpty(promo.membresias)}"</span>&gt;
+<span class="line-num">41</span>              &lt;span class=<span class="string">"font-semibold text-gray-700"</span>&gt;Aplica a:&lt;/span&gt;
+<span class="line-num">42</span>              &lt;span th:each=<span class="string">"m, iterStat : ${promo.membresias}"</span>&gt; ... &lt;/span&gt;
+<span class="line-num">44</span>            &lt;div class=<span class="string">"mt-3 flex justify-end"</span>&gt;
+<span class="line-num">45</span>              &lt;a th:href=<span class="string">"@{/planes(promoId=${promo.id})}"</span>
+<span class="line-num">46</span>                 class=<span class="string">"inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-orange-500 rounded-md hover:bg-orange-600"</span>&gt;
+<span class="line-num">47</span>                 Quiero esta promo
+<span class="line-num">48</span>              &lt;/a&gt;
+<span class="line-num">49</span>            &lt;/div&gt;
+<span class="line-num">54</span>      &lt;section class=<span class="string">"bg-white rounded-lg shadow p-6"</span>
+<span class="line-num">55</span>               th:if=<span class="string">"${mostrarPromocionesClases}"</span>&gt;
+<span class="line-num">57</span>        &lt;div th:if=<span class="string">"${#lists.isEmpty(promocionesClases)}"</span>
+<span class="line-num">58</span>             class=<span class="string">"text-sm text-gray-500"</span>&gt;No hay promociones para clases con costo adicional vigentes.&lt;/div&gt;
+<span class="line-num">59</span>        &lt;div th:if=<span class="string">"${!#lists.isEmpty(promocionesClases)}"</span>
+<span class="line-num">60</span>             class=<span class="string">"grid grid-cols-1 md:grid-cols-2 gap-4"</span>&gt;
+<span class="line-num">61</span>          &lt;div th:each=<span class="string">"promo : ${promocionesClases}"</span>
+<span class="line-num">62</span>               class=<span class="string">"bg-white rounded-lg border border-gray-200 p-5 flex flex-col justify-between"</span>&gt;
+<span class="line-num">63</span>            &lt;!-- Contenido similar: nombre, descripción, descuento y fechas --&gt;
+<span class="line-num">64</span>            &lt;div class=<span class="string">"mt-3 flex justify-end"</span>&gt;
+<span class="line-num">65</span>              &lt;a th:if=<span class="string">"${promo.clase != null}"</span>
+<span class="line-num">66</span>                 th:href=<span class="string">"@{/checkout/clase(claseId=${promo.clase.id}, promoId=${promo.id})}"</span>
+<span class="line-num">67</span>                 class=<span class="string">"inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-orange-500 rounded-md hover:bg-orange-600"</span>&gt;
+<span class="line-num">68</span>                 Quiero esta promo
+<span class="line-num">69</span>              &lt;/a&gt;
+<span class="line-num">70</span>              &lt;a th:if=<span class="string">"${promo.clase == null}"</span>
+<span class="line-num">71</span>                 th:href=<span class="string">"@{/reservas}"</span>
+<span class="line-num">72</span>                 class=<span class="string">"inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-orange-500 rounded-md hover:bg-orange-600"</span>&gt;
+<span class="line-num">73</span>                 Ver clases
+<span class="line-num">74</span>              &lt;/a&gt;
+<span class="line-num">75</span>            &lt;/div&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Líneas 1-10:</strong> Definen el <code>&lt;main&gt;</code> y la tarjeta de cabecera con el título "Descuentos y promociones" y la fecha
+                            formateada usando <code>#temporals.format(hoy, 'dd/MM/yyyy')</code>, enviada desde el controlador.</p>
+                        <p><strong>Líneas 12-15:</strong> Bloque con <code>th:if="${#lists.isEmpty(promociones)}"</code> que muestra un mensaje amigable cuando
+                            <strong>no hay promociones vigentes</strong>.</p>
+                        <p><strong>Líneas 17-25:</strong> Si la lista <code>promociones</code> no está vacía, se muestra la sección principal con las tarjetas. Primero,
+                            la sección de <strong>membresías</strong>, que recorre <code>promocionesMembresia</code> con <code>th:each</code>.</p>
+                        <p><strong>Líneas 26-36:</strong> Cada tarjeta incluye nombre, descripción y el texto del descuento, que cambia según el <code>tipo</code>:</p>
+                        <p>- Si <code>promo.tipo == PERCENTAGE</code> → "X % de descuento".</p>
+                        <p>- Si <code>promo.tipo == AMOUNT</code> → "S/ X de descuento".</p>
+                        <p><strong>Líneas 38-42:</strong> Zona de detalles: fechas de vigencia (inicio / fin) y membresías a las que aplica usando
+                            <code>th:each="m, iterStat : ${promo.membresias}"</code>.</p>
+                        <p><strong>Líneas 44-48:</strong> El botón "Quiero esta promo" va a <code>/planes</code> mandando <code>promoId</code> por query string. Desde
+                            esa pantalla el usuario continúa con el flujo de checkout de membresía.</p>
+                        <p><strong>Líneas 54-58:</strong> La segunda sección solo se muestra si <code>mostrarPromocionesClases</code> es <code>true</code>; esta bandera se calcula
+                            en el controlador según la suscripción del usuario.</p>
+                        <p><strong>Líneas 59-63:</strong> Si hay elementos en <code>promocionesClases</code>, se recorre la lista y se construyen tarjetas similares, pero
+                            orientadas a clases con costo adicional.</p>
+                        <p><strong>Líneas 64-75:</strong> Cada tarjeta de clase ofrece dos posibles flujos:</p>
+                        <p>- Si la promoción está asociada a una clase concreta (<code>promo.clase != null</code>), el botón va a <code>/checkout/clase</code> con
+                            <code>claseId</code> y <code>promoId</code>.</p>
+                        <p>- Si no hay clase asociada (<code>promo.clase == null</code>), muestra "Ver clases" y envía al usuario a la pantalla de
+                            <code>/reservas</code> para elegir una.</p>
+                        <p><strong>Resumen:</strong> El HTML toma las listas generadas por <code>PromocionesDeportistaController</code> y las presenta en una UI moderna,
+                            separando claramente las promociones de membresías y de clases, y conectando con los flujos de compra adecuados.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📖 Documentación interactiva - Usa los botones superiores para navegar entre secciones del módulo de promociones del deportista</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Desactivar todos los botones
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Mis Clases y Calificación</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #22c55e 0%, #0ea5e9 50%, #6366f1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #22c55e 0%, #0ea5e9 50%, #6366f1 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.4em; margin-bottom: 10px; }
+        .header p { font-size: 1.05em; opacity: 0.9; }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            padding: 10px 22px;
+            border: 2px solid #22c55e;
+            background: white;
+            color: #15803d;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+        .nav-btn:hover {
+            background: #22c55e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34,197,94,0.4);
+        }
+        .nav-btn.active {
+            background: #22c55e;
+            color: white;
+        }
+
+        .content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-title {
+            font-size: 2em;
+            color: #16a34a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #16a34a;
+        }
+        .purpose-box {
+            background: #dcfce7;
+            border-left: 5px solid #22c55e;
+            padding: 25px;
+            margin-bottom: 35px;
+            border-radius: 8px;
+        }
+        .purpose-box h3 { color: #166534; margin-bottom: 15px; font-size: 1.25em; font-weight: 700; }
+        .purpose-box p { color: #111827; line-height: 1.8; font-size: 1.02em; }
+
+        .code-explanation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            overflow-x: auto;
+            min-width: 900px;
+        }
+        .code-explanation-stacked { grid-template-columns: 1fr; }
+        .code-column {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .code-column h4 {
+            color: #16a34a;
+            margin-bottom: 18px;
+            font-size: 1.15em;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #16a34a;
+            font-weight: 700;
+        }
+        .code-block {
+            background: #0f172a;
+            color: #e5e7eb;
+            padding: 18px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre;
+        }
+        .code-block .line-num {
+            color: #9ca3af;
+            margin-right: 15px;
+            display: inline-block;
+            width: 35px;
+            text-align: right;
+            font-weight: bold;
+        }
+        .keyword { color: #38bdf8; font-weight: bold; }
+        .string { color: #facc15; }
+        .comment { color: #6b7280; font-style: italic; }
+        .class-name { color: #22c55e; font-weight: bold; }
+        .method { color: #f97316; }
+        .number { color: #a855f7; }
+
+        .explanation { color: #111827; line-height: 2; font-size: 0.98em; }
+        .explanation strong { color: #16a34a; font-weight: 700; }
+        .explanation p { margin-bottom: 10px; }
+
+        .footer {
+            background: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        @media (max-width: 1024px) {
+            .code-explanation { grid-template-columns: 1fr; min-width: auto; }
+            .header h1 { font-size: 1.8em; }
+            .nav-buttons { flex-direction: column; }
+            .nav-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Documentación - Mis Clases & Calificación</h1>
+            <p>Cómo se cargan las clases del deportista y cómo funciona la pantalla para calificar cada clase.</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('misclases-api'); return false;">1. API Mis Clases (/api/deportista/mis-clases)</button>
+            <button class="nav-btn" onclick="showSection('calificaciones-api'); return false;">2. API Calificación (/api/clases/calificaciones)</button>
+            <button class="nav-btn" onclick="showSection('misclases-vista'); return false;">3. Vista Mis Clases (HTML + JS)</button>
+        </div>
+
+        <!-- SECCIÓN 1: API MIS CLASES -->
+        <div id="misclases-api" class="content active">
+            <h2 class="section-title">1️⃣ API Mis Clases - /api/deportista/mis-clases</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Devuelve, en formato JSON, las clases asociadas a un deportista, ya agrupadas por estado:
+                    <strong>próximas</strong>, <strong>pendientes de calificar</strong> y <strong>calificadas</strong>. Esta API es consumida
+                    por el JavaScript de la pantalla <em>"Mis Clases"</em> para construir todas las tarjetas que ves en la interfaz.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código (MisClasesApiController)</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="keyword">@RestController</span>
+<span class="line-num">2</span> <span class="keyword">@RequestMapping</span>(<span class="string">"/api/deportista"</span>)
+<span class="line-num">3</span> <span class="keyword">public class</span> <span class="class-name">MisClasesApiController</span> {
+<span class="line-num">5</span>     <span class="keyword">private final</span> PersonaRepository personaRepository;
+<span class="line-num">6</span>     <span class="keyword">private final</span> ClaseService claseService;
+<span class="line-num">8</span>     <span class="keyword">public</span> <span class="method">MisClasesApiController</span>(PersonaRepository personaRepository,
+<span class="line-num">9</span>             ClaseService claseService) {
+<span class="line-num">10</span>        this.personaRepository = personaRepository;
+<span class="line-num">11</span>        this.claseService = claseService;
+<span class="line-num">12</span>    }
+<span class="line-num">14</span>    <span class="keyword">@GetMapping</span>(<span class="string">"/mis-clases"</span>)
+<span class="line-num">15</span>    <span class="keyword">public ResponseEntity&lt;?&gt;</span> <span class="method">misClases</span>(
+<span class="line-num">16</span>            @RequestParam(name = <span class="string">"deportistaId"</span>, required = <span class="keyword">false</span>) Long deportistaId,
+<span class="line-num">17</span>            Principal principal) {
+<span class="line-num">19</span>        <span class="comment">// Si no llega deportistaId por parámetro, se toma del usuario autenticado</span>
+<span class="line-num">20</span>        <span class="keyword">if</span> (deportistaId == <span class="keyword">null</span> &amp;&amp; principal != <span class="keyword">null</span>) {
+<span class="line-num">21</span>            deportistaId = personaRepository.findByEmail(principal.getName())
+<span class="line-num">22</span>                    .map(p -&gt; p.getId())
+<span class="line-num">23</span>                    .orElse(<span class="keyword">null</span>);
+<span class="line-num">24</span>        }
+<span class="line-num">26</span>        <span class="comment">// Validar que finalmente tengamos un ID de deportista</span>
+<span class="line-num">27</span>        <span class="keyword">if</span> (deportistaId == <span class="keyword">null</span>) {
+<span class="line-num">28</span>            <span class="keyword">return</span> ResponseEntity.badRequest().body(Map.of(<span class="string">"error"</span>, <span class="string">"deportistaId requerido"</span>));
+<span class="line-num">29</span>        }
+<span class="line-num">31</span>        <span class="keyword">try</span> {
+<span class="line-num">32</span>            Map&lt;String, Object&gt; resultado = claseService.obtenerClasesDeportista(deportistaId);
+<span class="line-num">33</span>            <span class="keyword">return</span> ResponseEntity.ok(resultado);
+<span class="line-num">34</span>        } <span class="keyword">catch</span> (Exception e) {
+<span class="line-num">35</span>            <span class="keyword">return</span> ResponseEntity.internalServerError()
+<span class="line-num">36</span>                    .body(Map.of(<span class="string">"error"</span>, <span class="string">"Error al obtener las clases del deportista"</span>));
+<span class="line-num">37</span>        }
+<span class="line-num">38</span>    }
+<span class="line-num">39</span> }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Ruta base:</strong> el controlador está bajo <code>/api/deportista</code>, por lo que el endpoint completo es
+                            <code>/api/deportista/mis-clases</code>.</p>
+                        <p><strong>Parámetro opcional:</strong> acepta <code>deportistaId</code> como query param. Si no se envía y hay un usuario autenticado
+                            (<code>Principal</code>), busca su <code>Persona</code> por email y usa ese ID.</p>
+                        <p><strong>Validación:</strong> si después de eso todavía no hay <code>deportistaId</code>, responde 400 con el mensaje
+                            <code>"deportistaId requerido"</code>.</p>
+                        <p><strong>Llamada al servicio:</strong> delega en <code>claseService.obtenerClasesDeportista(deportistaId)</code> toda la lógica de negocio
+                            (consultas a BD, armado de estructuras, etc.).</p>
+                        <p><strong>Respuesta:</strong> devuelve 200 OK con un <code>Map&lt;String,Object&gt;</code> que típicamente contiene tres listas:</p>
+                        <p>- <code>proximas</code>: clases futuras que aún no se han dictado.</p>
+                        <p>- <code>pendientes</code>: clases ya realizadas que el deportista puede calificar.</p>
+                        <p>- <code>calificadas</code>: clases que ya tienen una calificación asociada.</p>
+                        <p>Ese JSON es consumido más adelante por el JavaScript de la vista para pintar todas las tarjetas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: API CALIFICACIONES -->
+        <div id="calificaciones-api" class="content">
+            <h2 class="section-title">2️⃣ API Calificaciones - /api/clases/calificaciones</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Permite <strong>crear, actualizar, consultar y eliminar</strong> calificaciones de clases asociadas a una reserva concreta. Es el backend
+                    que usa el modal de "Calificar Clase" para guardar las estrellitas y comentarios del deportista.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código (ClaseCalificacionApiController)</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="keyword">@RestController</span>
+<span class="line-num">2</span> <span class="keyword">@RequestMapping</span>(<span class="string">"/api/clases/calificaciones"</span>)
+<span class="line-num">3</span> <span class="keyword">public class</span> <span class="class-name">ClaseCalificacionApiController</span> {
+<span class="line-num">5</span>     <span class="keyword">private final</span> ClaseCalificacionRepository repo;
+<span class="line-num">7</span>     <span class="keyword">public</span> <span class="method">ClaseCalificacionApiController</span>(ClaseCalificacionRepository repo) {
+<span class="line-num">8</span>         this.repo = repo;
+<span class="line-num">9</span>     }
+<span class="line-num">11</span>    <span class="comment">// Obtener calificación por reserva</span>
+<span class="line-num">12</span>    <span class="keyword">@GetMapping</span>(<span class="string">"/by-reserva/{reservaId}"</span>)
+<span class="line-num">13</span>    <span class="keyword">public ResponseEntity&lt;?&gt;</span> <span class="method">getByReserva</span>(@PathVariable Long reservaId) {
+<span class="line-num">14</span>        Optional&lt;ClaseCalificacion&gt; opt = repo.findByReservaId(reservaId);
+<span class="line-num">15</span>        <span class="keyword">return</span> opt.<ResponseEntity&lt;?&gt;>map(ResponseEntity::ok)
+<span class="line-num">16</span>                .orElseGet(() -&gt; ResponseEntity.notFound().build());
+<span class="line-num">17</span>    }
+
+<span class="line-num">19</span>    <span class="comment">// Crear o actualizar calificación</span>
+<span class="line-num">20</span>    <span class="keyword">@PostMapping</span>
+<span class="line-num">21</span>    <span class="keyword">public ResponseEntity&lt;?&gt;</span> <span class="method">createOrUpdate</span>(@RequestBody ClaseCalificacion payload) {
+<span class="line-num">22</span>        <span class="comment">// Validación temprana: se requiere reservaId, claseId y deportistaId</span>
+<span class="line-num">23</span>        <span class="keyword">if</span> (payload.getReservaId() == <span class="keyword">null</span>
+<span class="line-num">24</span>                || payload.getClaseId() == <span class="keyword">null</span>
+<span class="line-num">25</span>                || payload.getDeportistaId() == <span class="keyword">null</span>) {
+<span class="line-num">26</span>            <span class="keyword">return</span> ResponseEntity.badRequest()
+<span class="line-num">27</span>                    .body(Map.of(<span class="string">"error"</span>, <span class="string">"reservaId, claseId y deportistaId son obligatorios"</span>));
+<span class="line-num">28</span>        }
+<span class="line-num">29</span>        Optional&lt;ClaseCalificacion&gt; existing = repo.findByReservaId(payload.getReservaId());
+<span class="line-num">30</span>        ClaseCalificacion c = existing.orElseGet(ClaseCalificacion::new);
+<span class="line-num">31</span>        <span class="keyword">if</span> (c.getId() == <span class="keyword">null</span>) {
+<span class="line-num">32</span>            c.setReservaId(payload.getReservaId());
+<span class="line-num">33</span>        }
+<span class="line-num">34</span>        c.setClaseId(payload.getClaseId());
+<span class="line-num">35</span>        c.setDeportistaId(payload.getDeportistaId());
+<span class="line-num">36</span>        c.setRatingGeneral(payload.getRatingGeneral());
+<span class="line-num">37</span>        c.setRatingInstructor(payload.getRatingInstructor());
+<span class="line-num">38</span>        c.setRatingInstalaciones(payload.getRatingInstalaciones());
+<span class="line-num">39</span>        c.setRatingMusica(payload.getRatingMusica());
+<span class="line-num">40</span>        c.setRatingDificultad(payload.getRatingDificultad());
+<span class="line-num">41</span>        c.setComentario(payload.getComentario());
+<span class="line-num">42</span>        ClaseCalificacion saved = repo.save(c);
+<span class="line-num">43</span>        <span class="keyword">if</span> (existing.isPresent()) {
+<span class="line-num">44</span>            <span class="keyword">return</span> ResponseEntity.ok(saved);
+<span class="line-num">45</span>        }
+<span class="line-num">46</span>        URI location = URI.create(<span class="string">"/api/clases/calificaciones/"</span> + saved.getId());
+<span class="line-num">47</span>        <span class="keyword">return</span> ResponseEntity.created(location).body(saved);
+<span class="line-num">48</span>    }
+
+<span class="line-num">50</span>    <span class="comment">// Eliminar calificación por reserva</span>
+<span class="line-num">51</span>    <span class="keyword">@DeleteMapping</span>(<span class="string">"/by-reserva/{reservaId}"</span>)
+<span class="line-num">52</span>    <span class="keyword">public ResponseEntity&lt;?&gt;</span> <span class="method">deleteByReserva</span>(@PathVariable Long reservaId) {
+<span class="line-num">53</span>        Optional&lt;ClaseCalificacion&gt; existing = repo.findByReservaId(reservaId);
+<span class="line-num">54</span>        <span class="keyword">if</span> (existing.isEmpty()) <span class="keyword">return</span> ResponseEntity.notFound().build();
+<span class="line-num">55</span>        repo.deleteByReservaId(reservaId);
+<span class="line-num">56</span>        <span class="keyword">return</span> ResponseEntity.ok(Map.of(<span class="string">"deleted"</span>, <span class="keyword">true</span>));
+<span class="line-num">57</span>    }
+<span class="line-num">58</span> }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Ruta base:</strong> todos los endpoints cuelgan de <code>/api/clases/calificaciones</code>.</p>
+                        <p><strong>GET /by-reserva/{reservaId}:</strong> devuelve la calificación asociada a una reserva, o 404 si no existe.
+                            Es útil cuando quieres precargar el modal con una calificación ya hecha.</p>
+                        <p><strong>POST /api/clases/calificaciones:</strong></p>
+                        <p>- Recibe en el cuerpo un JSON con: <code>reservaId</code>, <code>claseId</code>, <code>deportistaId</code>,
+                            <code>ratingGeneral</code>, <code>ratingInstructor</code>, <code>ratingInstalaciones</code>, <code>ratingMusica</code>,
+                            <code>ratingDificultad</code> y <code>comentario</code>.</p>
+                        <p>- Si ya existe una calificación para esa <code>reservaId</code>, la actualiza (PUT implícito).</p>
+                        <p>- Si no existe, crea una nueva y responde con <code>201 Created</code>.</p>
+                        <p><strong>DELETE /by-reserva/{reservaId}:</strong> si hay una calificación asociada a esa reserva la elimina y devuelve
+                            <code>{ "deleted": true }</code>. Si no existe, responde 404.</p>
+                        <p><strong>Relación con la UI:</strong> el JavaScript de <em>mis-clases</em> llama a estos endpoints para guardar, editar o eliminar
+                            la calificación de cada clase directamente desde el navegador.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: VISTA MIS CLASES (HTML + JS) -->
+        <div id="misclases-vista" class="content">
+            <h2 class="section-title">3️⃣ Vista Mis Clases - HTML + JavaScript</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define la pantalla <strong>"Mis Clases"</strong> del deportista. Muestra filtros por estado e instructor, un listado de tarjetas por clase y
+                    un <strong>modal</strong> para calificar cuando una clase está pendiente. Todo el contenido se carga dinámicamente desde las APIs
+                    anteriores usando el archivo <code>deportista/mis-clases.js</code>.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 HTML principal (mis-clases.html)</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> &lt;!DOCTYPE html&gt;
+<span class="line-num">2</span> &lt;html lang=<span class="string">"es"</span> xmlns:th=<span class="string">"http://www.thymeleaf.org"</span>&gt;
+<span class="line-num">6</span>   &lt;title&gt;Mis Clases&lt;/title&gt;
+<span class="line-num">7</span>   &lt;meta th:if=<span class="string">"${_csrf != null}"</span> name=<span class="string">"_csrf"</span> th:content=<span class="string">"${_csrf.token}"</span>&gt;
+<span class="line-num">8</span>   &lt;meta th:if=<span class="string">"${_csrf != null}"</span> name=<span class="string">"_csrf_header"</span> th:content=<span class="string">"${_csrf.headerName}"</span>&gt;
+<span class="line-num">9</span>   &lt;script src=<span class="string">"https://cdn.tailwindcss.com"</span>&gt;&lt;/script&gt;
+<span class="line-num">10</span>  &lt;link rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/Estilos/sidebar-common.css}"</span>&gt;
+<span class="line-num">11</span>  &lt;link rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/deportista/mis-clases.css}"</span>&gt;
+<span class="line-num">25</span>  &lt;div class=<span class="string">"flex h-screen bg-gray-200"</span>&gt;
+<span class="line-num">27</span>    &lt;div th:replace=<span class="string">"~{fragments/sidebar :: sidebar('mis-clases')}"</span>&gt;&lt;/div&gt;
+<span class="line-num">31</span>    &lt;header class=<span class="string">"flex justify-between items-center p-4 bg-white border-b shadow-sm"</span>&gt; ... &lt;/header&gt;
+<span class="line-num">45</span>    &lt;div class=<span class="string">"filters"</span>&gt;
+<span class="line-num">49</span>      &lt;select id=<span class="string">"estado"</span>&gt;
+<span class="line-num">50</span>        &lt;option value=<span class="string">"todas"</span>&gt;Todas las clases&lt;/option&gt;
+<span class="line-num">51</span>        &lt;option value=<span class="string">"proximas"</span>&gt;Próximas clases&lt;/option&gt;
+<span class="line-num">52</span>        &lt;option value=<span class="string">"pendientes"</span>&gt;Pendientes de calificar&lt;/option&gt;
+<span class="line-num">53</span>        &lt;option value=<span class="string">"calificadas"</span>&gt;Calificadas&lt;/option&gt;
+<span class="line-num">59</span>      &lt;select id=<span class="string">"instructor"</span>&gt; ... &lt;/select&gt;
+<span class="line-num">71</span>    &lt;div id=<span class="string">"clasesList"</span> class=<span class="string">"clases-list mt-6"</span>&gt;&lt;/div&gt;
+
+<span class="line-num">79</span>  &lt;!-- Modal para calificar --&gt;
+<span class="line-num">80</span>  &lt;div id=<span class="string">"modalCalificar"</span> class=<span class="string">"modal"</span>&gt;
+<span class="line-num">81</span>    &lt;div class=<span class="string">"modal-content"</span>&gt;
+<span class="line-num">82</span>      &lt;button class=<span class="string">"modal-close"</span>&gt;&amp;times;&lt;/button&gt;
+<span class="line-num">83</span>      &lt;h2 class=<span class="string">"modal-title"</span>&gt;Calificar Clase&lt;/h2&gt;
+<span class="line-num">84</span>      &lt;p class=<span class="string">"modal-subtitle"</span> id=<span class="string">"modalSubtitle"</span>&gt;&lt;/p&gt;
+<span class="line-num">85</span>      &lt;p class=<span class="string">"modal-info"</span> id=<span class="string">"modalInfo"</span>&gt;&lt;/p&gt;
+<span class="line-num">86</span>      &lt;div id=<span class="string">"modalBody"</span>&gt;&lt;/div&gt;
+<span class="line-num">87</span>    &lt;/div&gt;
+<span class="line-num">88</span>  &lt;/div&gt;
+
+<span class="line-num">90</span>  &lt;script th:inline=<span class="string">"javascript"</span>&gt;
+<span class="line-num">92</span>    (<span class="keyword">function</span>(){
+<span class="line-num">93</span>       <span class="keyword">var</span> depId = /*[[${deportistaId}]]*/ <span class="keyword">null</span>;
+<span class="line-num">94</span>       <span class="keyword">if</span> (depId !== <span class="keyword">null</span>) { window.__deportistaId = depId; }
+<span class="line-num">95</span>    })();
+<span class="line-num">96</span>  &lt;/script&gt;
+<span class="line-num">98</span>  &lt;script th:src=<span class="string">"@{/deportista/mis-clases.js}"</span>&gt;&lt;/script&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación HTML</h4>
+                    <div class="explanation">
+                        <p><strong>Encabezado y estilos:</strong> reutiliza Tailwind y el CSS común del sidebar, más un CSS específico para las tarjetas
+                            de clases (<code>mis-clases.css</code>).</p>
+                        <p><strong>CSRF:</strong> incluye dos <code>&lt;meta&gt;</code> con el token y el nombre del header para poder llamar a las APIs
+                            <code>POST</code> y <code>DELETE</code> de forma segura desde JavaScript.</p>
+                        <p><strong>Filtros:</strong> los <code>&lt;select&gt;</code> con ids <code>estado</code> e <code>instructor</code> permiten filtrar
+                            la lista de clases ya cargadas en memoria.</p>
+                        <p><strong>Contenedor de lista:</strong> <code>clasesList</code> comienza vacío; el JS creará dentro todas las tarjetas de clases.</p>
+                        <p><strong>Modal de calificación:</strong> el <code>div</code> <code>modalCalificar</code> contiene el título, descripción,<br>
+                            información de clase y un <code>modalBody</code> donde se inyecta dinámicamente el formulario de estrellas y comentarios.</p>
+                        <p><strong>Variable global deportistaId:</strong> en el script inline se expone <code>window.__deportistaId</code> con el ID del deportista
+                            actual, para que el JS lo envíe a la API de calificación.</p>
+                        <p><strong>Scripts:</strong> finalmente se carga <code>mis-clases.js</code>, que implementa toda la lógica de carga, filtrado y
+                            calificación, y <code>sidebar.js</code> para el comportamiento del menú lateral.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 JavaScript principal (mis-clases.js)</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="comment">// Datos recibidos del backend</span>
+<span class="line-num">2</span> <span class="keyword">let</span> clasesData = [];
+<span class="line-num">7</span> <span class="keyword">function</span> renderClases(filtroEstado = <span class="string">'todas'</span>, filtroInstructor = <span class="string">'todos'</span>) {
+<span class="line-num">12</span>   <span class="keyword">let</span> clasesFiltradas = clasesData;
+<span class="line-num">15</span>   <span class="comment">// Filtrar por estado: proxima, pendiente, calificada</span>
+<span class="line-num">24</span>   <span class="comment">// Filtrar por instructor (demo con nombres fijos)</span>
+<span class="line-num">34</span>   clasesFiltradas.forEach(clase =&gt; {
+<span class="line-num">35</span>       <span class="keyword">const</span> card = createClaseCard(clase);
+<span class="line-num">36</span>       clasesList.appendChild(card);
+<span class="line-num">37</span>   });
+<span class="line-num">40</span> }
+
+<span class="line-num">40</span> <span class="keyword">function</span> createClaseCard(clase) {
+<span class="line-num">42</span>   card.className = <span class="string">'clase-card'</span>;
+<span class="line-num">47</span>   <span class="comment">// Muestra el estado: Próxima, Pendiente o Calificada con rating</span>
+<span class="line-num">74</span>   <span class="keyword">if</span> (clase.estado === <span class="string">'pendiente'</span>) {
+<span class="line-num">76</span>       contentHTML += <span class="string">`... botón Calificar Clase ...`</span>;
+<span class="line-num">79</span>   } <span class="keyword">else if</span> (clase.estado === <span class="string">'proxima'</span>) {
+<span class="line-num">81</span>       contentHTML += <span class="string">`mensaje: podrás calificarla después`</span>;
+<span class="line-num">83</span>   } <span class="keyword">else if</span> (clase.estado === <span class="string">'calificada'</span>) {
+<span class="line-num">85</span>       contentHTML += <span class="string">`... review, ratings por aspecto y botones Editar / Eliminar ...`</span>;
+<span class="line-num">111</span>  }
+
+<span class="line-num">131</span> <span class="keyword">function</span> abrirModalCalificar(claseId) {
+<span class="line-num">136</span>   <span class="keyword">const</span> clase = clasesData.find(c =&gt; c.id === claseId);
+<span class="line-num">139</span>   modalSubtitle.textContent = <span class="string">`${clase.titulo} con ${clase.instructor}`</span>;
+<span class="line-num">142</span>   modalBody.innerHTML = <span class="string">`&lt;form ... onsubmit="guardarCalificacion(event, ${claseId})"&gt; ... estrellas ... &lt;/form&gt;`</span>;
+<span class="line-num">189</span>   modal.style.display = <span class="string">'block'</span>;
+<span class="line-num">192</span> }
+
+<span class="line-num">192</span> <span class="keyword">const</span> ratings = { general: 0, instructor: 0, instalaciones: 0, musica: 0, dificultad: 0 };
+<span class="line-num">200</span> <span class="keyword">function</span> setRating(tipo, valor) { ... actualiza estrellas visualmente ... }
+
+<span class="line-num">215</span> <span class="keyword">function</span> guardarCalificacion(event, claseId) {
+<span class="line-num">221</span>   <span class="keyword">const</span> csrf = document.querySelector(<span class="string">'meta[name="_csrf"]'</span>)?.content;
+<span class="line-num">223</span>   fetch(<span class="string">'/api/clases/calificaciones'</span>, {
+<span class="line-num">224</span>       method: <span class="string">'POST'</span>,
+<span class="line-num">225</span>       headers: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>, [csrfHeader]: csrf },
+<span class="line-num">226</span>       body: JSON.stringify({
+<span class="line-num">227</span>           reservaId: clase.reservaId,
+<span class="line-num">228</span>           claseId: clase.claseId,
+<span class="line-num">229</span>           deportistaId: window.__deportistaId || <span class="number">0</span>,
+<span class="line-num">230</span>           ratingGeneral: ratings.general,
+<span class="line-num">231</span>           ratingInstructor: ratings.instructor,
+<span class="line-num">232</span>           ratingInstalaciones: ratings.instalaciones,
+<span class="line-num">233</span>           ratingMusica: ratings.musica,
+<span class="line-num">234</span>           ratingDificultad: ratings.dificultad,
+<span class="line-num">235</span>           comentario: comentarios
+<span class="line-num">236</span>       })
+<span class="line-num">237</span>   }).then(...).catch(...);
+
+<span class="line-num">248</span> <span class="keyword">function</span> eliminarCalificacion(claseId) {
+<span class="line-num">254</span>   fetch(<span class="string">`/api/clases/calificaciones/by-reserva/${clase.reservaId}`</span>, { method: <span class="string">'DELETE'</span>, headers: { [csrfHeader]: csrf } }) ...
+
+<span class="line-num">306</span> <span class="keyword">function</span> cargarDesdeApi(){
+<span class="line-num">312</span>   <span class="keyword">const</span> url = isFinite(depId) &amp;&amp; depId &gt; <span class="number">0</span>
+<span class="line-num">313</span>       ? <span class="string">`/api/deportista/mis-clases?deportistaId=${depId}`</span>
+<span class="line-num">314</span>       : <span class="string">`/api/deportista/mis-clases`</span>;
+<span class="line-num">315</span>   fetch(url)
+<span class="line-num">316</span>       .then(r =&gt; r.json())
+<span class="line-num">322</span>       clasesData = []; <span class="keyword">let</span> id=<span class="number">1</span>;
+<span class="line-num">323</span>       data.proximas.forEach(c =&gt; clasesData.push({ id:id++, ...c }));
+<span class="line-num">324</span>       data.pendientes.forEach(c =&gt; clasesData.push({ id:id++, ...c }));
+<span class="line-num">325</span>       data.calificadas.forEach(c =&gt; clasesData.push({ id:id++, ...c }));
+<span class="line-num">331</span>       renderClases();
+<span class="line-num">335</span> }
+
+<span class="line-num">335</span> document.addEventListener(<span class="string">'DOMContentLoaded'</span>, () =&gt; {
+<span class="line-num">336</span>   cargarDesdeApi();
+<span class="line-num">339</span>   document.getElementById(<span class="string">'estado'</span>).addEventListener(<span class="string">'change'</span>, ...);
+<span class="line-num">343</span>   document.getElementById(<span class="string">'instructor'</span>).addEventListener(<span class="string">'change'</span>, ...);
+<span class="line-num">347</span>   document.querySelector(<span class="string">'.modal-close'</span>).addEventListener(<span class="string">'click'</span>, cerrarModal);
+<span class="line-num">350</span>   window.addEventListener(<span class="string">'click'</span>, (e) =&gt; { <span class="comment">// cerrar modal clic fuera</span> });
+<span class="line-num">356</span> });
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación JavaScript</h4>
+                    <div class="explanation">
+                        <p><strong>Carga de datos:</strong> la función <code>cargarDesdeApi()</code> llama al endpoint
+                            <code>/api/deportista/mis-clases</code>, tomando el <code>deportistaId</code> desde la URL o desde la variable global
+                            <code>window.__deportistaId</code>.</p>
+                        <p><strong>Unificación:</strong> las listas <code>proximas</code>, <code>pendientes</code> y <code>calificadas</code> que vienen del backend
+                            se combinan en un solo arreglo <code>clasesData</code>, agregando un <code>id</code> interno para manejar el renderizado.</p>
+                        <p><strong>Renderizado de tarjetas:</strong> <code>renderClases()</code> aplica filtros de estado/instructor y llama a
+                            <code>createClaseCard()</code> para generar el HTML de cada tarjeta.</p>
+                        <p><strong>Estados de clase:</strong></p>
+                        <p>- <code>proxima</code>: muestra un texto indicando que la clase aún no ocurrió.</p>
+                        <p>- <code>pendiente</code>: muestra un botón "Calificar Clase" que abre el modal.</p>
+                        <p>- <code>calificada</code>: muestra el rating promedio, el detalle por aspecto y botones para editar o eliminar la calificación.</p>
+                        <p><strong>Modal de calificación:</strong> al abrirlo, se construye un formulario con cinco grupos de estrellas (general, instructor,
+                            instalaciones, música y dificultad) más un textarea de comentarios.</p>
+                        <p><strong>Guardado de calificación:</strong> las funciones <code>guardarCalificacion()</code> y <code>submitFromModal()</code> envían un
+                            <code>POST</code> a <code>/api/clases/calificaciones</code> con todos los ratings y el comentario. Tras un guardado exitoso, se
+                            cierra el modal y se vuelve a llamar a <code>cargarDesdeApi()</code> para refrescar la lista.</p>
+                        <p><strong>Eliminación:</strong> <code>eliminarCalificacion()</code> llama a <code>DELETE /api/clases/calificaciones/by-reserva/{reservaId}</code>
+                            para borrar una calificación existente, y luego recarga las clases.</p>
+                        <p><strong>Interacción de usuario:</strong> se agregan listeners para los filtros, para cerrar el modal y para detectar clic fuera del
+                            cuadro del modal.</p>
+                        <p><strong>Resumen:</strong> la pantalla de "Mis Clases" es completamente dinámica: todo el contenido proviene de las APIs de mis clases y
+                            calificaciones, y el JavaScript se encarga de armar las tarjetas, abrir el modal y enviar/actualizar las calificaciones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📖 Documentación interactiva - Usa los botones superiores para navegar entre la API y la vista de "Mis Clases" y calificación.</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content').forEach(function (el) {
+                el.classList.remove('active');
+            });
+
+            // Desactivar todos los botones
+            document.querySelectorAll('.nav-btn').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

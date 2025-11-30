@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Checkout Controller & HTML</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #22c55e 0%, #0ea5e9 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #22c55e 0%, #0ea5e9 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .nav-buttons { display: flex; gap: 10px; justify-content: center; padding: 20px; background: #f8f9fa; border-bottom: 2px solid #e9ecef; flex-wrap: wrap; }
+        .nav-btn { padding: 12px 24px; border: 2px solid #22c55e; background: white; color: #16a34a; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95em; }
+        .nav-btn:hover { background: #22c55e; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4); }
+        .nav-btn.active { background: #22c55e; color: white; }
+        .content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .section-title { font-size: 2em; color: #16a34a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #16a34a; }
+        .purpose-box { background: #ecfdf3; border-left: 5px solid #22c55e; padding: 25px; margin-bottom: 35px; border-radius: 8px; }
+        .purpose-box h3 { color: #16a34a; margin-bottom: 15px; font-size: 1.3em; font-weight: 700; }
+        .purpose-box p { color: #333; line-height: 1.8; font-size: 1.05em; }
+        .code-explanation { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; background: #f8f9fa; padding: 30px; border-radius: 8px; border: 1px solid #e9ecef; overflow-x: auto; min-width: 900px; }
+        .code-explanation-stacked { grid-template-columns: 1fr; }
+        .code-column { background: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; }
+        .code-column h4 { color: #16a34a; margin-bottom: 20px; font-size: 1.2em; padding-bottom: 12px; border-bottom: 3px solid #16a34a; font-weight: 700; }
+        .code-block { background: #0f172a; color: #e5e7eb; padding: 20px; border-radius: 6px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.95em; line-height: 1.6; margin-bottom: 15px; white-space: pre; }
+        .code-block .line-num { color: #9ca3af; margin-right: 15px; display: inline-block; width: 35px; text-align: right; font-weight: bold; }
+        .keyword { color: #38bdf8; font-weight: bold; }
+        .string { color: #facc15; }
+        .comment { color: #6b7280; font-style: italic; }
+        .class-name { color: #22c55e; font-weight: bold; }
+        .method { color: #f97316; }
+        .number { color: #a855f7; }
+        .explanation { color: #333; line-height: 2; font-size: 0.98em; }
+        .explanation strong { color: #16a34a; font-weight: 700; }
+        .explanation p { margin-bottom: 12px; }
+        .line-item { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+        .line-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .line-number { display: inline-block; background: #16a34a; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right: 10px; font-size: 0.9em; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #e9ecef; }
+        @media (max-width: 1024px) { .code-explanation { grid-template-columns: 1fr; min-width: auto; } .header h1 { font-size: 1.8em; } .nav-buttons { flex-direction: column; } .nav-btn { width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Documentación Checkout</h1>
+            <p>Explicación del flujo de pagos con Stripe para membresías y clases</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('checkout-controller-imports'); return false;">1. Controller - Clase y Dependencias</button>
+            <button class="nav-btn" onclick="showSection('checkout-controller-membresia'); return false;">2. Controller - GET /checkout (Membresía)</button>
+            <button class="nav-btn" onclick="showSection('checkout-controller-create-session'); return false;">3. Controller - Crear sesión Stripe</button>
+            <button class="nav-btn" onclick="showSection('checkout-controller-resultados'); return false;">4. Controller - Éxito / Cancelación</button>
+            <button class="nav-btn" onclick="showSection('checkout-controller-clase'); return false;">5. Controller - Checkout de Clases</button>
+            <button class="nav-btn" onclick="showSection('checkout-html-membresia'); return false;">6. HTML - checkout.html</button>
+            <button class="nav-btn" onclick="showSection('checkout-html-clase'); return false;">7. HTML - checkout_clase.html</button>
+        </div>
+
+        <!-- SECCIÓN 1: CONTROLLER IMPORTS Y CLASE -->
+        <div id="checkout-controller-imports" class="content active">
+            <h2 class="section-title">1️⃣ Controller - Clase, Ruta y Dependencias</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define el controlador <strong>CheckoutController</strong>, la ruta base <code>/checkout</code> y las dependencias que usa para gestionar pagos de <strong>membresías</strong> y <strong>clases</strong> usando Stripe.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">28</span> /**
+<span class="line-num">29</span>  * Controlador de Checkout - Proceso de pago de membresías
+<span class="line-num">30</span>  * Ruta: /checkout | Acceso: Público (para nuevos registros)
+<span class="line-num">31</span>  * Tablas: personas, planes, suscripciones, pagos
+<span class="line-num">32</span>  * Proceso transaccional: crea/actualiza suscripción y registra pago
+<span class="line-num">33</span>  */
+<span class="line-num">34</span> @Controller
+<span class="line-num">35</span> @RequestMapping("/checkout")
+<span class="line-num">36</span> public class CheckoutController {
+<span class="line-num">37</span> 
+<span class="line-num">38</span>     private final PersonaRepository personaRepository;
+<span class="line-num">39</span>     private final PlanRepository planRepository;
+<span class="line-num">40</span>     private final SuscripcionRepository suscripcionRepository;
+<span class="line-num">41</span>     private final PagoRepository pagoRepository;
+<span class="line-num">42</span>     private final PromocionRepository promocionRepository;
+<span class="line-num">43</span>     private final ClaseRepository claseRepository;
+<span class="line-num">44</span>     private final ReservaClaseRepository reservaClaseRepository;
+<span class="line-num">45</span> 
+<span class="line-num">46</span>     @Value("${stripe.publishable.key:}")
+<span class="line-num">47</span>     private String stripePublishableKey;
+<span class="line-num">48</span> 
+<span class="line-num">49</span>     public CheckoutController(PersonaRepository personaRepository,
+<span class="line-num">50</span>                             PlanRepository planRepository,
+<span class="line-num">51</span>                             SuscripcionRepository suscripcionRepository,
+<span class="line-num">52</span>                             PagoRepository pagoRepository,
+<span class="line-num">53</span>                             PromocionRepository promocionRepository,
+<span class="line-num">54</span>                             ClaseRepository claseRepository,
+<span class="line-num">55</span>                             ReservaClaseRepository reservaClaseRepository) {
+<span class="line-num">56</span>         this.personaRepository = personaRepository;
+<span class="line-num">57</span>         this.planRepository = planRepository;
+<span class="line-num">58</span>         this.suscripcionRepository = suscripcionRepository;
+<span class="line-num">59</span>         this.pagoRepository = pagoRepository;
+<span class="line-num">60</span>         this.promocionRepository = promocionRepository;
+<span class="line-num">61</span>         this.claseRepository = claseRepository;
+<span class="line-num">62</span>         this.reservaClaseRepository = reservaClaseRepository;
+<span class="line-num">63</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Líneas 1-7:</strong> Importan los modelos, repositorios de BD y clases de Stripe necesarias para crear sesiones de pago (<code>Session</code>, <code>SessionCreateParams</code>).</p>
+                        <p><strong>Líneas 13-17:</strong> Importan las anotaciones de Spring MVC (<code>@Controller</code>, <code>@RequestMapping</code>, etc.) y <code>Model</code> para pasar datos a las vistas Thymeleaf.</p>
+                        <p><strong>Líneas 34-35:</strong> <span class="keyword">@Controller</span> indica que es un controlador web. <span class="keyword">@RequestMapping("/checkout")</span> fija la ruta base: todos los métodos comienzan con <code>/checkout</code>.</p>
+                        <p><strong>Líneas 38-44:</strong> Se declaran los repositorios usados para buscar/guardar <strong>personas</strong>, <strong>planes</strong>, <strong>suscripciones</strong>, <strong>pagos</strong>, <strong>promociones</strong> y <strong>reservas de clases</strong>.</p>
+                        <p><strong>Líneas 46-47:</strong> <code>stripePublishableKey</code> se inyecta desde <code>application.properties</code>. Se envía luego al HTML para inicializar Stripe en el navegador.</p>
+                        <p><strong>Líneas 49-55:</strong> Constructor con inyección de dependencias: Spring pasa automáticamente las implementaciones de los repositorios cuando se crea el controlador.</p>
+                        <p><strong>Resumen:</strong> Esta parte solo prepara el entorno: ruta, dependencias y configuración de Stripe que usará el resto de métodos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: GET /checkout MEMBRESÍA -->
+        <div id="checkout-controller-membresia" class="content">
+            <h2 class="section-title">2️⃣ Controller - GET /checkout (Membresía)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Muestra la página <strong>checkout.html</strong> con el resumen del plan elegido, el período (mensual/anual), el precio y, si aplica, la promoción seleccionada.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">70</span>     <span class="keyword">@GetMapping</span>
+<span class="line-num">71</span>     <span class="keyword">public String</span> <span class="method">mostrarCheckout</span>(
+<span class="line-num">72</span>             @RequestParam String plan,
+<span class="line-num">73</span>             @RequestParam String periodo,
+<span class="line-num">74</span>             @RequestParam String precio,
+<span class="line-num">75</span>             @RequestParam(required = <span class="keyword">false</span>) String usuario,
+<span class="line-num">76</span>             @RequestParam(required = <span class="keyword">false</span>) Long promoId,
+<span class="line-num">77</span>             Model model,
+<span class="line-num">78</span>             @AuthenticationPrincipal UserDetails userDetails) {
+<span class="line-num">79</span> 
+<span class="line-num">80</span>         <span class="keyword">boolean</span> autenticado = userDetails != <span class="keyword">null</span> &amp;&amp; userDetails.getUsername() != <span class="keyword">null</span>;
+<span class="line-num">81</span>         <span class="keyword">if</span> (!autenticado) {
+<span class="line-num">82</span>             <span class="keyword">return</span> <span class="string">"redirect:/registro"</span>;
+<span class="line-num">83</span>         }
+<span class="line-num">84</span> 
+<span class="line-num">85</span>         String usuarioFinal = usuario;
+<span class="line-num">86</span>         <span class="keyword">if</span> ((usuarioFinal == <span class="keyword">null</span> || usuarioFinal.isBlank()) &amp;&amp; userDetails != <span class="keyword">null</span> &amp;&amp; userDetails.getUsername() != <span class="keyword">null</span>) {
+<span class="line-num">87</span>             usuarioFinal = userDetails.getUsername();
+<span class="line-num">88</span>         }
+<span class="line-num">89</span> 
+<span class="line-num">90</span>         model.addAttribute(<span class="string">"planNombre"</span>, plan);
+<span class="line-num">91</span>         model.addAttribute(<span class="string">"periodo"</span>, periodo);
+<span class="line-num">92</span>         model.addAttribute(<span class="string">"precio"</span>, precio);
+<span class="line-num">93</span>         model.addAttribute(<span class="string">"usuario"</span>, usuarioFinal);
+<span class="line-num">94</span>         model.addAttribute(<span class="string">"stripePublishableKey"</span>, stripePublishableKey);
+<span class="line-num">95</span>         model.addAttribute(<span class="string">"promoId"</span>, promoId);
+<span class="line-num">96</span>         model.addAttribute(<span class="string">"autenticado"</span>, autenticado);
+<span class="line-num">97</span>         
+<span class="line-num">98</span>         <span class="comment">// Calcular el ahorro si es anual</span>
+<span class="line-num">99</span>         <span class="keyword">if</span> (<span class="string">"anual"</span>.equalsIgnoreCase(periodo)) {
+<span class="line-num">100</span>             <span class="keyword">double</span> precioMensual = parsePrecio(precio) / <span class="number">12</span>;
+<span class="line-num">101</span>             <span class="keyword">double</span> ahorroMensual = <span class="number">0</span>;
+<span class="line-num">102</span>             
+<span class="line-num">103</span>             <span class="comment">// Ajustar según el plan</span>
+<span class="line-num">104</span>             <span class="keyword">switch</span> (plan.toLowerCase()) {
+<span class="line-num">105</span>                 <span class="keyword">case</span> <span class="string">"básico"</span>:
+<span class="line-num">106</span>                     ahorroMensual = <span class="number">49.90</span> - precioMensual;
+<span class="line-num">107</span>                     <span class="keyword">break</span>;
+<span class="line-num">108</span>                 <span class="keyword">case</span> <span class="string">"premium"</span>:
+<span class="line-num">109</span>                     ahorroMensual = <span class="number">79.90</span> - precioMensual;
+<span class="line-num">110</span>                     <span class="keyword">break</span>;
+<span class="line-num">111</span>                 <span class="keyword">case</span> <span class="string">"elite"</span>:
+<span class="line-num">112</span>                     ahorroMensual = <span class="number">129.90</span> - precioMensual;
+<span class="line-num">113</span>                     <span class="keyword">break</span>;
+<span class="line-num">114</span>             }
+<span class="line-num">115</span>             
+<span class="line-num">116</span>             model.addAttribute(<span class="string">"ahorroAnual"</span>, String.format(<span class="string">"%.2f"</span>, ahorroMensual * <span class="number">12</span>));
+<span class="line-num">117</span>         }
+<span class="line-num">118</span>
+<span class="line-num">119</span>         <span class="comment">// Si viene una promoción seleccionada, mostrar información de descuento estimado</span>
+<span class="line-num">120</span>         <span class="keyword">if</span> (promoId != <span class="keyword">null</span>) {
+<span class="line-num">121</span>             Promocion promo = obtenerPromocionAplicable(promoId, periodo);
+<span class="line-num">122</span>             <span class="keyword">if</span> (promo != <span class="keyword">null</span>) {
+<span class="line-num">123</span>                 <span class="keyword">double</span> precioBase = parsePrecio(precio);
+<span class="line-num">124</span>                 <span class="keyword">double</span> precioConDescuento = aplicarDescuento(precioBase, promo);
+<span class="line-num">125</span>                 <span class="keyword">if</span> (precioConDescuento &lt; <span class="number">0</span>) {
+<span class="line-num">126</span>                     precioConDescuento = <span class="number">0</span>;
+<span class="line-num">127</span>                 }
+<span class="line-num">128</span>                 model.addAttribute(<span class="string">"promo"</span>, promo);
+<span class="line-num">129</span>                 model.addAttribute(<span class="string">"precioConDescuento"</span>, String.format(<span class="string">"%.2f"</span>, precioConDescuento));
+<span class="line-num">130</span>             }
+<span class="line-num">131</span>         }
+<span class="line-num">132</span>         
+<span class="line-num">133</span>         <span class="keyword">return</span> <span class="string">"checkout"</span>;
+<span class="line-num">134</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 70:</strong> <span class="keyword">@GetMapping</span> sin ruta adicional → responde a <code>GET /checkout</code>.</p>
+                        <p><strong>Líneas 72-76:</strong> Recibe por query string el <strong>plan</strong>, <strong>periodo</strong>, <strong>precio</strong>, correo del <strong>usuario</strong> (opcional) y el <strong>ID de promoción</strong> si se ha elegido una.</p>
+                        <p><strong>Línea 78:</strong> Usa <code>@AuthenticationPrincipal</code> para obtener el usuario autenticado. Así puede rellenar el correo aunque no llegue en la URL.</p>
+                        <p><strong>Líneas 80-83:</strong> Si no hay usuario autenticado, redirige al registro. El flujo de pago solo se permite a usuarios registrados.</p>
+                        <p><strong>Líneas 85-88:</strong> Calcula <code>usuarioFinal</code>: toma el valor del parámetro y, si está vacío, usa el correo del usuario logueado.</p>
+                        <p><strong>Líneas 90-95:</strong> Carga en el <code>model</code> todos los datos que necesita <strong>checkout.html</strong>: nombre del plan, período, precio, correo del usuario, clave pública de Stripe y posible promoción.</p>
+                        <p><strong>Líneas 98-117 (resumido):</strong> Si el período es anual, calcula el <strong>ahorro anual</strong> comparando con el precio mensual estándar y lo manda a la vista como <code>ahorroAnual</code>.</p>
+                        <p><strong>Líneas 119-130 (resumido):</strong> Si viene un <code>promoId</code>, busca la promoción aplicable, calcula el <strong>precio con descuento</strong> y lo añade al modelo.</p>
+                        <p><strong>Línea 133:</strong> Devuelve la vista <code>"checkout"</code> → Spring renderiza <code>checkout.html</code> en <code>src/main/resources/templates</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: CREAR SESIÓN STRIPE -->
+        <div id="checkout-controller-create-session" class="content">
+            <h2 class="section-title">3️⃣ Controller - POST /checkout/create-session (Stripe)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Crea una <strong>Session</strong> de Stripe con el monto final (aplicando promoción si existe) y devuelve el <strong>sessionId</strong> al frontend para redirigir al formulario seguro de Stripe.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">150</span>     <span class="keyword">@PostMapping</span>(<span class="string">"/create-session"</span>)
+<span class="line-num">151</span>     <span class="keyword">@ResponseBody</span>
+<span class="line-num">152</span>     <span class="keyword">public</span> ResponseEntity&lt;Map&lt;String,String&gt;&gt; <span class="method">createCheckoutSession</span>(
+<span class="line-num">153</span>             @RequestParam String usuario,
+<span class="line-num">154</span>             @RequestParam String plan,
+<span class="line-num">155</span>             @RequestParam String periodo,
+<span class="line-num">156</span>             @RequestParam String precio,
+<span class="line-num">157</span>             @RequestParam(required = <span class="keyword">false</span>) Long promoId,
+<span class="line-num">158</span>             HttpServletRequest request) {
+<span class="line-num">160</span>     Map&lt;String,String&gt; response = <span class="keyword">new</span> HashMap&lt;&gt;();
+<span class="line-num">162</span>     <span class="keyword">try</span> {
+<span class="line-num">163</span>         Promocion promo = <span class="keyword">null</span>;
+<span class="line-num">164</span>         <span class="keyword">if</span> (promoId != <span class="keyword">null</span>) {
+<span class="line-num">165</span>             promo = obtenerPromocionAplicable(promoId, periodo);
+<span class="line-num">166</span>         }
+<span class="line-num">167</span>         <span class="keyword">double</span> amountDouble = parsePrecio(precio);
+<span class="line-num">168</span>         <span class="keyword">if</span> (promo != <span class="keyword">null</span>) {
+<span class="line-num">169</span>             amountDouble = aplicarDescuento(amountDouble, promo);
+<span class="line-num">170</span>         }
+<span class="line-num">171</span>         <span class="keyword">long</span> amountInCents = Math.round(amountDouble * <span class="number">100</span>);
+<span class="line-num">173</span>         <span class="keyword">if</span> (amountInCents &lt;= <span class="number">0</span>) {
+<span class="line-num">174</span>             response.put(<span class="string">"error"</span>, <span class="string">"Monto inválido para el pago."</span>);
+<span class="line-num">175</span>             <span class="keyword">return</span> ResponseEntity.badRequest().body(response);
+<span class="line-num">176</span>         }
+<span class="line-num">178</span>         String baseUrl = request.getScheme() + <span class="string">"://"</span> + request.getServerName();
+<span class="line-num">181</span>         <span class="keyword">if</span> ((<span class="string">"http"</span>.equals(request.getScheme()) &amp;&amp; request.getServerPort() != <span class="number">80</span>) ||
+<span class="line-num">180</span>             (<span class="string">"https"</span>.equals(request.getScheme()) &amp;&amp; request.getServerPort() != <span class="number">443</span>)) {
+<span class="line-num">181</span>             baseUrl += <span class="string">":"</span> + request.getServerPort();
+<span class="line-num">182</span>         }
+<span class="line-num">183</span> 
+<span class="line-num">184</span>         String successUrl = baseUrl + <span class="string">"/checkout/success?session_id={CHECKOUT_SESSION_ID}"</span>;
+<span class="line-num">186</span> 
+<span class="line-num">187</span>         StringBuilder cancelUrlBuilder = <span class="keyword">new</span> StringBuilder(baseUrl)
+<span class="line-num">188</span>             .append(<span class="string">"/checkout/cancel"</span>)
+<span class="line-num">189</span>             .append(<span class="string">"?plan="</span>).append(URLEncoder.encode(plan, StandardCharsets.UTF_8))
+<span class="line-num">190</span>             .append(<span class="string">"&amp;periodo="</span>).append(URLEncoder.encode(periodo, StandardCharsets.UTF_8))
+<span class="line-num">191</span>             .append(<span class="string">"&amp;precio="</span>).append(URLEncoder.encode(precio, StandardCharsets.UTF_8));
+<span class="line-num">192</span> 
+<span class="line-num">193</span>         <span class="keyword">if</span> (usuario != <span class="keyword">null</span> &amp;&amp; !usuario.isBlank()) {
+<span class="line-num">194</span>             cancelUrlBuilder.append(<span class="string">"&amp;usuario="</span>).append(URLEncoder.encode(usuario, StandardCharsets.UTF_8));
+<span class="line-num">195</span>         }
+<span class="line-num">196</span> 
+<span class="line-num">197</span>         String cancelUrl = cancelUrlBuilder.toString();
+<span class="line-num">198</span> 
+<span class="line-num">199</span>         SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
+<span class="line-num">200</span>             .setMode(SessionCreateParams.Mode.PAYMENT)
+<span class="line-num">201</span>             .setSuccessUrl(successUrl)
+<span class="line-num">202</span>             .setCancelUrl(cancelUrl)
+<span class="line-num">203</span>             .setCustomerEmail(usuario)
+<span class="line-num">204</span>             .putMetadata(<span class="string">"usuario"</span>, usuario)
+<span class="line-num">205</span>             .putMetadata(<span class="string">"plan"</span>, plan)
+<span class="line-num">206</span>             .putMetadata(<span class="string">"periodo"</span>, periodo)
+<span class="line-num">207</span>             .putMetadata(<span class="string">"precio"</span>, precio);
+<span class="line-num">208</span> 
+<span class="line-num">209</span>         <span class="keyword">if</span> (promo != <span class="keyword">null</span>) {
+<span class="line-num">210</span>             paramsBuilder
+<span class="line-num">211</span>                 .putMetadata(<span class="string">"promoId"</span>, String.valueOf(promo.getId()))
+<span class="line-num">212</span>                 .putMetadata(<span class="string">"precioConDescuento"</span>, String.valueOf(amountDouble));
+<span class="line-num">213</span>         }
+<span class="line-num">214</span> 
+<span class="line-num">215</span>         SessionCreateParams params = paramsBuilder
+<span class="line-num">216</span>             .addLineItem(
+<span class="line-num">217</span>                 SessionCreateParams.LineItem.builder()
+<span class="line-num">218</span>                     .setQuantity(<span class="number">1L</span>)
+<span class="line-num">219</span>                     .setPriceData(
+<span class="line-num">220</span>                         SessionCreateParams.LineItem.PriceData.builder()
+<span class="line-num">221</span>                             .setCurrency(<span class="string">"pen"</span>)
+<span class="line-num">222</span>                             .setUnitAmount(amountInCents)
+<span class="line-num">223</span>                             .setProductData(
+<span class="line-num">224</span>                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
+<span class="line-num">225</span>                                         .setName(<span class="string">"Membresía "</span> + plan)
+<span class="line-num">226</span>                                         .build()
+<span class="line-num">227</span>                             )
+<span class="line-num">228</span>                             .build()
+<span class="line-num">229</span>                     )
+<span class="line-num">230</span>                     .build()
+<span class="line-num">231</span>             )
+<span class="line-num">232</span>             .build();
+<span class="line-num">233</span> 
+<span class="line-num">234</span>         Session session = Session.create(params);
+<span class="line-num">235</span>         response.put(<span class="string">"id"</span>, session.getId());
+<span class="line-num">236</span>         <span class="keyword">return</span> ResponseEntity.ok(response);
+<span class="line-num">237</span>     } <span class="keyword">catch</span> (StripeException e) {
+<span class="line-num">238</span>         System.err.println(<span class="string">"Error al crear sesión de Stripe: "</span> + e.getMessage());
+<span class="line-num">239</span>         e.printStackTrace();
+<span class="line-num">240</span>         response.put(<span class="string">"error"</span>, <span class="string">"No se pudo iniciar el pago. Intenta nuevamente."</span>);
+<span class="line-num">241</span>         <span class="keyword">return</span> ResponseEntity.status(<span class="number">500</span>).body(response);
+<span class="line-num">242</span>     } <span class="keyword">catch</span> (Exception e) {
+<span class="line-num">243</span>         System.err.println(<span class="string">"Error inesperado al crear sesión de Stripe: "</span> + e.getMessage());
+<span class="line-num">244</span>         e.printStackTrace();
+<span class="line-num">245</span>         response.put(<span class="string">"error"</span>, <span class="string">"Ocurrió un error al iniciar el pago."</span>);
+<span class="line-num">246</span>         <span class="keyword">return</span> ResponseEntity.status(<span class="number">500</span>).body(response);
+<span class="line-num">247</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Líneas 150-152:</strong> Método <code>POST /checkout/create-session</code> que devuelve JSON (<span class="keyword">@ResponseBody</span>) con el <code>id</code> de la sesión de Stripe.</p>
+                        <p><strong>Líneas 153-157:</strong> Recibe los mismos datos que la vista: usuario, plan, período, precio y opcionalmente <code>promoId</code> para aplicar descuento.</p>
+                        <p><strong>Líneas 163-171:</strong> Si hay promoción, calcula el <strong>monto final</strong> aplicando el descuento. Convierte el precio a centavos, que es lo que Stripe espera.</p>
+                        <p><strong>Líneas 173-176:</strong> Valida que el monto sea mayor que cero; si no, devuelve un error al frontend.</p>
+                        <p><strong>Líneas 178-183:</strong> Construye <code>baseUrl</code> dinámicamente (incluyendo puerto si aplica) para formar las URLs de éxito/cancelación.</p>
+                        <p><strong>Líneas 184-192:</strong> Genera <code>successUrl</code> (<code>/checkout/success</code>) y <code>cancelUrl</code> (<code>/checkout/cancel</code>) con los parámetros necesarios para reconstruir la vista si el pago se cancela.</p>
+                        <p><strong>Líneas 200-223:</strong> Crea el objeto <code>SessionCreateParams</code> indicando moneda, monto, descripción del producto y <strong>metadatos</strong> (usuario, plan, período, precio) que luego se leerán en el callback de éxito.</p>
+                        <p><strong>Líneas 225-227:</strong> Llama a <code>Session.create(params)</code> en Stripe y devuelve al navegador el <code>sessionId</code> para redirigir al formulario de pago.</p>
+                        <p><strong>Líneas 228-231:</strong> Si hay una excepción de Stripe, responde con un mensaje de error que el JavaScript mostrará al usuario.</p>
+                        <p><strong>Resumen:</strong> Este método es el puente entre tu aplicación y Stripe: traduce el plan elegido en una sesión de pago real.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: ÉXITO / CANCELACIÓN -->
+        <div id="checkout-controller-resultados" class="content">
+            <h2 class="section-title">4️⃣ Controller - Éxito y Cancelación de Pago</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Gestiona el resultado del pago de Stripe: cuando el pago es exitoso, crea/actualiza la suscripción y registra el pago; cuando se cancela, vuelve a cargar la pantalla de checkout con un mensaje de error.</p>
+            </div>
+
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código (resumen)</h4>
+                    <div class="code-block">
+<span class="line-num">523</span>     <span class="keyword">@GetMapping</span>(<span class="string">"/success"</span>)
+<span class="line-num">524</span>     <span class="keyword">@Transactional</span>
+<span class="line-num">525</span>     <span class="keyword">public String</span> <span class="method">stripeSuccess</span>(
+<span class="line-num">526</span>             @RequestParam(<span class="string">"session_id"</span>) String sessionId,
+<span class="line-num">527</span>             @AuthenticationPrincipal UserDetails userDetails) {
+<span class="line-num">528</span>         <span class="keyword">try</span> {
+<span class="line-num">529</span>             Session session = Session.retrieve(sessionId);
+<span class="line-num">530</span> 
+<span class="line-num">531</span>             <span class="keyword">if</span> (session == <span class="keyword">null</span> || !<span class="string">"paid"</span>.equalsIgnoreCase(session.getPaymentStatus())) {
+<span class="line-num">532</span>                 <span class="keyword">return</span> <span class="string">"redirect:/planes?errorPagoStripe=true"</span>;
+<span class="line-num">533</span>             }
+<span class="line-num">534</span> 
+<span class="line-num">535</span>             String usuario = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"usuario"</span>) : <span class="keyword">null</span>;
+<span class="line-num">536</span>             String plan = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"plan"</span>) : <span class="keyword">null</span>;
+<span class="line-num">537</span>             String periodo = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"periodo"</span>) : <span class="keyword">null</span>;
+<span class="line-num">538</span>             String precio = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"precio"</span>) : <span class="keyword">null</span>;
+<span class="line-num">539</span>             String promoIdStr = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"promoId"</span>) : <span class="keyword">null</span>;
+<span class="line-num">540</span> 
+<span class="line-num">541</span>             <span class="keyword">if</span> (usuario == <span class="keyword">null</span> || plan == <span class="keyword">null</span> || periodo == <span class="keyword">null</span> || precio == <span class="keyword">null</span>) {
+<span class="line-num">542</span>                 <span class="keyword">return</span> <span class="string">"redirect:/planes?errorPagoStripe=true"</span>;
+<span class="line-num">543</span>             }
+<span class="line-num">544</span> 
+<span class="line-num">545</span>             Persona persona = personaRepository.findByEmail(usuario)
+<span class="line-num">546</span>                     .orElseThrow(() -&gt; <span class="keyword">new</span> RuntimeException(<span class="string">"Usuario no encontrado: "</span> + usuario));
+<span class="line-num">547</span> 
+<span class="line-num">548</span>             Plan planEntity = planRepository.findByNombre(plan)
+<span class="line-num">549</span>                     .orElseGet(() -&gt; {
+<span class="line-num">550</span>                         Plan nuevoPlan = <span class="keyword">new</span> Plan();
+<span class="line-num">551</span>                         nuevoPlan.setNombre(plan);
+<span class="line-num">552</span>                         nuevoPlan.setPrecio(parsePrecio(precio));
+<span class="line-num">553</span>                         nuevoPlan.setFrecuencia(periodo.equalsIgnoreCase(<span class="string">"anual"</span>) ? <span class="string">"Anual"</span> : <span class="string">"Mensual"</span>);
+<span class="line-num">554</span>                         <span class="keyword">return</span> planRepository.save(nuevoPlan);
+<span class="line-num">555</span>                     });
+<span class="line-num">556</span> 
+<span class="line-num">557</span>             Optional&lt;Suscripcion&gt; suscripcionExistente = suscripcionRepository.findActiveByDeportistaId(persona.getId());
+<span class="line-num">558</span>             Suscripcion suscripcion;
+<span class="line-num">559</span> 
+<span class="line-num">560</span>             <span class="keyword">if</span> (suscripcionExistente.isPresent()) {
+<span class="line-num">561</span>                 suscripcion = suscripcionExistente.get();
+<span class="line-num">562</span>                 suscripcion.setPlan(planEntity);
+<span class="line-num">563</span>                 suscripcion.setEstado(<span class="string">"Activa"</span>);
+<span class="line-num">564</span>             } <span class="keyword">else</span> {
+<span class="line-num">565</span>                 suscripcion = <span class="keyword">new</span> Suscripcion();
+<span class="line-num">566</span>                 suscripcion.setDeportista(persona);
+<span class="line-num">567</span>                 suscripcion.setPlan(planEntity);
+<span class="line-num">568</span>                 suscripcion.setEstado(<span class="string">"Activa"</span>);
+<span class="line-num">569</span>                 suscripcion.setFechaInicio(LocalDate.now());
+<span class="line-num">570</span>             }
+<span class="line-num">571</span> 
+<span class="line-num">572</span>             suscripcion.setFechaFin(calcularFechaFin(periodo));
+<span class="line-num">573</span>             suscripcion.setProximoPago(calcularProximoPago(periodo));
+<span class="line-num">574</span> 
+<span class="line-num">575</span>             suscripcionRepository.save(suscripcion);
+<span class="line-num">576</span> 
+<span class="line-num">577</span>             Pago pago = <span class="keyword">new</span> Pago();
+<span class="line-num">578</span>             pago.setCodigoPago(generarCodigoPago());
+<span class="line-num">579</span>             pago.setDeportista(persona);
+<span class="line-num">580</span>             pago.setFecha(LocalDate.now());
+<span class="line-num">581</span>             pago.setMetodoPago(<span class="string">"Stripe"</span>);
+<span class="line-num">582</span> 
+<span class="line-num">583</span>             Long amountTotal = session.getAmountTotal();
+<span class="line-num">584</span>             <span class="keyword">double</span> montoPagado = amountTotal != <span class="keyword">null</span> ? amountTotal / <span class="number">100.0</span> : parsePrecio(precio);
+<span class="line-num">585</span>             pago.setMonto(montoPagado);
+<span class="line-num">586</span> 
+<span class="line-num">587</span>             pago.setEstado(<span class="string">"Completado"</span>);
+<span class="line-num">588</span>             pago.setPlanServicio(plan);
+<span class="line-num">589</span>             pagoRepository.save(pago);
+<span class="line-num">590</span> 
+<span class="line-num">591</span>             persona.setMembresiaActiva(<span class="keyword">true</span>);
+<span class="line-num">592</span>             personaRepository.save(persona);
+<span class="line-num">593</span> 
+<span class="line-num">594</span>             <span class="comment">// Registrar uso de la promoción si se aplicó</span>
+<span class="line-num">595</span>             <span class="keyword">if</span> (promoIdStr != <span class="keyword">null</span> &amp;&amp; !promoIdStr.isBlank()) {
+<span class="line-num">596</span>                 <span class="keyword">try</span> {
+<span class="line-num">597</span>                     Long promoId = Long.valueOf(promoIdStr);
+<span class="line-num">598</span>                     Optional&lt;Promocion&gt; promoOpt = promocionRepository.findById(promoId);
+<span class="line-num">599</span>                     <span class="keyword">if</span> (promoOpt.isPresent()) {
+<span class="line-num">600</span>                         Promocion promo = promoOpt.get();
+<span class="line-num">601</span>                         Integer usados = promo.getUsados() != <span class="keyword">null</span> ? promo.getUsados() : <span class="number">0</span>;
+<span class="line-num">602</span>                         promo.setUsados(usados + <span class="number">1</span>);
+<span class="line-num">603</span>                         promocionRepository.save(promo);
+<span class="line-num">604</span>                     }
+<span class="line-num">605</span>                 } <span class="keyword">catch</span> (NumberFormatException ignored) {
+<span class="line-num">606</span>                     <span class="comment">// Si el ID no es válido, simplemente no se registra uso</span>
+<span class="line-num">607</span>                 }
+<span class="line-num">608</span>             }
+<span class="line-num">609</span> 
+<span class="line-num">610</span>             <span class="keyword">boolean</span> esDeportistaAutenticado =
+<span class="line-num">611</span>                     userDetails != <span class="keyword">null</span> &amp;&amp;
+<span class="line-num">612</span>                     userDetails.getUsername() != <span class="keyword">null</span> &amp;&amp;
+<span class="line-num">613</span>                     userDetails.getUsername().equalsIgnoreCase(usuario);
+<span class="line-num">614</span> 
+<span class="line-num">615</span>             <span class="keyword">if</span> (esDeportistaAutenticado) {
+<span class="line-num">616</span>                 <span class="keyword">return</span> <span class="string">"redirect:/perfil"</span>;
+<span class="line-num">617</span>             } <span class="keyword">else</span> {
+<span class="line-num">618</span>                 <span class="keyword">return</span> <span class="string">"redirect:/login?registroExitoso=true&amp;mensaje=¡Pago+procesado+correctamente!+Ya+puedes+iniciar+sesión."</span>;
+<span class="line-num">619</span>             }
+<span class="line-num">620</span>         } <span class="keyword">catch</span> (Exception e) {
+<span class="line-num">621</span>             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+<span class="line-num">622</span>             System.err.println(<span class="string">"Error al procesar el pago mediante Stripe: "</span> + e.getMessage());
+<span class="line-num">623</span>             e.printStackTrace();
+<span class="line-num">624</span>             <span class="keyword">return</span> <span class="string">"redirect:/planes?errorPagoStripe=true"</span>;
+<span class="line-num">625</span>         }
+<span class="line-num">626</span>     }
+<span class="line-num">627</span> 
+<span class="line-num">628</span>     <span class="keyword">@GetMapping</span>(<span class="string">"/cancel"</span>)
+<span class="line-num">629</span>     <span class="keyword">public String</span> <span class="method">stripeCancel</span>(@RequestParam String plan,
+<span class="line-num">630</span>                                @RequestParam String periodo,
+<span class="line-num">631</span>                                @RequestParam String precio,
+<span class="line-num">632</span>                                @RequestParam(required = <span class="keyword">false</span>) String usuario,
+<span class="line-num">633</span>                                Model model) {
+<span class="line-num">634</span> 
+<span class="line-num">635</span>         model.addAttribute(<span class="string">"planNombre"</span>, plan);
+<span class="line-num">636</span>         model.addAttribute(<span class="string">"periodo"</span>, periodo);
+<span class="line-num">637</span>         model.addAttribute(<span class="string">"precio"</span>, precio);
+<span class="line-num">638</span>         model.addAttribute(<span class="string">"usuario"</span>, usuario);
+<span class="line-num">639</span>         model.addAttribute(<span class="string">"stripePublishableKey"</span>, stripePublishableKey);
+<span class="line-num">640</span>         model.addAttribute(<span class="string">"error"</span>, <span class="string">"El pago fue cancelado. No se ha realizado ningún cargo."</span>);
+<span class="line-num">641</span>         <span class="keyword">return</span> <span class="string">"checkout"</span>;
+<span class="line-num">642</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>stripeSuccess (GET /checkout/success):</strong></p>
+                        <p>- Recupera la <strong>Session</strong> de Stripe usando el <code>session_id</code> recibido en la URL.</p>
+                        <p>- Lee de los <strong>metadatos</strong> el usuario, plan, período y precio originales.</p>
+                        <p>- Busca o crea el <strong>Plan</strong> y la <strong>Suscripción</strong> asociada al deportista.</p>
+                        <p>- Calcula fechas de fin y próximo pago, guarda la suscripción y registra un <strong>Pago</strong> con estado "Completado".</p>
+                        <p>- Marca la membresía del usuario como activa y lo redirige al <code>/perfil</code> si está autenticado, o al <code>/login</code> con un mensaje de éxito si venía como nuevo registro.</p>
+                        <p><strong>stripeCancel (GET /checkout/cancel):</strong></p>
+                        <p>- Se llama cuando el usuario cancela el pago en la pantalla de Stripe.</p>
+                        <p>- Vuelve a cargar los datos del plan, período y precio en el <code>model</code>, añade un mensaje de error y retorna nuevamente la vista <code>checkout</code> para que el usuario pueda reintentar.</p>
+                        <p><strong>Resumen:</strong> Estos métodos conectan el resultado del pago con tu modelo de negocio (suscripciones y pagos) y controlan a dónde se envía al usuario después de pagar o cancelar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: CHECKOUT DE CLASES -->
+        <div id="checkout-controller-clase" class="content">
+            <h2 class="section-title">5️⃣ Controller - Checkout de Clases</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Maneja el pago de <strong>clases individuales</strong> usando Stripe: muestra la pantalla de resumen de clase, crea la sesión de pago y procesa el éxito/cancelación.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código (métodos principales)</h4>
+                    <div class="code-block">
+<span class="line-num">261</span>     <span class="keyword">@GetMapping</span>(<span class="string">"/clase"</span>)
+<span class="line-num">262</span>     <span class="keyword">public String</span> <span class="method">mostrarCheckoutClase</span>(@RequestParam(<span class="string">"claseId"</span>) Long claseId,
+<span class="line-num">263</span>                                        @RequestParam(required = <span class="keyword">false</span>) Long promoId,
+<span class="line-num">264</span>                                        Model model,
+<span class="line-num">265</span>                                        @AuthenticationPrincipal UserDetails userDetails) {
+<span class="line-num">266</span> 
+<span class="line-num">267</span>         <span class="keyword">if</span> (userDetails == <span class="keyword">null</span> || userDetails.getUsername() == <span class="keyword">null</span>) {
+<span class="line-num">268</span>             <span class="keyword">return</span> <span class="string">"redirect:/login"</span>;
+<span class="line-num">269</span>         }
+<span class="line-num">270</span> 
+<span class="line-num">271</span>         Persona persona = personaRepository.findByEmail(userDetails.getUsername()).orElse(<span class="keyword">null</span>);
+<span class="line-num">272</span>         <span class="keyword">if</span> (persona == <span class="keyword">null</span>) {
+<span class="line-num">273</span>             <span class="keyword">return</span> <span class="string">"redirect:/login"</span>;
+<span class="line-num">274</span>         }
+<span class="line-num">275</span> 
+<span class="line-num">276</span>         Clase clase = claseRepository.findById(claseId).orElse(<span class="keyword">null</span>);
+<span class="line-num">277</span>         <span class="keyword">if</span> (clase == <span class="keyword">null</span> || Boolean.FALSE.equals(clase.getEsPago())) {
+<span class="line-num">278</span>             <span class="keyword">return</span> <span class="string">"redirect:/reservas?claseNoDisponible=true"</span>;
+<span class="line-num">279</span>         }
+<span class="line-num">280</span> 
+<span class="line-num">281</span>         <span class="keyword">double</span> precioBase = <span class="number">0.0</span>;
+<span class="line-num">282</span>         <span class="keyword">if</span> (clase.getPrecio() != <span class="keyword">null</span>) {
+<span class="line-num">283</span>             precioBase = clase.getPrecio().doubleValue();
+<span class="line-num">284</span>         }
+<span class="line-num">285</span> 
+<span class="line-num">286</span>         model.addAttribute(<span class="string">"clase"</span>, clase);
+<span class="line-num">287</span>         model.addAttribute(<span class="string">"usuario"</span>, persona.getEmail());
+<span class="line-num">288</span>         model.addAttribute(<span class="string">"stripePublishableKey"</span>, stripePublishableKey);
+<span class="line-num">289</span>         model.addAttribute(<span class="string">"claseId"</span>, clase.getId());
+<span class="line-num">290</span>         model.addAttribute(<span class="string">"promoId"</span>, promoId);
+<span class="line-num">291</span> 
+<span class="line-num">292</span>         <span class="keyword">if</span> (promoId != <span class="keyword">null</span>) {
+<span class="line-num">293</span>             Promocion promo = obtenerPromocionClaseAplicable(promoId, clase);
+<span class="line-num">294</span>             <span class="keyword">if</span> (promo != <span class="keyword">null</span>) {
+<span class="line-num">295</span>                 <span class="keyword">double</span> precioConDescuento = aplicarDescuento(precioBase, promo);
+<span class="line-num">296</span>                 <span class="keyword">if</span> (precioConDescuento &lt; <span class="number">0</span>) {
+<span class="line-num">297</span>                     precioConDescuento = <span class="number">0</span>;
+<span class="line-num">298</span>                 }
+<span class="line-num">299</span>                 model.addAttribute(<span class="string">"promo"</span>, promo);
+<span class="line-num">300</span>                 model.addAttribute(<span class="string">"precioConDescuento"</span>, String.format(<span class="string">"%.2f"</span>, precioConDescuento));
+<span class="line-num">301</span>             }
+<span class="line-num">302</span>         }
+<span class="line-num">303</span> 
+<span class="line-num">304</span>         model.addAttribute(<span class="string">"precio"</span>, String.format(<span class="string">"%.2f"</span>, precioBase));
+<span class="line-num">305</span>         <span class="keyword">return</span> <span class="string">"checkout_clase"</span>;
+<span class="line-num">306</span>     }
+<span class="line-num">307</span> 
+<span class="line-num">308</span>     <span class="keyword">@PostMapping</span>(<span class="string">"/clase/create-session"</span>)
+<span class="line-num">309</span>     <span class="keyword">@ResponseBody</span>
+<span class="line-num">310</span>     <span class="keyword">public</span> ResponseEntity&lt;Map&lt;String, String&gt;&gt; <span class="method">createCheckoutSessionClase</span>(
+<span class="line-num">311</span>             @RequestParam Long claseId,
+<span class="line-num">312</span>             @RequestParam String usuario,
+<span class="line-num">313</span>             @RequestParam String precio,
+<span class="line-num">314</span>             @RequestParam(required = <span class="keyword">false</span>) Long promoId,
+<span class="line-num">315</span>             HttpServletRequest request) {
+<span class="line-num">316</span> 
+<span class="line-num">317</span>         Map&lt;String, String&gt; response = <span class="keyword">new</span> HashMap&lt;&gt;();
+<span class="line-num">318</span>         <span class="keyword">try</span> {
+<span class="line-num">319</span>             Clase clase = claseRepository.findById(claseId).orElse(<span class="keyword">null</span>);
+<span class="line-num">320</span>             <span class="keyword">if</span> (clase == <span class="keyword">null</span>) {
+<span class="line-num">321</span>                 response.put(<span class="string">"error"</span>, <span class="string">"Clase no encontrada"</span>);
+<span class="line-num">322</span>                 <span class="keyword">return</span> ResponseEntity.badRequest().body(response);
+<span class="line-num">323</span>             }
+<span class="line-num">324</span> 
+<span class="line-num">325</span>             Promocion promo = <span class="keyword">null</span>;
+<span class="line-num">326</span>             <span class="keyword">if</span> (promoId != <span class="keyword">null</span>) {
+<span class="line-num">327</span>                 promo = obtenerPromocionClaseAplicable(promoId, clase);
+<span class="line-num">328</span>             }
+<span class="line-num">329</span> 
+<span class="line-num">330</span>             <span class="keyword">double</span> amountDouble = parsePrecio(precio);
+<span class="line-num">331</span>             <span class="keyword">if</span> (promo != <span class="keyword">null</span>) {
+<span class="line-num">332</span>                 amountDouble = aplicarDescuento(amountDouble, promo);
+<span class="line-num">333</span>             }
+<span class="line-num">334</span>             <span class="keyword">long</span> amountInCents = Math.round(amountDouble * <span class="number">100</span>);
+<span class="line-num">335</span> 
+<span class="line-num">336</span>             <span class="keyword">if</span> (amountInCents &lt;= <span class="number">0</span>) {
+<span class="line-num">337</span>                 response.put(<span class="string">"error"</span>, <span class="string">"Monto inválido para el pago."</span>);
+<span class="line-num">338</span>                 <span class="keyword">return</span> ResponseEntity.badRequest().body(response);
+<span class="line-num">339</span>             }
+<span class="line-num">340</span> 
+<span class="line-num">341</span>             String baseUrl = request.getScheme() + <span class="string">"://"</span> + request.getServerName();
+<span class="line-num">342</span>             <span class="keyword">if</span> ((<span class="string">"http"</span>.equals(request.getScheme()) &amp;&amp; request.getServerPort() != <span class="number">80</span>) ||
+<span class="line-num">343</span>                 (<span class="string">"https"</span>.equals(request.getScheme()) &amp;&amp; request.getServerPort() != <span class="number">443</span>)) {
+<span class="line-num">344</span>                 baseUrl += <span class="string">":"</span> + request.getServerPort();
+<span class="line-num">345</span>             }
+<span class="line-num">346</span> 
+<span class="line-num">347</span>             String successUrl = baseUrl + <span class="string">"/checkout/clase/success?session_id={CHECKOUT_SESSION_ID}"</span>;
+<span class="line-num">348</span>             String cancelUrl = baseUrl + <span class="string">"/reservas?pagoClaseCancelado=true"</span>;
+<span class="line-num">349</span> 
+<span class="line-num">350</span>             SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
+<span class="line-num">351</span>                     .setMode(SessionCreateParams.Mode.PAYMENT)
+<span class="line-num">352</span>                     .setSuccessUrl(successUrl)
+<span class="line-num">353</span>                     .setCancelUrl(cancelUrl)
+<span class="line-num">354</span>                     .setCustomerEmail(usuario)
+<span class="line-num">355</span>                     .putMetadata(<span class="string">"usuario"</span>, usuario)
+<span class="line-num">356</span>                     .putMetadata(<span class="string">"claseId"</span>, String.valueOf(claseId))
+<span class="line-num">357</span>                     .putMetadata(<span class="string">"precio"</span>, precio)
+<span class="line-num">358</span>                     .putMetadata(<span class="string">"tipoPago"</span>, <span class="string">"CLASE"</span>);
+<span class="line-num">359</span> 
+<span class="line-num">360</span>             <span class="keyword">if</span> (promo != <span class="keyword">null</span>) {
+<span class="line-num">361</span>                 paramsBuilder
+<span class="line-num">362</span>                         .putMetadata(<span class="string">"promoId"</span>, String.valueOf(promo.getId()))
+<span class="line-num">363</span>                         .putMetadata(<span class="string">"precioConDescuento"</span>, String.valueOf(amountDouble));
+<span class="line-num">364</span>             }
+<span class="line-num">365</span> 
+<span class="line-num">366</span>             SessionCreateParams params = paramsBuilder
+<span class="line-num">367</span>                     .addLineItem(
+<span class="line-num">368</span>                             SessionCreateParams.LineItem.builder()
+<span class="line-num">369</span>                                     .setQuantity(<span class="number">1L</span>)
+<span class="line-num">370</span>                                     .setPriceData(
+<span class="line-num">371</span>                                             SessionCreateParams.LineItem.PriceData.builder()
+<span class="line-num">372</span>                                                     .setCurrency(<span class="string">"pen"</span>)
+<span class="line-num">373</span>                                                     .setUnitAmount(amountInCents)
+<span class="line-num">374</span>                                                     .setProductData(
+<span class="line-num">375</span>                                                             SessionCreateParams.LineItem.PriceData.ProductData.builder()
+<span class="line-num">376</span>                                                                     .setName(<span class="string">"Clase "</span> + clase.getNombre())
+<span class="line-num">377</span>                                                                     .build()
+<span class="line-num">378</span>                                                     )
+<span class="line-num">379</span>                                                     .build()
+<span class="line-num">380</span>                                     )
+<span class="line-num">381</span>                                     .build()
+<span class="line-num">382</span>                     )
+<span class="line-num">383</span>                     .build();
+<span class="line-num">384</span> 
+<span class="line-num">385</span>             Session session = Session.create(params);
+<span class="line-num">386</span>             response.put(<span class="string">"id"</span>, session.getId());
+<span class="line-num">387</span>             <span class="keyword">return</span> ResponseEntity.ok(response);
+<span class="line-num">388</span>         } <span class="keyword">catch</span> (StripeException e) {
+<span class="line-num">389</span>             System.err.println(<span class="string">"Error al crear sesión de Stripe para clase: "</span> + e.getMessage());
+<span class="line-num">390</span>             e.printStackTrace();
+<span class="line-num">391</span>             response.put(<span class="string">"error"</span>, <span class="string">"No se pudo iniciar el pago de la clase. Intenta nuevamente."</span>);
+<span class="line-num">392</span>             <span class="keyword">return</span> ResponseEntity.status(<span class="number">500</span>).body(response);
+<span class="line-num">393</span>         } <span class="keyword">catch</span> (Exception e) {
+<span class="line-num">394</span>             System.err.println(<span class="string">"Error inesperado al crear sesión de Stripe para clase: "</span> + e.getMessage());
+<span class="line-num">395</span>             e.printStackTrace();
+<span class="line-num">396</span>             response.put(<span class="string">"error"</span>, <span class="string">"Ocurrió un error al iniciar el pago de la clase."</span>);
+<span class="line-num">397</span>             <span class="keyword">return</span> ResponseEntity.status(<span class="number">500</span>).body(response);
+<span class="line-num">398</span>         }
+<span class="line-num">399</span>     }
+<span class="line-num">400</span> 
+<span class="line-num">401</span>     <span class="keyword">@GetMapping</span>(<span class="string">"/clase/success"</span>)
+<span class="line-num">402</span>     <span class="keyword">@Transactional</span>
+<span class="line-num">403</span>     <span class="keyword">public String</span> <span class="method">stripeSuccessClase</span>(@RequestParam(<span class="string">"session_id"</span>) String sessionId,
+<span class="line-num">404</span>                                      @AuthenticationPrincipal UserDetails userDetails) {
+<span class="line-num">405</span>         <span class="keyword">try</span> {
+<span class="line-num">406</span>             Session session = Session.retrieve(sessionId);
+<span class="line-num">407</span> 
+<span class="line-num">408</span>             <span class="keyword">if</span> (session == <span class="keyword">null</span> || !<span class="string">"paid"</span>.equalsIgnoreCase(session.getPaymentStatus())) {
+<span class="line-num">409</span>                 <span class="keyword">return</span> <span class="string">"redirect:/reservas?errorPagoClaseStripe=true"</span>;
+<span class="line-num">410</span>             }
+<span class="line-num">411</span> 
+<span class="line-num">412</span>             String usuario = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"usuario"</span>) : <span class="keyword">null</span>;
+<span class="line-num">413</span>             String claseIdStr = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"claseId"</span>) : <span class="keyword">null</span>;
+<span class="line-num">414</span>             String precio = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"precio"</span>) : <span class="keyword">null</span>;
+<span class="line-num">415</span>             String promoIdStr = session.getMetadata() != <span class="keyword">null</span> ? session.getMetadata().get(<span class="string">"promoId"</span>) : <span class="keyword">null</span>;
+<span class="line-num">416</span> 
+<span class="line-num">417</span>             <span class="keyword">if</span> (usuario == <span class="keyword">null</span> || claseIdStr == <span class="keyword">null</span> || precio == <span class="keyword">null</span>) {
+<span class="line-num">418</span>                 <span class="keyword">return</span> <span class="string">"redirect:/reservas?errorPagoClaseStripe=true"</span>;
+<span class="line-num">419</span>             }
+<span class="line-num">420</span> 
+<span class="line-num">421</span>             Long claseId = Long.valueOf(claseIdStr);
+<span class="line-num">422</span> 
+<span class="line-num">423</span>             Persona persona = personaRepository.findByEmail(usuario)
+<span class="line-num">424</span>                     .orElseThrow(() -&gt; <span class="keyword">new</span> RuntimeException(<span class="string">"Usuario no encontrado: "</span> + usuario));
+<span class="line-num">425</span> 
+<span class="line-num">426</span>             Clase clase = claseRepository.findById(claseId)
+<span class="line-num">427</span>                     .orElseThrow(() -&gt; <span class="keyword">new</span> RuntimeException(<span class="string">"Clase no encontrada: "</span> + claseId));
+<span class="line-num">428</span> 
+<span class="line-num">429</span>             <span class="keyword">long</span> ocupados = reservaClaseRepository.countOcupados(clase.getId());
+<span class="line-num">430</span>             <span class="keyword">if</span> (ocupados &gt;= clase.getCapacidad()) {
+<span class="line-num">431</span>                 <span class="keyword">return</span> <span class="string">"redirect:/reservas?claseLlena=true"</span>;
+<span class="line-num">432</span>             }
+<span class="line-num">433</span> 
+<span class="line-num">434</span>             <span class="keyword">boolean</span> yaReservada = reservaClaseRepository.existsByClase_IdAndDeportista_IdAndEstadoNot(
+<span class="line-num">435</span>                     clase.getId(), persona.getId(), <span class="string">"Cancelado"</span>);
+<span class="line-num">436</span>             <span class="keyword">if</span> (!yaReservada) {
+<span class="line-num">437</span>                 ReservaClase r = <span class="keyword">new</span> ReservaClase();
+<span class="line-num">438</span>                 r.setClase(clase);
+<span class="line-num">439</span>                 r.setDeportista(persona);
+<span class="line-num">440</span>                 r.setReservadoEn(java.time.OffsetDateTime.now());
+<span class="line-num">441</span>                 r.setEstado(<span class="string">"Reservado"</span>);
+<span class="line-num">442</span>                 reservaClaseRepository.save(r);
+<span class="line-num">443</span>             }
+<span class="line-num">444</span> 
+<span class="line-num">445</span>             Pago pago = <span class="keyword">new</span> Pago();
+<span class="line-num">446</span>             pago.setCodigoPago(generarCodigoPago());
+<span class="line-num">447</span>             pago.setDeportista(persona);
+<span class="line-num">448</span>             pago.setFecha(LocalDate.now());
+<span class="line-num">449</span>             pago.setMetodoPago(<span class="string">"Stripe"</span>);
+<span class="line-num">450</span> 
+<span class="line-num">451</span>             Long amountTotal = session.getAmountTotal();
+<span class="line-num">452</span>             <span class="keyword">double</span> montoPagado = amountTotal != <span class="keyword">null</span> ? amountTotal / <span class="number">100.0</span> : parsePrecio(precio);
+<span class="line-num">453</span>             pago.setMonto(montoPagado);
+<span class="line-num">454</span> 
+<span class="line-num">455</span>             pago.setEstado(<span class="string">"Completado"</span>);
+<span class="line-num">456</span>             pago.setPlanServicio(<span class="string">"Clase - "</span> + clase.getNombre());
+<span class="line-num">457</span>             pagoRepository.save(pago);
+<span class="line-num">458</span> 
+<span class="line-num">459</span>             <span class="keyword">if</span> (promoIdStr != <span class="keyword">null</span> &amp;&amp; !promoIdStr.isBlank()) {
+<span class="line-num">460</span>                 <span class="keyword">try</span> {
+<span class="line-num">461</span>                     Long promoId = Long.valueOf(promoIdStr);
+<span class="line-num">462</span>                     Optional&lt;Promocion&gt; promoOpt = promocionRepository.findById(promoId);
+<span class="line-num">463</span>                     <span class="keyword">if</span> (promoOpt.isPresent()) {
+<span class="line-num">464</span>                         Promocion promo = promoOpt.get();
+<span class="line-num">465</span>                         Integer usados = promo.getUsados() != <span class="keyword">null</span> ? promo.getUsados() : <span class="number">0</span>;
+<span class="line-num">466</span>                         promo.setUsados(usados + <span class="number">1</span>);
+<span class="line-num">467</span>                         promocionRepository.save(promo);
+<span class="line-num">468</span>                     }
+<span class="line-num">469</span>                 } <span class="keyword">catch</span> (NumberFormatException ignored) {
+<span class="line-num">470</span>                 }
+<span class="line-num">471</span>             }
+<span class="line-num">472</span> 
+<span class="line-num">473</span>             <span class="keyword">return</span> <span class="string">"redirect:/reservas?pagoClaseExitoso=true"</span>;
+<span class="line-num">474</span>         } <span class="keyword">catch</span> (Exception e) {
+<span class="line-num">475</span>             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+<span class="line-num">476</span>             System.err.println(<span class="string">"Error al procesar el pago de clase mediante Stripe: "</span> + e.getMessage());
+<span class="line-num">477</span>             e.printStackTrace();
+<span class="line-num">478</span>             <span class="keyword">return</span> <span class="string">"redirect:/reservas?errorPagoClaseStripe=true"</span>;
+<span class="line-num">479</span>         }
+<span class="line-num">480</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>mostrarCheckoutClase (GET /checkout/clase):</strong></p>
+                        <p>- Recibe el <code>claseId</code> y opcionalmente una promoción.</p>
+                        <p>- Busca la clase en la BD y carga en el modelo: nombre, fecha/hora, entrenador, precio y posible precio con descuento.</p>
+                        <p>- Envía también el correo del usuario autenticado y la clave pública de Stripe.</p>
+                        <p>- Retorna la vista <code>"checkout_clase"</code> → Thymeleaf renderiza <code>checkout_clase.html</code>.</p>
+                        <p><strong>createCheckoutSessionClase (POST /checkout/clase/create-session):</strong></p>
+                        <p>- Lógica muy similar a <code>createCheckoutSession</code> pero para una sola clase.</p>
+                        <p>- Calcula el monto (con promo si aplica), construye las URLs de éxito/cancelación relacionadas a reservas de clase y crea una sesión de Stripe con metadatos de clase y usuario.</p>
+                        <p><strong>stripeSuccessClase (GET /checkout/clase/success):</strong></p>
+                        <p>- Recupera la sesión de Stripe, obtiene los metadatos de clase y usuario.</p>
+                        <p>- Crea una <strong>ReservaClase</strong>, registra un <strong>Pago</strong> asociado y marca la reserva como confirmada.</p>
+                        <p>- Finalmente redirige a la pantalla de <code>/reservas</code> mostrando el resultado.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: HTML checkout.html -->
+        <div id="checkout-html-membresia" class="content">
+            <h2 class="section-title">6️⃣ HTML - checkout.html (Membresía)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Pantalla donde el usuario ve el <strong>resumen de la suscripción</strong> (plan, período, precio, promoción) y pulsa el botón <strong>"Pagar con Stripe"</strong>, que inicia el flujo de Stripe.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código HTML</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="string">&lt;!DOCTYPE html&gt;</span>
+<span class="line-num">2</span> &lt;html lang="es" xmlns:th="http://www.thymeleaf.org"&gt;
+<span class="line-num">6</span>   &lt;title&gt;Finalizar Suscripción - FitGym&lt;/title&gt;
+<span class="line-num">7</span>   &lt;link href="bootstrap.min.css" rel="stylesheet"&gt;
+<span class="line-num">9</span>   &lt;link rel="stylesheet" th:href="@{/Estilos/checkout.css}"&gt;
+<span class="line-num">13</span>  &lt;h1 class="checkout-title"&gt;Finalizar Suscripción&lt;/h1&gt;
+<span class="line-num">24</span>  &lt;span class="label"&gt;Plan &lt;span th:text="${planNombre}"&gt;Básico&lt;/span&gt;&lt;/span&gt;
+<span class="line-num">29</span>  &lt;span class="label"&gt;Facturación &lt;span th:text="${periodo}"&gt;anual&lt;/span&gt;&lt;/span&gt;
+<span class="line-num">34</span>  S/ &lt;span th:text="${precio}"&gt;499.90&lt;/span&gt;
+<span class="line-num">37</span>  &lt;div th:if="${precioConDescuento != null}" class="order-summary-item"&gt;
+<span class="line-num">38</span>      &lt;span class="label text-success"&gt;Precio con promoción&lt;/span&gt;
+<span class="line-num">39</span>      &lt;span class="value fw-bold text-success"&gt;S/ &lt;span th:text="${precioConDescuento}"&gt;399.90&lt;/span&gt;&lt;/span&gt;
+<span class="line-num">40</span>  &lt;/div&gt;
+<span class="line-num">42</span>  &lt;div class="order-total"&gt;
+<span class="line-num">43</span>      &lt;span&gt;Total a Pagar&lt;/span&gt;
+<span class="line-num">44</span>      &lt;span&gt;
+<span class="line-num">45</span>          &lt;span th:if="${precioConDescuento != null}"&gt;
+<span class="line-num">46</span>              S/ &lt;span th:text="${precioConDescuento}"&gt;399.90&lt;/span&gt;
+<span class="line-num">47</span>          &lt;/span&gt;
+<span class="line-num">48</span>          &lt;span th:if="${precioConDescuento == null}"&gt;
+<span class="line-num">49</span>              S/ &lt;span th:text="${precio}"&gt;499.90&lt;/span&gt;
+<span class="line-num">50</span>          &lt;/span&gt;
+<span class="line-num">51</span>      &lt;/span&gt;
+<span class="line-num">52</span>  &lt;/div&gt;
+<span class="line-num">54</span>  &lt;div class="security-note"&gt;
+<span class="line-num">55</span>      &lt;i class="fas fa-lock"&gt;&lt;/i&gt;
+<span class="line-num">56</span>      &lt;span&gt;Pago 100% seguro con encriptación SSL&lt;/span&gt;
+<span class="line-num">57</span>  &lt;/div&gt;
+<span class="line-num">71</span>  &lt;form id="checkout-form" action="#" method="post"&gt;
+<span class="line-num">72</span>      &lt;input type="hidden" name="usuario" th:value="${usuario}"&gt;
+<span class="line-num">73</span>      &lt;input type="hidden" name="plan" th:value="${planNombre}"&gt;
+<span class="line-num">75</span>      &lt;input type="hidden" name="precio" th:value="${precio}"&gt;
+<span class="line-num">76</span>      &lt;input type="hidden" name="promoId" th:value="${promoId}"&gt;
+<span class="line-num">78</span>      &lt;button type="button" class="btn btn-outline-secondary" 
+<span class="line-num">79</span>              th:if="${usuario != null}"
+<span class="line-num">80</span>              th:onclick="|location.href='@{/perfil}'|"&gt;
+<span class="line-num">81</span>          Volver
+<span class="line-num">82</span>      &lt;/button&gt;
+<span class="line-num">83</span>      &lt;button type="button" class="btn btn-outline-secondary" 
+<span class="line-num">84</span>              th:unless="${usuario != null}"
+<span class="line-num">85</span>              th:onclick="|location.href='@{/planes}'|"&gt;
+<span class="line-num">86</span>          Volver
+<span class="line-num">87</span>      &lt;/button&gt;
+<span class="line-num">88</span>      &lt;button type="submit" class="btn btn-custom-orange"&gt;Pagar con Stripe&lt;/button&gt;
+<span class="line-num">99</span>  &lt;script src="https://js.stripe.com/v3/"&gt;&lt;/script&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Encabezado y estilos:</strong> Usa Bootstrap, Font Awesome y una hoja de estilos propia <code>checkout.css</code> para dar el aspecto de tarjetas y botones.</p>
+                        <p><strong>Resumen del pedido:</strong> Muestra el nombre del plan, el período de facturación y el precio. Si el controlador envió <code>precioConDescuento</code>, se muestra una línea adicional resaltando el precio con promoción.</p>
+                        <p><strong>Total a pagar:</strong> Muestra ya sea el precio original o el precio con descuento, según exista o no la promoción.</p>
+                        <p><strong>Nota de seguridad:</strong> Indica que el pago es seguro con encriptación SSL, reforzando confianza.</p>
+                        <p><strong>Formulario oculto:</strong> El formulario no pide datos de tarjeta; solo contiene <strong>inputs ocultos</strong> con usuario, plan, período, precio y promoId. Estos datos se mandan al backend para crear la sesión de Stripe.</p>
+                        <p><strong>Botones:</strong></p>
+                        <p>- Botón <code>Volver</code> devuelve a <code>/perfil</code> o <code>/planes</code> según si hay usuario en el modelo.</p>
+                        <p>- Botón <code>Pagar con Stripe</code> dispara el JavaScript que llama a <code>/checkout/create-session</code> y redirige al formulario seguro de Stripe.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código JavaScript</h4>
+                    <div class="code-block">
+<span class="line-num">101</span> &lt;script th:inline="javascript"&gt;
+<span class="line-num">102</span>   const stripePublicKey = /*[[${stripePublishableKey}]]*/ '';
+<span class="line-num">103</span>   const stripe = stripePublicKey ? Stripe(stripePublicKey) : null;
+<span class="line-num">105</span>   document.addEventListener('DOMContentLoaded', () =&gt; {
+<span class="line-num">106</span>     const form = document.getElementById('checkout-form');
+<span class="line-num">111</span>     form.addEventListener('submit', (e) =&gt; {
+<span class="line-num">112</span>       e.preventDefault();
+<span class="line-num">114</span>       if (!stripe) { alert('El pago con Stripe no está disponible en este momento. Contacta con el administrador.'); <span class="keyword">return</span>; }
+<span class="line-num">119</span>       const usuario = form.querySelector('input[name="usuario"]').value;
+<span class="line-num">126</span>       fetch('/checkout/create-session', {
+<span class="line-num">127</span>         method: 'POST',
+<span class="line-num">129</span>         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+<span class="line-num">131</span>         body: new URLSearchParams({ usuario, plan, periodo, precio, promoId })
+<span class="line-num">133</span>       }).then(r =&gt; r.json())
+<span class="line-num">134</span>         .then(data =&gt; {
+<span class="line-num">135</span>           if (data.error) { alert(data.error); <span class="keyword">return</span>; }
+<span class="line-num">140</span>           if (data.id) { stripe.redirectToCheckout({ sessionId: data.id }); }
+<span class="line-num">144</span>         })
+<span class="line-num">144</span>         .catch(err =&gt; alert('No se pudo iniciar el pago. Intenta nuevamente.'));
+<span class="line-num">148</span>   });
+<span class="line-num">150</span> &lt;/script&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Inicialización de Stripe:</strong> Usa la <code>stripePublishableKey</code> enviada por el controlador. Si no está configurada, bloquea el pago y muestra un mensaje.</p>
+                        <p><strong>Manejo del submit:</strong> Evita el envío tradicional del formulario (<code>e.preventDefault()</code>) y llama al endpoint <code>/checkout/create-session</code> con <code>fetch</code>.</p>
+                        <p><strong>Respuesta JSON:</strong> Si la respuesta contiene <code>error</code>, se muestra un <em>alert</em>. Si contiene <code>id</code>, llama a <code>stripe.redirectToCheckout</code> para mostrar la página de Stripe.</p>
+                        <p><strong>Resumen:</strong> Toda la lógica de pago con tarjeta vive en Stripe; el HTML solo prepara los datos y redirige al formulario seguro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 7: HTML checkout_clase.html -->
+        <div id="checkout-html-clase" class="content">
+            <h2 class="section-title">7️⃣ HTML - checkout_clase.html (Clases)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Pantalla donde el usuario ve el <strong>resumen de una clase específica</strong> (nombre, fecha, instructor, precio) y realiza el pago vía Stripe para confirmar la reserva.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código HTML</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> &lt;html lang="es" xmlns:th="http://www.thymeleaf.org"&gt;
+<span class="line-num">13</span> &lt;h1 class="checkout-title"&gt;Pagar Clase&lt;/h1&gt;
+<span class="line-num">24</span> &lt;span class="label"&gt;Clase&lt;/span&gt;
+<span class="line-num">26</span> &lt;span class="value" th:text="${clase.nombre}"&gt;Nombre de la clase&lt;/span&gt;
+<span class="line-num">29</span> &lt;span class="label"&gt;Fecha&lt;/span&gt;
+<span class="line-num">30</span> &lt;span class="value" th:text="${#temporals.format(clase.fecha, 'dd/MM/yyyy HH:mm')}"&gt;01/01/2025 10:00&lt;/span&gt;
+<span class="line-num">33</span> &lt;span class="label"&gt;Instructor&lt;/span&gt;
+<span class="line-num">34</span> &lt;span class="value" th:text="${clase.entrenador != null ? clase.entrenador.nombre : '-'}"&gt;Instructor&lt;/span&gt;
+<span class="line-num">39</span> S/ &lt;span th:text="${precio}"&gt;0.00&lt;/span&gt;
+<span class="line-num">42</span> &lt;div th:if="${precioConDescuento != null}" class="order-summary-item"&gt;
+<span class="line-num">43</span>   &lt;span class="label text-success"&gt;Precio con promoción&lt;/span&gt;
+<span class="line-num">44</span>   &lt;span class="value fw-bold text-success"&gt;S/ &lt;span th:text="${precioConDescuento}"&gt;0.00&lt;/span&gt;&lt;/span&gt;
+<span class="line-num">45</span> &lt;/div&gt;
+<span class="line-num">47</span> &lt;div class="order-total"&gt;
+<span class="line-num">48</span>   &lt;span&gt;Total a Pagar&lt;/span&gt;
+<span class="line-num">49</span>   &lt;span&gt;
+<span class="line-num">50</span>       &lt;span th:if="${precioConDescuento != null}"&gt;
+<span class="line-num">51</span>           S/ &lt;span th:text="${precioConDescuento}"&gt;0.00&lt;/span&gt;
+<span class="line-num">52</span>       &lt;/span&gt;
+<span class="line-num">53</span>       &lt;span th:if="${precioConDescuento == null}"&gt;
+<span class="line-num">54</span>           S/ &lt;span th:text="${precio}"&gt;0.00&lt;/span&gt;
+<span class="line-num">55</span>       &lt;/span&gt;
+<span class="line-num">56</span>   &lt;/span&gt;
+<span class="line-num">57</span> &lt;/div&gt;
+<span class="line-num">76</span> &lt;form id="checkout-clase-form" action="#" method="post"&gt;
+<span class="line-num">77</span>   &lt;input type="hidden" name="claseId" th:value="${claseId}"&gt;
+<span class="line-num">78</span>   &lt;input type="hidden" name="usuario" th:value="${usuario}"&gt;
+<span class="line-num">79</span>   &lt;input type="hidden" name="precio" th:value="${precio}"&gt;
+<span class="line-num">80</span>   &lt;input type="hidden" name="promoId" th:value="${promoId}"&gt;
+<span class="line-num">83</span>   &lt;button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='@{/reservas}'|"&gt;Volver&lt;/button&gt;
+<span class="line-num">87</span>   &lt;button type="submit" class="btn btn-custom-orange"&gt;Pagar con Stripe&lt;/button&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Resumen de la clase:</strong> Muestra información contextual (nombre, fecha/hora, instructor) usando los atributos enviados desde <code>mostrarCheckoutClase</code>.</p>
+                        <p><strong>Precio y promoción:</strong> Igual que en membresías, muestra precio base y, si existe, el precio con promoción.</p>
+                        <p><strong>Formulario oculto:</strong> Incluye el <code>claseId</code>, usuario, precio y promoción. No se piden datos de tarjeta aquí.</p>
+                        <p><strong>Botones:</strong></p>
+                        <p>- <code>Volver</code> lleva de regreso a <code>/reservas</code>.</p>
+                        <p>- <code>Pagar con Stripe</code> inicia el flujo de pago para esta clase concreta.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código JavaScript</h4>
+                    <div class="code-block">
+<span class="line-num">100</span> &lt;script th:inline="javascript"&gt;
+<span class="line-num">101</span>   const stripePublicKey = /*[[${stripePublishableKey}]]*/ '';
+<span class="line-num">102</span>   const stripe = stripePublicKey ? Stripe(stripePublicKey) : null;
+<span class="line-num">104</span>   document.addEventListener('DOMContentLoaded', () =&gt; {
+<span class="line-num">105</span>     const form = document.getElementById('checkout-clase-form');
+<span class="line-num">110</span>     form.addEventListener('submit', (e) =&gt; {
+<span class="line-num">111</span>       e.preventDefault();
+<span class="line-num">113</span>       if (!stripe) { alert('El pago con Stripe no está disponible en este momento. Contacta con el administrador.'); <span class="keyword">return</span>; }
+<span class="line-num">118</span>       const claseId = form.querySelector('input[name="claseId"]').value;
+<span class="line-num">119</span>       const usuario = form.querySelector('input[name="usuario"]').value;
+<span class="line-num">120</span>       const precio = form.querySelector('input[name="precio"]').value;
+<span class="line-num">122</span>       const promoId = form.querySelector('input[name="promoId"]').value;
+<span class="line-num">124</span>       const params = new URLSearchParams({ claseId, usuario, precio, promoId });
+<span class="line-num">126</span>       fetch('/checkout/clase/create-session', {
+<span class="line-num">127</span>         method: 'POST',
+<span class="line-num">129</span>         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+<span class="line-num">131</span>         body: params.toString()
+<span class="line-num">133</span>       }).then(r =&gt; r.json())
+<span class="line-num">134</span>         .then(data =&gt; { if (data.error) { alert(data.error); <span class="keyword">return</span>; } if (data.id) { stripe.redirectToCheckout({ sessionId: data.id }); } })
+<span class="line-num">144</span>         .catch(err =&gt; alert('No se pudo iniciar el pago de la clase. Intenta nuevamente.'));
+<span class="line-num">149</span>   });
+<span class="line-num">150</span> &lt;/script&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p>El patrón es el mismo que en <strong>checkout.html</strong>:</p>
+                        <p>- Toma los valores ocultos del formulario (clase, usuario, precio, promoción).</p>
+                        <p>- Llama a <code>/checkout/clase/create-session</code> para crear una sesión de Stripe específica para esa clase.</p>
+                        <p>- Redirige al formulario de pago de Stripe con <code>redirectToCheckout</code>.</p>
+                        <p>- Maneja errores mostrando mensajes simples al usuario para que pueda reintentar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Documentación Checkout - Generada para explicar el flujo de pagos con Stripe (membresías y clases).
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.content');
+            const buttons = document.querySelectorAll('.nav-btn');
+
+            sections.forEach(sec => sec.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            const target = document.getElementById(sectionId);
+            if (target) target.classList.add('active');
+
+            buttons.forEach(btn => {
+                const onclickAttr = btn.getAttribute('onclick');
+                if (onclickAttr && onclickAttr.includes("'" + sectionId + "'")) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

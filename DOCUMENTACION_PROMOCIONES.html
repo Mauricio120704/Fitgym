@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación - Promociones Controller & HTML</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f97316 0%, #fb7185 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #f97316 0%, #fb7185 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .nav-buttons { display: flex; gap: 10px; justify-content: center; padding: 20px; background: #f8f9fa; border-bottom: 2px solid #e9ecef; flex-wrap: wrap; }
+        .nav-btn { padding: 12px 24px; border: 2px solid #f97316; background: white; color: #f97316; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 1em; }
+        .nav-btn:hover { background: #f97316; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4); }
+        .nav-btn.active { background: #f97316; color: white; }
+        .content { display: none; padding: 30px; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .section-title { font-size: 2em; color: #f97316; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #f97316; }
+        .purpose-box { background: #fff7ed; border-left: 5px solid #f97316; padding: 25px; margin-bottom: 35px; border-radius: 8px; }
+        .purpose-box h3 { color: #f97316; margin-bottom: 15px; font-size: 1.3em; font-weight: 700; }
+        .purpose-box p { color: #333; line-height: 1.8; font-size: 1.05em; }
+        .code-explanation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            overflow-x: auto;       /* Permite desplazar para ver la columna de explicación en pantallas más angostas */
+            min-width: 900px;       /* Fuerza que el bloque completo pueda desbordar horizontalmente */
+        }
+        .code-explanation-stacked { grid-template-columns: 1fr; }
+        .code-column { background: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; }
+        .code-column h4 { color: #f97316; margin-bottom: 20px; font-size: 1.2em; padding-bottom: 12px; border-bottom: 3px solid #f97316; font-weight: 700; }
+        .code-block { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 6px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 1em; line-height: 1.6; margin-bottom: 15px; white-space: pre; }
+        .code-block .line-num { color: #888; margin-right: 15px; display: inline-block; width: 35px; text-align: right; font-weight: bold; }
+        .keyword { color: #ff79c6; font-weight: bold; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .class-name { color: #8be9fd; font-weight: bold; }
+        .method { color: #50fa7b; }
+        .number { color: #bd93f9; }
+        .explanation { color: #333; line-height: 2; font-size: 1em; }
+        .explanation strong { color: #f97316; font-weight: 700; }
+        .explanation p { margin-bottom: 12px; }
+        .line-item { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e9ecef; }
+        .line-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .line-number { display: inline-block; background: #f97316; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right: 10px; font-size: 0.9em; }
+        .responsive-note { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 8px; color: #856404; }
+        .responsive-note strong { color: #664d03; }
+        @media (max-width: 1024px) {
+            .code-explanation {
+                grid-template-columns: 1fr;  /* En pantallas pequeñas se apilan código y explicación */
+                min-width: auto;             /* Evita scroll horizontal innecesario en móviles */
+            }
+            .header h1 { font-size: 1.8em; }
+            .nav-buttons { flex-direction: column; }
+            .nav-btn { width: 100%; }
+        }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Documentación Promociones</h1>
+            <p>Explicación detallada del Controller y Templates HTML relacionados con promociones</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('prom-controller-imports')">1. Controller - Imports y Clase</button>
+            <button class="nav-btn" onclick="showSection('prom-controller-listar')">2. Controller - Listar Promociones</button>
+            <button class="nav-btn" onclick="showSection('prom-controller-crear')">3. Controller - Crear Promoción</button>
+            <button class="nav-btn" onclick="showSection('prom-controller-estado')">4. Controller - Editar / Estado / Eliminar</button>
+            <button class="nav-btn" onclick="showSection('prom-controller-historial')">5. Controller - Historial</button>
+            <button class="nav-btn" onclick="showSection('prom-html-admin-estructura')">6. HTML Admin - Estructura</button>
+            <button class="nav-btn" onclick="showSection('prom-html-admin-tarjetas')">7. HTML Admin - Tarjetas y Modal</button>
+            <button class="nav-btn" onclick="showSection('prom-html-historial-global')">8. HTML - Historial Global</button>
+        </div>
+
+        <!-- SECCIÓN 1: CONTROLLER IMPORTS Y CLASE -->
+        <div id="prom-controller-imports" class="content active">
+            <h2 class="section-title">1️⃣ Controller - Importaciones, Clase y Dependencias</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Esta parte define el paquete, las importaciones de clases necesarias y la declaración de la clase <strong>PromocionController</strong>. También inyecta los repositorios que permiten acceder a la base de datos de promociones.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">32</span> /**
+<span class="line-num">33</span>  * Controlador de Promociones - Gestión de descuentos y ofertas
+<span class="line-num">34</span>  * Ruta: /promociones | Acceso: ADMIN, RECEPCIONISTA, ENTRENADOR
+<span class="line-num">35</span>  * Tabla: promociones, promocion_membresia
+<span class="line-num">36</span>  */
+<span class="line-num">37</span> @Controller
+<span class="line-num">38</span> public class PromocionController {
+<span class="line-num">39</span> 
+<span class="line-num">40</span>     private final PromocionRepository promocionRepository;
+<span class="line-num">41</span>     private final PromocionHistorialRepository historialRepository;
+<span class="line-num">42</span>     private final ClaseRepository claseRepository;
+<span class="line-num">43</span> 
+<span class="line-num">44</span>     public PromocionController(PromocionRepository promocionRepository,
+<span class="line-num">45</span>                                PromocionHistorialRepository historialRepository,
+<span class="line-num">46</span>                                ClaseRepository claseRepository) {
+<span class="line-num">47</span>         this.promocionRepository = promocionRepository;
+<span class="line-num">48</span>         this.historialRepository = historialRepository;
+<span class="line-num">49</span>         this.claseRepository = claseRepository;
+<span class="line-num">50</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 1:</strong> Define el paquete Java donde vive el controlador. Ayuda a organizar el código por capas.</p>
+                        <p><strong>Línea 3-4:</strong> Importan las entidades <span class="class-name">Promocion</span> y <span class="class-name">PromocionMembresia</span>, que representan las tablas de la BD.</p>
+                        <p><strong>Línea 7-9:</strong> Importan los repositorios de promociones e historial. Estos se usan para leer y escribir en la BD.</p>
+                        <p><strong>Línea 10:</strong> <span class="class-name">PreAuthorize</span> permite restringir métodos a ciertos roles (ADMINISTRADOR, RECEPCIONISTA, ENTRENADOR).</p>
+                        <p><strong>Línea 37:</strong> <span class="keyword">@Controller</span> indica a Spring que esta clase maneja peticiones web y devuelve vistas Thymeleaf.</p>
+                        <p><strong>Línea 40-42:</strong> Se declaran campos <em>final</em> para los repositorios. Se inyectan una sola vez en el constructor.</p>
+                        <p><strong>Línea 44-46:</strong> El constructor recibe las dependencias y las asigna. Es inyección de dependencias: el controlador no crea repositorios, los recibe ya configurados por Spring.</p>
+                        <p><strong>Para qué sirve esta parte:</strong> Preparar todo lo necesario para que el controlador pueda listar, crear, editar y registrar historial de promociones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: LISTAR PROMOCIONES -->
+        <div id="prom-controller-listar" class="content">
+            <h2 class="section-title">2️⃣ Controller - Método Listar (GET /promociones)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Maneja las peticiones <strong>GET /promociones</strong>. Permite buscar por texto, filtrar por estado y separar las promociones en: activas, expiradas e inactivas para mostrarlas en la vista de administración.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 57:</strong> Restringe el acceso a personal interno: administrador, recepcionista y entrenador.</p>
+                        <p><strong>Línea 58:</strong> <span class="keyword">@GetMapping</span>("/promociones") indica que este método responde a la URL principal de promociones.</p>
+                        <p><strong>Línea 60-61:</strong> <span class="class-name">@RequestParam</span> recibe parámetros de búsqueda (<code>q</code>) y filtro de estado (<code>estado</code>) desde la URL.</p>
+                        <p><strong>Línea 70-72:</strong> Si hay texto de búsqueda, consulta la BD por nombre o descripción; si no, carga todas las promociones.</p>
+                        <p><strong>Línea 79-80:</strong> Construye la lista de <strong>expiradas</strong> usando la fecha de fin (&lt; hoy).</p>
+                        <p><strong>Línea 84-92:</strong> Separa las promociones no expiradas en dos grupos según el campo <code>estado</code> (ACTIVE / INACTIVE).</p>
+                        <p><strong>Línea 121-123:</strong> Envía al modelo tres listas diferentes para que la vista <code>promociones.html</code> pueda mostrar secciones separadas.</p>
+                        <p><strong>Línea 132:</strong> Retorna el nombre del template Thymeleaf <strong>"promociones"</strong>, que corresponde al archivo <code>promociones.html</code>.</p>
+                        <p><strong>Para qué sirve este método:</strong> Es el <em>listado principal</em> del módulo. Toda la gestión de promociones parte de esta pantalla.</p>
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">52</span>     /**
+<span class="line-num">53</span>      * GET /promociones - Lista todas las promociones
+<span class="line-num">54</span>      * Permite búsqueda por nombre/descripción
+<span class="line-num">55</span>      * Separa activas, expiradas e inactivas
+<span class="line-num">56</span>      */
+<span class="line-num">57</span>     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
+<span class="line-num">58</span>     @GetMapping("/promociones")
+<span class="line-num">59</span>     public String listarPromociones(@RequestParam(name = "q", required = false) String q,
+<span class="line-num">60</span>                                     @RequestParam(name = "estado", required = false) String estado,
+<span class="line-num">61</span>                                     Model model) {
+<span class="line-num">62</span>         List<Promocion> activas;
+<span class="line-num">63</span>         List<Promocion> expiradas;
+<span class="line-num">64</span>         List<Promocion> inactivas;
+<span class="line-num">65</span>         LocalDate hoy = LocalDate.now();
+<span class="line-num">66</span>         if (q != null && q.isBlank()) {
+<span class="line-num">67</span>             q = null; // Tratar búsqueda vacía como no aplicada para no perder el filtro de estado
+<span class="line-num">68</span>         }
+<span class="line-num">69</span>         // Base de datos: o filtradas por texto, o todas
+<span class="line-num">70</span>         List<Promocion> base = (q != null)
+<span class="line-num">71</span>                 ? promocionRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(q, q)
+<span class="line-num">72</span>                 : promocionRepository.findAll();
+<span class="line-num">73</span> 
+<span class="line-num">74</span>         if (q != null) {
+<span class="line-num">75</span>             model.addAttribute("q", q);
+<span class="line-num">76</span>         }
+<span class="line-num">77</span> 
+<span class="line-num">78</span>         // Expiradas por FECHA (siempre): fechaFin < hoy
+<span class="line-num">79</span>         expiradas = base.stream()
+<span class="line-num">80</span>                 .filter(p -> p.getFechaFin() != null && p.getFechaFin().isBefore(hoy))
+<span class="line-num">81</span>                 .collect(Collectors.toList());
+<span class="line-num">82</span> 
+<span class="line-num">83</span>         // Restantes (no expiradas) separadas por ESTADO
+<span class="line-num">84</span>         List<Promocion> noExpiradas = base.stream()
+<span class="line-num">85</span>                 .filter(p -> p.getFechaFin() == null || !p.getFechaFin().isBefore(hoy))
+<span class="line-num">86</span>                 .collect(Collectors.toList());
+<span class="line-num">87</span> 
+<span class="line-num">88</span>         activas = noExpiradas.stream()
+<span class="line-num">89</span>                 .filter(p -> p.getEstado() == Promocion.Estado.ACTIVE)
+<span class="line-num">90</span>                 .collect(Collectors.toList());
+<span class="line-num">91</span> 
+<span class="line-num">92</span>         inactivas = noExpiradas.stream()
+<span class="line-num">93</span>                 .filter(p -> p.getEstado() == Promocion.Estado.INACTIVE)
+<span class="line-num">94</span>                 .collect(Collectors.toList());
+<span class="line-num">95</span> 
+<span class="line-num">96</span>         // Filtro por estado (ACTIVE, INACTIVE, EXPIRED)
+<span class="line-num">97</span>         if (estado != null && !estado.isBlank()) {
+<span class="line-num">98</span>             try {
+<span class="line-num">99</span>                 Promocion.Estado estadoEnum = Promocion.Estado.valueOf(estado);
+<span class="line-num">100</span>                 if (estadoEnum == Promocion.Estado.INACTIVE) {
+<span class="line-num">101</span>                     activas = Collections.emptyList();
+<span class="line-num">102</span>                     expiradas = Collections.emptyList();
+<span class="line-num">103</span>                     inactivas = inactivas.stream().filter(p -> p.getEstado() == Promocion.Estado.INACTIVE).collect(Collectors.toList());
+<span class="line-num">104</span>                 } else if (estadoEnum == Promocion.Estado.ACTIVE) {
+<span class="line-num">105</span>                     expiradas = Collections.emptyList();
+<span class="line-num">106</span>                     inactivas = Collections.emptyList();
+<span class="line-num">107</span>                     activas = activas.stream().filter(p -> p.getEstado() == Promocion.Estado.ACTIVE).collect(Collectors.toList());
+<span class="line-num">108</span>                 } else if (estadoEnum == Promocion.Estado.EXPIRED) {
+<span class="line-num">109</span>                     activas = Collections.emptyList();
+<span class="line-num">110</span>                     inactivas = Collections.emptyList();
+<span class="line-num">111</span>                     // Ya están determinadas por fecha; no aplicar filtro por estado aquí
+<span class="line-num">112</span>                 }
+<span class="line-num">113</span>                 model.addAttribute("estadoFiltro", estadoEnum.name());
+<span class="line-num">114</span>             } catch (IllegalArgumentException e) {
+<span class="line-num">115</span>                 model.addAttribute("estadoFiltro", "");
+<span class="line-num">116</span>             }
+<span class="line-num">117</span>         } else {
+<span class="line-num">118</span>             model.addAttribute("estadoFiltro", "");
+<span class="line-num">119</span>         }
+<span class="line-num">120</span> 
+<span class="line-num">121</span>         model.addAttribute("activas", activas);
+<span class="line-num">122</span>         model.addAttribute("expiradas", expiradas);
+<span class="line-num">123</span>         model.addAttribute("inactivas", inactivas);
+<span class="line-num">124</span> 
+<span class="line-num">125</span>         // Agregar la lista de estados al modelo
+<span class="line-num">126</span>         model.addAttribute("todosEstados", Promocion.Estado.values());
+<span class="line-num">127</span>         // Fecha actual para la vista (evita T(java.time.LocalDate).now())
+<span class="line-num">128</span>         model.addAttribute("hoy", hoy);
+<span class="line-num">129</span>         
+<span class="line-num">130</span>         return "promociones";
+<span class="line-num">133</span>     }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: CREAR PROMOCIÓN -->
+        <div id="prom-controller-crear" class="content">
+            <h2 class="section-title">3️⃣ Controller - Crear Promoción (POST /promociones)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Recibe los datos del formulario de la vista de administración y crea una nueva promoción, asociando membresías o clases según el tipo seleccionado y registrando una entrada en el historial.</p>
+            </div>
+
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">135</span>     /**
+<span class="line-num">136</span>      * POST /promociones - Crea nueva promoción
+<span class="line-num">137</span>      * Tipos: AMOUNT (monto fijo) o PERCENTAGE (porcentaje)
+<span class="line-num">138</span>      * Estado auto: EXPIRED si fecha fin < hoy, sino ACTIVE
+<span class="line-num">139</span>      */
+<span class="line-num">140</span>     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
+<span class="line-num">141</span>     @PostMapping("/promociones")
+<span class="line-num">142</span>     public String crearPromocion(@RequestParam String nombre,
+<span class="line-num">143</span>                                  @RequestParam String tipo,
+<span class="line-num">144</span>                                  @RequestParam(required = false) String descripcion,
+<span class="line-num">145</span>                                  @RequestParam BigDecimal valor,
+<span class="line-num">146</span>                                  @RequestParam Integer maxUsos,
+<span class="line-num">147</span>                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+<span class="line-num">148</span>                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+<span class="line-num">149</span>                                  @RequestParam(name = "membership", required = false) List<String> memberships,
+<span class="line-num">150</span>                                  @RequestParam(name = "tipoPromocion", required = false) String tipoPromocion,
+<span class="line-num">151</span>                                  @RequestParam(name = "tipoPlan", required = false) String tipoPlan,
+<span class="line-num">152</span>                                  @RequestParam(name = "claseId", required = false) Long claseId) {
+<span class="line-num">153</span> 
+<span class="line-num">154</span>         Promocion p = new Promocion();
+<span class="line-num">155</span>         p.setNombre(nombre);
+<span class="line-num">156</span>         p.setDescripcion(descripcion);
+<span class="line-num">157</span>         p.setTipo("AMOUNT".equalsIgnoreCase(tipo) ? Promocion.TipoDescuento.AMOUNT : Promocion.TipoDescuento.PERCENTAGE);
+<span class="line-num">158</span>         p.setValor(valor);
+<span class="line-num">159</span>         p.setMaxUsos(maxUsos);
+<span class="line-num">160</span>         p.setFechaInicio(fechaInicio);
+<span class="line-num">161</span>         p.setFechaFin(fechaFin);
+<span class="line-num">162</span> 
+<span class="line-num">163</span>         // Tipo de promoción: por defecto MEMBRESIA si no se especifica
+<span class="line-num">164</span>         Promocion.TipoPromocion tipoPromoEnum = Promocion.TipoPromocion.MEMBRESIA;
+<span class="line-num">165</span>         if (tipoPromocion != null && !tipoPromocion.isBlank()) {
+<span class="line-num">166</span>             try {
+<span class="line-num">167</span>                 tipoPromoEnum = Promocion.TipoPromocion.valueOf(tipoPromocion);
+<span class="line-num">168</span>             } catch (IllegalArgumentException ignored) {
+<span class="line-num">169</span>                 tipoPromoEnum = Promocion.TipoPromocion.MEMBRESIA;
+<span class="line-num">170</span>             }
+<span class="line-num">171</span>         }
+<span class="line-num">172</span>         p.setTipoPromocion(tipoPromoEnum);
+<span class="line-num">173</span> 
+<span class="line-num">174</span>         // Calcular estado según fecha de fin
+<span class="line-num">175</span>         if (fechaFin != null && fechaFin.isBefore(LocalDate.now())) {
+<span class="line-num">176</span>             p.setEstado(Promocion.Estado.EXPIRED);
+<span class="line-num">177</span>         } else {
+<span class="line-num">178</span>             p.setEstado(Promocion.Estado.ACTIVE);
+<span class="line-num">179</span>         }
+<span class="line-num">180</span> 
+<span class="line-num">181</span>         if (tipoPromoEnum == Promocion.TipoPromocion.MEMBRESIA) {
+<span class="line-num">182</span>             p.setTipoPlan(tipoPlan);
+<span class="line-num">183</span>             if (memberships != null) {
+<span class="line-num">184</span>                 for (String m : memberships) {
+<span class="line-num">185</span>                     PromocionMembresia pm = new PromocionMembresia();
+<span class="line-num">186</span>                     pm.setPromocion(p);
+<span class="line-num">187</span>                     pm.setMembresia(m);
+<span class="line-num">188</span>                     p.getMembresias().add(pm);
+<span class="line-num">189</span>                 }
+<span class="line-num">190</span>             }
+<span class="line-num">191</span>             p.setClase(null);
+<span class="line-num">192</span>         } else {
+<span class="line-num">193</span>             p.setTipoPlan(null);
+<span class="line-num">194</span>             p.getMembresias().clear();
+<span class="line-num">195</span>             if (claseId != null) {
+<span class="line-num">196</span>                 claseRepository.findById(claseId).ifPresent(p::setClase);
+<span class="line-num">197</span>             } else {
+<span class="line-num">198</span>                 p.setClase(null);
+<span class="line-num">199</span>             }
+<span class="line-num">200</span>         }
+<span class="line-num">201</span> 
+<span class="line-num">202</span>         promocionRepository.save(p);
+<span class="line-num">203</span>         guardarHistorial(p, PromocionHistorial.Accion.CREAR, null, p.getEstado(), "Creación de promoción");
+<span class="line-num">204</span>         return "redirect:/promociones";
+<span class="line-num">205</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 141:</strong> <span class="keyword">@PostMapping("/promociones")</span> indica que este método procesa el formulario de creación.</p>
+                        <p><strong>Línea 143-150:</strong> Los <span class="class-name">@RequestParam</span> reciben todos los campos del formulario: nombre, tipo de descuento, descripción, fechas, membresías asociadas y tipo de promoción (MEMBRESIA o CLASE).</p>
+                        <p><strong>Línea 154-159:</strong> Se crea un objeto <span class="class-name">Promocion</span> y se mapea el campo <code>tipo</code> (texto del formulario) al <strong>enum TipoDescuento</strong> (AMOUNT o PERCENTAGE).</p>
+                        <p><strong>Línea 174-181:</strong> Calcula el estado inicial: si la fecha de fin ya pasó, queda como EXPIRED; de lo contrario, ACTIVE.</p>
+                        <p><strong>Línea 181-193:</strong> Según <code>tipoPromocion</code> se decide si la promo aplica a <strong>membresías</strong> o a una <strong>clase individual</strong>:</p>
+                        <p>- Para MEMBRESIA: rellena la lista <code>p.getMembresias()</code> con objetos <span class="class-name">PromocionMembresia</span>.</p>
+                        <p>- Para CLASE: limpia las membresías y asocia una <span class="class-name">Clase</span> concreta usando <code>claseId</code>.</p>
+                        <p><strong>Línea 202-204:</strong> Guarda la promoción en la base de datos y registra un movimiento en <strong>PromocionHistorial</strong> indicando que fue creada.</p>
+                        <p><strong>Para qué sirve este método:</strong> Centraliza toda la lógica de alta de promociones, incluyendo el cálculo automático del estado y la relación con membresías o clases.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: EDITAR / ESTADO / ELIMINAR -->
+        <div id="prom-controller-estado" class="content">
+            <h2 class="section-title">4️⃣ Controller - Editar, Cambiar Estado, Reactivar y Eliminar</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Agrupa los endpoints que modifican promociones existentes: activar/desactivar, reactivar con nuevas fechas, editar datos y eliminar una promoción.</p>
+            </div>
+
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código (Toggle y Reactivar)</h4>
+                    <div class="code-block">
+<span class="line-num">207</span>     /**
+<span class="line-num">208</span>      * POST /promociones/{id}/toggle - Activa/Desactiva promoción
+<span class="line-num">209</span>      * Solo alterna entre ACTIVE e INACTIVE (no afecta EXPIRED)
+<span class="line-num">210</span>      */
+<span class="line-num">211</span>     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
+<span class="line-num">212</span>     @PostMapping("/promociones/{id}/toggle")
+<span class="line-num">213</span>     public String toggle(@PathVariable long id) {
+<span class="line-num">214</span>         Optional<Promocion> opt = promocionRepository.findById(id);
+<span class="line-num">215</span>         if (opt.isPresent()) {
+<span class="line-num">216</span>             Promocion p = opt.get();
+<span class="line-num">217</span>             Promocion.Estado anterior = p.getEstado();
+<span class="line-num">218</span>             if (anterior == Promocion.Estado.INACTIVE) {
+<span class="line-num">219</span>                 p.setEstado(Promocion.Estado.ACTIVE);
+<span class="line-num">220</span>                 promocionRepository.save(p);
+<span class="line-num">221</span>                 guardarHistorial(p, PromocionHistorial.Accion.REACTIVAR, anterior, p.getEstado(), "Reactivación de promoción");
+<span class="line-num">222</span>             } else if (anterior == Promocion.Estado.ACTIVE) {
+<span class="line-num">223</span>                 p.setEstado(Promocion.Estado.INACTIVE);
+<span class="line-num">224</span>                 promocionRepository.save(p);
+<span class="line-num">225</span>                 guardarHistorial(p, PromocionHistorial.Accion.TOGGLE, anterior, p.getEstado(), "Cambio de estado");
+<span class="line-num">226</span>             }
+<span class="line-num">227</span>         }
+<span class="line-num">228</span>         return "redirect:/promociones";
+<span class="line-num">229</span>     }
+<span class="line-num">230</span> 
+<span class="line-num">231</span>     /**
+<span class="line-num">232</span>      * POST /promociones/{id}/reactivar - Reactiva una promoción vencida con nuevas fechas
+<span class="line-num">233</span>      */
+<span class="line-num">234</span>     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
+<span class="line-num">235</span>     @PostMapping("/promociones/{id}/reactivar")
+<span class="line-num">236</span>     public String reactivar(@PathVariable long id,
+<span class="line-num">237</span>                             @RequestParam(value = "inicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+<span class="line-num">238</span>                             @RequestParam(value = "fin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin,
+<span class="line-num">239</span>                             @RequestParam(value = "fechaInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+<span class="line-num">240</span>                             @RequestParam(value = "fechaFin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+<span class="line-num">241</span>         Promocion p = promocionRepository.findById(id).orElseThrow();
+<span class="line-num">242</span>         Promocion.Estado anterior = p.getEstado();
+<span class="line-num">243</span>         if (inicio == null) inicio = fechaInicio;
+<span class="line-num">244</span>         if (fin == null) fin = fechaFin;
+<span class="line-num">245</span>         if (fin != null && inicio != null && fin.isBefore(inicio)) {
+<span class="line-num">246</span>             // En caso de rango inválido, solo redirige sin cambios; se podría mejorar con feedback
+<span class="line-num">247</span>             return "redirect:/promociones";
+<span class="line-num">248</span>         }
+<span class="line-num">249</span>         p.setFechaInicio(inicio);
+<span class="line-num">250</span>         p.setFechaFin(fin);
+<span class="line-num">251</span>         p.setEstado(Promocion.Estado.ACTIVE);
+<span class="line-num">252</span>         promocionRepository.save(p);
+<span class="line-num">253</span>         guardarHistorial(p, PromocionHistorial.Accion.REACTIVAR, anterior, p.getEstado(),
+<span class="line-num">254</span>                 "Reactivación con nuevo período: " + inicio + " - " + fin);
+<span class="line-num">255</span>         return "redirect:/promociones#promo-" + id;
+<span class="line-num">256</span>     }
+                    </div>
+
+                    <h4>📝 Código (Editar y Eliminar)</h4>
+                    <div class="code-block">
+<span class="line-num">258</span>     /**
+<span class="line-num">259</span>      * POST /promociones/{id}/delete - Elimina promoción por ID
+<span class="line-num">260</span>      */
+<span class="line-num">261</span>     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
+<span class="line-num">262</span>     @PostMapping("/promociones/{id}/delete")
+<span class="line-num">263</span>     public String delete(@PathVariable long id) {
+<span class="line-num">264</span>         if (promocionRepository.existsById(id)) {
+<span class="line-num">265</span>             promocionRepository.deleteById(id);
+<span class="line-num">266</span>         }
+<span class="line-num">267</span>         return "redirect:/promociones";
+<span class="line-num">268</span>     }
+<span class="line-num">269</span> 
+<span class="line-num">270</span>     /**
+<span class="line-num">271</span>      * POST /promociones/{id}/editar - Actualiza promoción existente
+<span class="line-num">272</span>      * Reemplaza completamente las membresías asociadas
+<span class="line-num">273</span>      */
+<span class="line-num">274</span>     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
+<span class="line-num">275</span>     @PostMapping("/promociones/{id}/editar")
+<span class="line-num">276</span>     public String editar(@PathVariable long id,
+<span class="line-num">277</span>                          @RequestParam String nombre,
+<span class="line-num">278</span>                          @RequestParam String tipo,
+<span class="line-num">279</span>                          @RequestParam(required = false) String descripcion,
+<span class="line-num">280</span>                          @RequestParam BigDecimal valor,
+<span class="line-num">281</span>                          @RequestParam Integer maxUsos,
+<span class="line-num">282</span>                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+<span class="line-num">283</span>                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+<span class="line-num">284</span>                          @RequestParam(name = "membership", required = false) List<String> memberships,
+<span class="line-num">285</span>                          @RequestParam(name = "tipoPromocion", required = false) String tipoPromocion,
+<span class="line-num">286</span>                          @RequestParam(name = "tipoPlan", required = false) String tipoPlan,
+<span class="line-num">287</span>                          @RequestParam(name = "claseId", required = false) Long claseId) {
+<span class="line-num">288</span>         Promocion p = promocionRepository.findById(id).orElseThrow();
+<span class="line-num">289</span>         Promocion.Estado anterior = p.getEstado();
+<span class="line-num">290</span>         p.setNombre(nombre);
+<span class="line-num">291</span>         p.setDescripcion(descripcion);
+<span class="line-num">292</span>         p.setTipo("AMOUNT".equalsIgnoreCase(tipo) ? Promocion.TipoDescuento.AMOUNT : Promocion.TipoDescuento.PERCENTAGE);
+<span class="line-num">293</span>         p.setValor(valor);
+<span class="line-num">294</span>         p.setMaxUsos(maxUsos);
+<span class="line-num">295</span>         p.setFechaInicio(fechaInicio);
+<span class="line-num">296</span>         p.setFechaFin(fechaFin);
+<span class="line-num">297</span>         if (fechaFin != null && fechaFin.isBefore(LocalDate.now())) {
+<span class="line-num">298</span>             p.setEstado(Promocion.Estado.EXPIRED);
+<span class="line-num">299</span>         }
+<span class="line-num">300</span> 
+<span class="line-num">301</span>         // Tipo de promoción
+<span class="line-num">302</span>         Promocion.TipoPromocion tipoPromoEnum = p.getTipoPromocion() != null ? p.getTipoPromocion() : Promocion.TipoPromocion.MEMBRESIA;
+<span class="line-num">303</span>         if (tipoPromocion != null && !tipoPromocion.isBlank()) {
+<span class="line-num">304</span>             try {
+<span class="line-num">305</span>                 tipoPromoEnum = Promocion.TipoPromocion.valueOf(tipoPromocion);
+<span class="line-num">306</span>             } catch (IllegalArgumentException ignored) {
+<span class="line-num">307</span>                 // mantener valor anterior
+<span class="line-num">308</span>             }
+<span class="line-num">309</span>         }
+<span class="line-num">310</span>         p.setTipoPromocion(tipoPromoEnum);
+<span class="line-num">311</span> 
+<span class="line-num">312</span>         if (tipoPromoEnum == Promocion.TipoPromocion.MEMBRESIA) {
+<span class="line-num">313</span>             p.setTipoPlan(tipoPlan);
+<span class="line-num">314</span>             p.setClase(null);
+<span class="line-num">315</span>             p.getMembresias().clear();
+<span class="line-num">316</span>             if (memberships != null) {
+<span class="line-num">317</span>                 for (String m : memberships) {
+<span class="line-num">318</span>                     PromocionMembresia pm = new PromocionMembresia();
+<span class="line-num">319</span>                     pm.setPromocion(p);
+<span class="line-num">320</span>                     pm.setMembresia(m);
+<span class="line-num">321</span>                     p.getMembresias().add(pm);
+<span class="line-num">322</span>                 }
+<span class="line-num">323</span>             }
+<span class="line-num">324</span>         } else {
+<span class="line-num">325</span>             p.setTipoPlan(null);
+<span class="line-num">326</span>             p.getMembresias().clear();
+<span class="line-num">327</span>             if (claseId != null) {
+<span class="line-num">328</span>                 claseRepository.findById(claseId).ifPresent(p::setClase);
+<span class="line-num">329</span>             } else {
+<span class="line-num">330</span>                 p.setClase(null);
+<span class="line-num">331</span>             }
+<span class="line-num">332</span>         }
+<span class="line-num">333</span> 
+<span class="line-num">334</span>         promocionRepository.save(p);
+<span class="line-num">335</span>         guardarHistorial(p, PromocionHistorial.Accion.EDITAR, anterior, p.getEstado(), "Edición de promoción");
+<span class="line-num">336</span>         return "redirect:/promociones";
+<span class="line-num">337</span>     }
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Toggle (activar/desactivar):</strong></p>
+                        <p>- Cambia entre estados <code>ACTIVE</code> e <code>INACTIVE</code> sin tocar promociones expiradas.</p>
+                        <p>- Cada cambio registra un movimiento en el historial con acción <strong>REACTIVAR</strong> o <strong>TOGGLE</strong>.</p>
+
+                        <p><strong>Reactivar:</strong></p>
+                        <p>- Pensado para promociones <strong>vencidas</strong>.</p>
+                        <p>- Recibe nuevas fechas de inicio y fin, las valida y vuelve a poner la promo en estado ACTIVE.</p>
+                        <p>- Guarda una descripción detallada en el historial con el nuevo rango de fechas.</p>
+
+                        <p><strong>Editar:</strong></p>
+                        <p>- Carga la promoción existente, actualiza todos sus campos (nombre, tipo, valor, fechas, relaciones).</p>
+                        <p>- Recalcula el estado si la nueva fecha de fin ya está vencida.</p>
+                        <p>- Reemplaza completamente las membresías asociadas o la clase, según el tipo de promoción.</p>
+
+                        <p><strong>Eliminar:</strong></p>
+                        <p>- Verifica si la promoción existe y, en caso afirmativo, la elimina de la base de datos.</p>
+
+                        <p><strong>Para qué sirve este grupo de métodos:</strong> Permite el ciclo de vida completo de una promoción (activar, pausar, reactivar con nuevas fechas, editar y eliminar) desde la vista <code>promociones.html</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: HISTORIAL -->
+        <div id="prom-controller-historial" class="content">
+            <h2 class="section-title">5️⃣ Controller - Historial de Promociones</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Expone una vista de solo lectura con el historial <strong>global</strong> de todas las promociones y centraliza la creación de registros de historial para cada cambio importante.</p>
+            </div>
+
+            <div class="code-explanation">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">343</span> <span class="keyword">@GetMapping</span>(<span class="string">"/promociones/historial"</span>)
+<span class="line-num">344</span> <span class="keyword">public String</span> <span class="method">historialGlobal</span>(Model model) {
+<span class="line-num">345</span>     model.addAttribute(<span class="string">"historial"</span>,
+<span class="line-num">346</span>         historialRepository.<span class="method">findAllWithPromocionOrderByRealizadoEnDesc</span>());
+<span class="line-num">347</span>     <span class="keyword">return</span> <span class="string">"promociones_historial"</span>;
+<span class="line-num">353</span> <span class="keyword">@GetMapping</span>(<span class="string">"/promociones/{id}/historial"</span>)
+<span class="line-num">354</span> <span class="keyword">public String</span> <span class="method">historialPorPromocion</span>(@PathVariable long id, Model model) {
+<span class="line-num">355</span>     Promocion p = promocionRepository.<span class="method">findById</span>(id).orElseThrow();
+<span class="line-num">356</span>     model.addAttribute(<span class="string">"promocion"</span>, p);
+<span class="line-num">357</span>     model.addAttribute(<span class="string">"historial"</span>,
+<span class="line-num">358</span>         historialRepository.<span class="method">findByPromocionIdOrderByRealizadoEnDesc</span>(id));
+<span class="line-num">403</span> <span class="keyword">private void</span> <span class="method">guardarHistorial</span>(Promocion p,
+<span class="line-num">404</span>                                   PromocionHistorial.Accion accion,
+<span class="line-num">405</span>                                   Promocion.Estado anterior,
+<span class="line-num">406</span>                                   Promocion.Estado nuevo,
+<span class="line-num">407</span>                                   String detalle) {
+<span class="line-num">408</span>     PromocionHistorial h = <span class="keyword">new</span> <span class="class-name">PromocionHistorial</span>();
+<span class="line-num">409</span>     h.setPromocion(p);
+<span class="line-num">410</span>     h.setAccion(accion);
+<span class="line-num">411</span>     h.setEstadoAnterior(anterior);
+<span class="line-num">412</span>     h.setEstadoNuevo(nuevo);
+<span class="line-num">413</span>     h.setDetalle(detalle);
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>historialGlobal (GET /promociones/historial):</strong></p>
+                        <p>- Recupera todas las entradas de <span class="class-name">PromocionHistorial</span>, ya unidas a su <span class="class-name">Promocion</span> correspondiente.</p>
+                        <p>- Ordena los registros de más reciente a más antiguo usando el método del repositorio <code>findAllWithPromocionOrderByRealizadoEnDesc()</code>.</p>
+                        <p>- Envía la lista al template <code>promociones_historial.html</code>, donde se muestra como una línea de tiempo global de cambios.</p>
+
+                        <p><strong>historialPorPromocion (GET /promociones/{id}/historial):</strong></p>
+                        <p>- Busca primero la promoción por <code>id</code> y la agrega al modelo como <code>promocion</code>.</p>
+                        <p>- Carga solo los registros de historial asociados a esa promoción mediante <code>findByPromocionIdOrderByRealizadoEnDesc(id)</code>.</p>
+                        <p>- Devuelve el template <code>promocion_historial.html</code>, útil si en algún momento se quiere mostrar el detalle histórico centrado en una sola promoción.</p>
+
+                        <p><strong>Método guardarHistorial (uso interno):</strong></p>
+                        <p>- Crea un nuevo objeto <span class="class-name">PromocionHistorial</span> y rellena: promoción, acción (CREAR, EDITAR, REACTIVAR, TOGGLE, ELIMINAR), estado anterior, estado nuevo y un texto <code>detalle</code> descriptivo.</p>
+                        <p>- Llama a <code>historialRepository.save(h)</code> para persistir el registro cada vez que se modifica una promoción.</p>
+
+                        <p><strong>Para qué sirve este conjunto:</strong> Proporciona una trazabilidad completa de qué pasó con cada promoción (creaciones, cambios de estado, ediciones, reactivaciones y eliminaciones), cuándo ocurrió y qué detalle se registró, lo que luego se refleja en las vistas de historial.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: HTML ADMIN ESTRUCTURA -->
+        <div id="prom-html-admin-estructura" class="content">
+            <h2 class="section-title">6️⃣ HTML Admin - Estructura básica de promociones.html</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Define la página principal de gestión de promociones para el administrador: incluye estilos, sidebar, encabezado y la zona donde se mostrarán las tarjetas de promociones.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="keyword">&lt;!DOCTYPE html&gt;</span>
+<span class="line-num">2</span> <span class="keyword">&lt;html</span> lang=<span class="string">"es"</span> xmlns:th=<span class="string">"http://www.thymeleaf.org"</span>
+<span class="line-num">3</span>       xmlns:sec=<span class="string">"http://www.thymeleaf.org/extras/spring-security"</span><span class="keyword">&gt;</span>
+<span class="line-num">5</span> <span class="keyword">&lt;meta</span> charset=<span class="string">"UTF-8"</span><span class="keyword">&gt;</span>
+<span class="line-num">7</span> <span class="keyword">&lt;title&gt;</span>Gestión de Promociones<span class="keyword">&lt;/title&gt;</span>
+<span class="line-num">8</span> <span class="comment">&lt;!-- CSS propio para tarjetas y layout --&gt;</span>
+<span class="line-num">26</span> .promo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+<span class="line-num">61</span> :root { --sidebar-width: 5rem; }
+<span class="line-num">72</span> .main-content { margin-left: var(--sidebar-width); }
+<span class="line-num">240</span> <span class="keyword">&lt;script</span> src=<span class="string">"https://cdn.tailwindcss.com"</span><span class="keyword">&gt;&lt;/script&gt;</span>
+<span class="line-num">242</span> <span class="keyword">&lt;link</span> rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/Estilos/sidebar-common.css}"</span><span class="keyword">&gt;</span>
+<span class="line-num">255</span> <span class="keyword">&lt;body</span> class=<span class="string">"bg-gray-100 font-sans"</span><span class="keyword">&gt;</span>
+<span class="line-num">256</span>   &lt;div class=<span class="string">"flex min-h-screen w-full bg-gray-100"</span>&gt;
+<span class="line-num">258</span>     &lt;div th:replace=<span class="string">"~{fragments/sidebar :: sidebar('promociones')}"</span>&gt;&lt;/div&gt;
+<span class="line-num">263</span>     &lt;header class=<span class="string">"sticky top-0 z-50 border-b bg-white shadow-sm"</span>&gt; ... &lt;/header&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Línea 1-3:</strong> Estructura base de un template Thymeleaf con soporte para reglas de seguridad (<code>sec:</code>).</p>
+                        <p><strong>Línea 5-7:</strong> Metadatos básicos (codificación y título de la página).</p>
+                        <p><strong>Línea 26:</strong> La clase <code>.promo-grid</code> define una grilla responsiva de tarjetas de promociones.</p>
+                        <p><strong>Línea 61-72:</strong> Se controla el ancho del sidebar mediante la variable CSS <code>--sidebar-width</code>, compartida con <code>sidebar.js</code>.</p>
+                        <p><strong>Línea 240-242:</strong> Se importan Tailwind y las hojas de estilo comunes del sidebar.</p>
+                        <p><strong>Línea 255-263:</strong> La estructura del <code>body</code> combina un contenedor flex:</p>
+                        <p>- A la izquierda, el fragmento <code>fragments/sidebar :: sidebar('promociones')</code> marca el menú activo.</p>
+                        <p>- A la derecha, el contenido principal con el encabezado fijo (sticky) y el resto de la página de gestión.</p>
+                        <p><strong>Para qué sirve esta sección:</strong> Montar el esqueleto visual y de navegación de todo el módulo de promociones para el panel administrativo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 7: HTML ADMIN TARJETAS Y MODAL -->
+        <div id="prom-html-admin-tarjetas" class="content">
+            <h2 class="section-title">7️⃣ HTML Admin - Tarjetas, Filtros y Modal</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Muestra las tarjetas de promociones agrupadas por estado (activas, expiradas, inactivas), con filtros y un modal para crear o editar promociones.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código - Filtros y acciones</h4>
+                    <div class="code-block">
+<span class="line-num">277</span> &lt;div class=<span class="string">"header"</span>&gt;
+<span class="line-num">279</span>   &lt;h1&gt;Gestión de Promociones&lt;/h1&gt;
+<span class="line-num">283</span>   &lt;form id=<span class="string">"searchForm"</span> th:action=<span class="string">"@{/promociones}"</span> method=<span class="string">"get"</span>&gt;
+<span class="line-num">289</span>     &lt;input type=<span class="string">"text"</span> name=<span class="string">"q"</span> th:value=<span class="string">"${q}"</span>
+<span class="line-num">293</span>     &lt;select name=<span class="string">"estado"</span> class=<span class="string">"form-select"</span> onchange=<span class="string">"this.form.submit()"</span>&gt;
+<span class="line-num">295</span>       &lt;option value=<span class="string">""</span> th:selected=<span class="string">"${estadoFiltro == null or estadoFiltro == ''}"</span>&gt;Todos&lt;/option&gt;
+<span class="line-num">296</span>       &lt;option th:each=<span class="string">"estado : ${todosEstados}"</span>
+<span class="line-num">301</span>     &lt;/select&gt;
+<span class="line-num">304</span>     &lt;button type=<span class="string">"submit"</span> class=<span class="string">"btn"</span>&gt;Filtrar&lt;/button&gt;
+<span class="line-num">314</span>   &lt;/form&gt;
+<span class="line-num">314</span>   &lt;a th:href=<span class="string">"@{/promociones/historial}"</span> class=<span class="string">"btn btn-secondary"</span>&gt;Historial&lt;/a&gt;
+                    </div>
+
+                    <h4>📝 Código - Tarjetas y acciones</h4>
+                    <div class="code-block">
+<span class="line-num">319</span> &lt;h2 class=<span class="string">"section-title"</span>&gt;Promociones Activas&lt;/h2&gt;
+<span class="line-num">321</span> &lt;div class=<span class="string">"promo-grid"</span>&gt;
+<span class="line-num">321</span>   &lt;div th:each=<span class="string">"p : ${activas}"</span> class=<span class="string">"promo-card"</span>
+<span class="line-num">323</span>     &lt;h3 class=<span class="string">"promo-title"</span> th:text=<span class="string">"${p.nombre}"</span>&gt;Nombre&lt;/h3&gt;
+<span class="line-num">341</span>     &lt;div class=<span class="string">"value-amount"</span> th:text=<span class="string">"${p.tipo.name() == 'PERCENTAGE' ? '%' + p.valor : 'S/ ' + p.valor}"</span>&gt;&lt;/div&gt;
+<span class="line-num">358</span>     &lt;span class=<span class="string">"membership-tag"</span> th:each=<span class="string">"m : ${p.membresias}"</span> th:text=<span class="string">"${m.membresia}"</span>&gt;Mensual&lt;/span&gt;
+<span class="line-num">364</span>     &lt;div class=<span class="string">"usage-section"</span>&gt; ... barra de usos ... &lt;/div&gt;
+<span class="line-num">374</span>     &lt;div class=<span class="string">"promo-actions"</span>&gt;
+<span class="line-num">388</span>       &lt;button type=<span class="string">"button"</span> onclick=<span class="string">"openEditFromButton(this)"</span>&gt;✏️ Editar&lt;/button&gt;
+<span class="line-num">389</span>       &lt;form th:action=<span class="string">"@{'/promociones/' + ${p.id} + '/toggle'}"</span> method=<span class="string">"post"</span>&gt;...&lt;/form&gt;
+<span class="line-num">396</span>       &lt;form th:action=<span class="string">"@{'/promociones/' + ${p.id} + '/delete'}"</span> method=<span class="string">"post"</span>&gt;...&lt;/form&gt;
+                    </div>
+
+                    <h4>📝 Código - Modal</h4>
+                    <div class="code-block">
+<span class="line-num">510</span> &lt;button class=<span class="string">"fab"</span> onclick=<span class="string">"openModalCreate()"</span>&gt;＋&lt;/button&gt;
+<span class="line-num">512</span> &lt;div class=<span class="string">"modal-overlay"</span> id=<span class="string">"modalOverlay"</span>&gt;
+<span class="line-num">518</span>   &lt;form id=<span class="string">"promoForm"</span> th:action=<span class="string">"@{/promociones}"</span> method=<span class="string">"post"</span>&gt;
+<span class="line-num">522</span>     &lt;input type=<span class="string">"text"</span> name=<span class="string">"nombre"</span> id=<span class="string">"promoName"</span> required&gt;
+<span class="line-num">527</span>     &lt;select name=<span class="string">"tipo"</span> id=<span class="string">"discountType"</span> onchange=<span class="string">"updateDiscountPrefix()"</span>&gt; ... &lt;/select&gt;
+<span class="line-num">553</span>     &lt;input type=<span class="string">"date"</span> name=<span class="string">"fechaInicio"</span> id=<span class="string">"startDate"</span> required&gt;
+<span class="line-num">563</span>     &lt;select name=<span class="string">"tipoPromocion"</span> id=<span class="string">"promoType"</span> onchange=<span class="string">"updatePromoTypeSections()"</span>&gt; ...&lt;/select&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Filtros y búsqueda:</strong></p>
+                        <p>- El formulario envía <code>q</code> (texto de búsqueda) y <code>estado</code> al método <code>listarPromociones</code>.</p>
+                        <p>- El <code>select</code> de estado se llena dinámicamente con <code>${todosEstados}</code> y se envía automáticamente al cambiar.</p>
+                        <p>- El botón "Historial" lleva a la vista <strong>promociones_historial.html</strong>.</p>
+
+                        <p><strong>Tarjetas de promociones:</strong></p>
+                        <p>- Cada tarjeta representa una promoción de la lista <code>activas</code>, <code>expiradas</code> o <code>inactivas</code>.</p>
+                        <p>- Muestra nombre, valor del descuento, periodo de vigencia, membresías aplicables y barra de usos.</p>
+                        <p>- Los botones disparan acciones del controller: <strong>editar</strong>, <strong>toggle</strong> (activar/desactivar) y <strong>delete</strong>.</p>
+
+                        <p><strong>Modal de creación/edición:</strong></p>
+                        <p>- El botón flotante (FAB) abre el modal para registrar una nueva promoción.</p>
+                        <p>- El formulario <code>promoForm</code> envía un POST a <code>/promociones</code> (método crear).</p>
+                        <p>- Incluye campos para tipo de descuento, valor, fechas, máximo de usos y a qué aplica (membresía o clase).</p>
+
+                        <p><strong>Para qué sirve esta sección:</strong> Es la interfaz visual donde el administrador <strong>ve</strong> y <strong>gestiona</strong> todas las promociones del sistema.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 8: HTML HISTORIAL GLOBAL -->
+        <div id="prom-html-historial-global" class="content">
+            <h2 class="section-title">8️⃣ HTML - Historial Global (promociones_historial.html)</h2>
+
+            <div class="purpose-box">
+                <h3>🎯 Para qué sirve:</h3>
+                <p>Muestra una <strong>línea de tiempo</strong> con todos los eventos de promociones: creaciones, ediciones, reactivaciones, eliminaciones y cambios de estado.</p>
+            </div>
+
+            <div class="code-explanation code-explanation-stacked">
+                <div class="code-column">
+                    <h4>📝 Código</h4>
+                    <div class="code-block">
+<span class="line-num">1</span> <span class="keyword">&lt;!DOCTYPE html&gt;</span>
+<span class="line-num">2</span> <span class="keyword">&lt;html</span> lang=<span class="string">"es"</span> xmlns:th=<span class="string">"http://www.thymeleaf.org"</span><span class="keyword">&gt;</span>
+<span class="line-num">6</span> <span class="keyword">&lt;title&gt;</span>Historial de Promociones<span class="keyword">&lt;/title&gt;</span>
+<span class="line-num">10</span> .container { max-width: 1100px; margin: 0 auto; }
+<span class="line-num">20</span> .item { display: grid; grid-template-columns: 180px 1fr; }
+<span class="line-num">31</span> .promo-link { font-weight: 700; }
+<span class="line-num">45</span> &lt;div class=<span class="string">"flex min-h-screen w-full bg-gray-100"</span>&gt;
+<span class="line-num">46</span>   &lt;div th:replace=<span class="string">"~{fragments/sidebar :: sidebar('promociones')}"</span>&gt;&lt;/div&gt;
+<span class="line-num">66</span>   &lt;div class=<span class="string">"title"</span>&gt;Historial de Promociones&lt;/div&gt;
+<span class="line-num">72</span>   &lt;div class=<span class="string">"item"</span> th:each=<span class="string">"h : ${historial}"</span>&gt;
+<span class="line-num">73</span>     &lt;div class=<span class="string">"when"</span> th:text=<span class="string">"${#temporals.format(h.realizadoEn, 'dd MMM yyyy HH:mm')}"</span>&gt;...&lt;/div&gt;
+<span class="line-num">77</span>     &lt;a class=<span class="string">"promo-link"</span>
+<span class="line-num">77</span>        th:href=<span class="string">"@{'/promociones#promo-' + ${h.promocion.id}}"</span>
+<span class="line-num">79</span>     &lt;span class=<span class="string">"badge"</span>
+<span class="line-num">79</span>        th:classappend=<span class="string">"${h.accion == T(...).CREAR} ? ' badge-success' : ..."</span>&gt;
+<span class="line-num">83</span>       &lt;span th:if=<span class="string">"${h.accion == T(...).CREAR}"</span>&gt;Creación&lt;/span&gt;
+<span class="line-num">89</span>       &lt;span class=<span class="string">"mono"</span> th:text=<span class="string">"${h.estadoAnterior != null ? ... : '-'}"</span>&gt;-&lt;/span&gt;
+<span class="line-num">94</span>     &lt;form th:action=<span class="string">"@{'/promociones/' + ${h.promocion.id} + '/delete'}"</span> method=<span class="string">"post"</span>&gt;...&lt;/form&gt;
+                    </div>
+                </div>
+
+                <div class="code-column">
+                    <h4>💡 Explicación</h4>
+                    <div class="explanation">
+                        <p><strong>Estructura general:</strong> Similar a otras vistas de administración: incluye sidebar, header con botón "Volver" a promociones y un contenedor central.</p>
+                        <p><strong>Línea 72-73:</strong> Recorre la lista <code>${historial}</code> enviada por el método <code>historialGlobal</code>.</p>
+                        <p><strong>Fecha y hora:</strong> <code>#temporals.format</code> da formato legible al campo <code>realizadoEn</code> (día, mes abreviado y hora).</p>
+                        <p><strong>Nombre de la promoción:</strong> El enlace lleva a la tarjeta concreta dentro de <code>promociones.html</code> usando un ancla <code>#promo-{id}</code>.</p>
+                        <p><strong>Badges de acción:</strong> Usa un <code>th:classappend</code> largo para colorear distinto según la acción (CREAR, EDITAR, REACTIVAR, ELIMINAR, TOGGLE).</p>
+                        <p><strong>Estados anterior / nuevo:</strong> Se muestran traducidos a "ACTIVA", "INACTIVA" o "EXPIRADA" para que sea fácil de leer.</p>
+                        <p><strong>Botón Eliminar:</strong> Permite, desde el historial, borrar directamente una promoción concreta (llama al endpoint <code>/promociones/{id}/delete</code>).</p>
+                        <p><strong>Para qué sirve esta vista:</strong> Es una herramienta de auditoría global: permite revisar qué está pasando con todas las promociones del sistema, en orden cronológico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📖 Documentación interactiva - Usa los botones superiores para navegar entre secciones del módulo de promociones</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.content').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Desactivar todos los botones
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
