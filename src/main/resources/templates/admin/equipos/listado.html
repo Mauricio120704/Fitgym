@@ -36,9 +36,6 @@
                     </button>
                     <div class="text-xl font-semibold text-gray-800">Equipos y Programación de Mantenimiento</div>
                 </div>
-                <a th:href="@{/admin/equipos/nuevo}" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition">
-                    Nuevo Equipo
-                </a>
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
@@ -195,13 +192,6 @@
                                             </svg>
                                             <span>Editar</span>
                                         </a>
-                                        <a th:href="@{/admin/equipos/registrar-servicio/{id}(id=${equipo.id})}"
-                                           class="btn btn-warning btn-sm" title="Registrar servicio">
-                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                                            </svg>
-                                            <span>Servicio</span>
-                                        </a>
                                         <form th:action="@{/admin/equipos/eliminar/{id}(id=${equipo.id})}"
                                               method="post" class="inline"
                                               onsubmit="return confirm('¿Está seguro de eliminar este equipo?')">
@@ -218,11 +208,150 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Paginación -->
+                <div th:if="${totalPages > 1}" class="flex items-center justify-between mt-4">
+                    <div class="text-sm text-gray-600">
+                        Página <span th:text="${currentPage + 1}"></span> de <span th:text="${totalPages}"></span>
+                    </div>
+                    <div class="inline-flex gap-2">
+                        <a th:if="${!equiposPage.first}"
+                           th:href="@{/admin/equipos(page=${currentPage - 1},size=${size},buscar=${buscar},estado=${estadoSeleccionado},tipo=${tipoSeleccionado})}"
+                           class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">Anterior</a>
+                        <span th:if="${equiposPage.first}"
+                              class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed">Anterior</span>
+
+                        <a th:if="${!equiposPage.last}"
+                           th:href="@{/admin/equipos(page=${currentPage + 1},size=${size},buscar=${buscar},estado=${estadoSeleccionado},tipo=${tipoSeleccionado})}"
+                           class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">Siguiente</a>
+                        <span th:if="${equiposPage.last}"
+                              class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed">Siguiente</span>
+                    </div>
+                </div>
+
+                <!-- Botón flotante Nuevo Equipo -->
+                <button type="button" id="btn-open-modal-nuevo" title="Nuevo Equipo"
+                        class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-orange-500 text-white shadow-lg hover:bg-orange-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-7 h-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+
+                <!-- Modal Nuevo Equipo -->
+                <div id="modal-nuevo" class="fixed inset-0 z-50 hidden">
+                    <div class="absolute inset-0 bg-black/40"></div>
+                    <div class="relative mx-auto w-full max-w-3xl mt-12">
+                        <div class="bg-white rounded-lg shadow-lg">
+                            <div class="flex items-center justify-between px-6 py-4 border-b">
+                                <h3 class="text-lg font-semibold text-gray-800">Nuevo Equipo</h3>
+                                <button type="button" id="btn-close-modal-nuevo" class="text-gray-500 hover:text-gray-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <form th:action="@{/admin/equipos/guardar}" th:object="${equipo}" method="post" class="space-y-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Equipo *</label>
+                                            <input type="text" th:field="*{nombre}" required
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                   placeholder="Ej: Bicicleta Estática Pro">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
+                                            <select th:field="*{tipo}" required
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                                <option value="">Seleccionar tipo</option>
+                                                <option value="CARDIO">Cardio</option>
+                                                <option value="PESAS">Pesas</option>
+                                                <option value="MAQUINAS">Máquinas</option>
+                                                <option value="ACCESORIOS">Accesorios</option>
+                                                <option value="FUERZA">Fuerza</option>
+                                                <option value="PESO LIBRE">Peso Libre</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Marca *</label>
+                                            <input type="text" th:field="*{marca}" required
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                   placeholder="Ej: Technogym">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Modelo *</label>
+                                            <input type="text" th:field="*{modelo}" required
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                   placeholder="Ej: Treadmill 5000">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Serie *</label>
+                                            <input type="text" th:field="*{numeroSerie}" required
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                   placeholder="Ej: TG-2024-001">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación *</label>
+                                            <input type="text" th:field="*{ubicacion}" required
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                   placeholder="Ej: Área Cardio - Zona A">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Adquisición *</label>
+                                            <input type="date" th:field="*{fechaAdquisicion}" required
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Estado *</label>
+                                            <select th:field="*{estado}" required
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none">
+                                                <option value="">Seleccionar estado</option>
+                                                <option value="ACTIVO">Activo</option>
+                                                <option value="MANTENIMIENTO">En Mantenimiento</option>
+                                                <option value="DAÑADO">Dañado</option>
+                                                <option value="FUERA_DE_SERVICIO">Fuera de Servicio</option>
+                                            </select>
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                                            <textarea th:field="*{descripcion}" rows="3"
+                                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                      placeholder="Describe las características principales del equipo..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                                        <button type="button" id="btn-cancel-modal-nuevo" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">Cancelar</button>
+                                        <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600">Guardar Equipo</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
     <script th:src="@{/custom-select.js}"></script>
+    <script>
+        const btnOpenModalNuevo = document.getElementById('btn-open-modal-nuevo');
+        const btnCloseModalNuevo = document.getElementById('btn-close-modal-nuevo');
+        const btnCancelModalNuevo = document.getElementById('btn-cancel-modal-nuevo');
+        const modalNuevo = document.getElementById('modal-nuevo');
+
+        btnOpenModalNuevo.addEventListener('click', () => {
+            modalNuevo.classList.remove('hidden');
+        });
+
+        btnCloseModalNuevo.addEventListener('click', () => {
+            modalNuevo.classList.add('hidden');
+        });
+
+        btnCancelModalNuevo.addEventListener('click', () => {
+            modalNuevo.classList.add('hidden');
+        });
+    </script>
 </body>
 </html>

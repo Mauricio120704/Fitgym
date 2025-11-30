@@ -39,14 +39,7 @@
                             </button>
                             <h1 class="ml-4 text-2xl font-bold text-gray-800">Inventario de Productos</h1>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <a th:href="@{/admin/inventario/nuevo}" class="btn btn-primary">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Nuevo Producto
-                            </a>
-                        </div>
+                        <div class="flex items-center space-x-4"></div>
                     </div>
                 </div>
             </header>
@@ -260,13 +253,6 @@
                                                     </svg>
                                                     <span>Editar</span>
                                                 </a>
-                                                <a th:href="@{/admin/inventario/ajustar-stock/{id}(id=${producto.id})}" 
-                                                   class="btn btn-warning btn-sm" title="Ajustar stock">
-                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                                    </svg>
-                                                    <span>Ajustar</span>
-                                                </a>
                                                 <form th:action="@{/admin/inventario/eliminar/{id}(id=${producto.id})}" 
                                                       method="post" 
                                                       onsubmit="return confirm('¿Está seguro que desea eliminar este producto?');"
@@ -284,6 +270,24 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Paginación -->
+                        <div th:if="${totalPages > 1}" class="flex items-center justify-between px-6 py-4 border-t">
+                            <div class="text-sm text-gray-600">
+                                Página <span th:text="${currentPage + 1}"></span> de <span th:text="${totalPages}"></span>
+                            </div>
+                            <div class="inline-flex gap-2">
+                                <a th:if="${!inventarioPage.first}"
+                                   th:href="@{/admin/inventario(page=${currentPage - 1},size=${size},buscar=${buscar},estado=${estadoSeleccionado},categoria=${categoriaSeleccionada},proveedor=${proveedorSeleccionado},ubicacion=${ubicacionSeleccionada})}"
+                                   class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">Anterior</a>
+                                <span th:if="${inventarioPage.first}"
+                                      class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed">Anterior</span>
+                                <a th:if="${!inventarioPage.last}"
+                                   th:href="@{/admin/inventario(page=${currentPage + 1},size=${size},buscar=${buscar},estado=${estadoSeleccionado},categoria=${categoriaSeleccionada},proveedor=${proveedorSeleccionado},ubicacion=${ubicacionSeleccionada})}"
+                                   class="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">Siguiente</a>
+                                <span th:if="${inventarioPage.last}"
+                                      class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-sm text-gray-400 cursor-not-allowed">Siguiente</span>
+                            </div>
+                        </div>
                         <div th:if="${inventario == null or inventario.empty}" class="text-center py-12">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
@@ -299,5 +303,97 @@
 
     <script th:src="@{/sidebar.js}"></script>
     <script th:src="@{/custom-select.js}"></script>
+
+    <!-- Botón flotante y Modal Nuevo Producto -->
+    <button type="button" id="btn-open-modal-producto" title="Nuevo Producto"
+            class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-orange-500 text-white shadow-lg hover:bg-orange-600 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-7 h-7">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+
+    <div id="modal-producto" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative mx-auto w-full max-w-4xl mt-12">
+            <div class="bg-white rounded-lg shadow-lg">
+                <div class="flex items-center justify-between px-6 py-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-800">Nuevo Producto</h3>
+                    <button type="button" id="btn-close-modal-producto" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <form th:action="@{/admin/inventario/guardar}" th:object="${productoNuevo}" method="post" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Código *</label>
+                                <input type="text" th:field="*{codigoProducto}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="COD-001" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                                <input type="text" th:field="*{nombre}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Nombre del producto" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
+                                <select th:field="*{categoria}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="">Seleccionar categoría</option>
+                                    <option th:each="c : ${categoriasOpciones}" th:value="${c}" th:text="${#strings.replace(c, '_', ' ')}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor *</label>
+                                <input type="text" th:field="*{proveedor}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Proveedor" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Ubicación *</label>
+                                <select th:field="*{ubicacion}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <option value="">Seleccionar ubicación</option>
+                                    <option th:each="u : ${ubicacionesOpciones}" th:value="${u}" th:text="${#strings.replace(u, '_', ' ')}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Precio Unitario *</label>
+                                <input type="number" step="0.01" th:field="*{precioUnitario}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="0.00" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad *</label>
+                                <input type="number" th:field="*{cantidad}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="0" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo *</label>
+                                <input type="number" th:field="*{stockMinimo}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="0" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Stock Máximo *</label>
+                                <input type="number" th:field="*{stockMaximo}" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="0" />
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+                                <textarea th:field="*{descripcion}" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Describe el producto..."></textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button type="button" id="btn-cancel-modal-producto" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">Cancelar</button>
+                            <button type="submit" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600">Guardar Producto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btnOpenProd = document.getElementById('btn-open-modal-producto');
+        const btnCloseProd = document.getElementById('btn-close-modal-producto');
+        const btnCancelProd = document.getElementById('btn-cancel-modal-producto');
+        const modalProd = document.getElementById('modal-producto');
+        if (btnOpenProd && modalProd) {
+            btnOpenProd.addEventListener('click', () => modalProd.classList.remove('hidden'));
+        }
+        if (btnCloseProd) btnCloseProd.addEventListener('click', () => modalProd.classList.add('hidden'));
+        if (btnCancelProd) btnCancelProd.addEventListener('click', () => modalProd.classList.add('hidden'));
+    </script>
 </body>
 </html>
