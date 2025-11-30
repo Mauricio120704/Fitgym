@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Controller
 @RequestMapping("/admin/inventario")
@@ -25,7 +29,9 @@ public class InventarioController {
                                   @RequestParam(required = false) String estado,
                                   @RequestParam(required = false) String categoria,
                                   @RequestParam(required = false) String proveedor,
-                                  @RequestParam(required = false) String ubicacion) {
+                                  @RequestParam(required = false) String ubicacion,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "20") int size) {
 
         List<Inventario> inventario;
 
@@ -41,10 +47,21 @@ public class InventarioController {
             inventario = inventarioService.buscarConFiltros(estadoFiltro, categoriaFiltro, proveedorFiltro, ubicacionFiltro, null);
         }
 
+        // Paginación manual sobre la lista resultante
+        Pageable pageable = PageRequest.of(page, size);
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), inventario.size());
+        List<Inventario> pageContent = start <= end ? inventario.subList(start, end) : List.of();
+        Page<Inventario> inventarioPage = new PageImpl<>(pageContent, pageable, inventario.size());
+
         // Estadísticas del dashboard
         InventarioService.DashboardStats stats = inventarioService.getDashboardStats();
 
-        model.addAttribute("inventario", inventario);
+        model.addAttribute("inventario", inventarioPage.getContent());
+        model.addAttribute("inventarioPage", inventarioPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", inventarioPage.getTotalPages());
+        model.addAttribute("size", size);
         model.addAttribute("totalProductos", stats.getTotalProductos());
         model.addAttribute("productosDisponibles", stats.getProductosDisponibles());
         model.addAttribute("productosBajoStock", stats.getProductosBajoStock());
@@ -66,6 +83,11 @@ public class InventarioController {
         // Productos que necesitan reorden
         List<Inventario> productosReorden = inventarioService.findProductosQueNecesitanReorden();
         model.addAttribute("productosReorden", productosReorden);
+
+        // Objeto para el modal de "Nuevo Producto" y listas de opciones
+        model.addAttribute("productoNuevo", new Inventario());
+        model.addAttribute("categoriasOpciones", List.of("EQUIPAMIENTO", "SUPLEMENTOS", "ROPA_DEPORTIVA", "ACCESORIOS", "HIGIENE", "OFICINA", "BEBIDAS/SNACKS"));
+        model.addAttribute("ubicacionesOpciones", List.of("ALMACEN_PRINCIPAL", "VENTA", "SHOWROOM", "DEPOSITO_SECUNDARIO"));
 
         model.addAttribute("activeMenu", "inventario");
         return "admin/inventario/listado";

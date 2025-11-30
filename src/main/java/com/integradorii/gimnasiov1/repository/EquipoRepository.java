@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface EquipoRepository extends JpaRepository<Equipo, Long> {
@@ -36,4 +38,18 @@ public interface EquipoRepository extends JpaRepository<Equipo, Long> {
 
     @Query("SELECT e FROM Equipo e ORDER BY e.proximoMantenimiento ASC")
     List<Equipo> findEquiposOrdenadosPorProximoMantenimiento();
+
+    // Pageable variants
+    Page<Equipo> findAll(Pageable pageable);
+
+    Page<Equipo> findByEstado(String estado, Pageable pageable);
+
+    Page<Equipo> findByTipo(String tipo, Pageable pageable);
+
+    @Query("SELECT e FROM Equipo e WHERE LOWER(e.nombre) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(e.tipo) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(e.marca) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(e.modelo) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(e.ubicacion) LIKE LOWER(CONCAT('%', :termino, '%'))")
+    Page<Equipo> buscarEquiposPorTermino(@Param("termino") String termino, Pageable pageable);
 }

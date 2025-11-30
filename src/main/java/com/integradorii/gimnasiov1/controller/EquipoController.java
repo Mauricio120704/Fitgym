@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Controller
 @RequestMapping("/admin/equipos")
@@ -26,46 +29,58 @@ public class EquipoController {
     private MantenimientoService mantenimientoService;
 
     @GetMapping
-    public String listarEquipos(Model model, 
+    public String listarEquipos(Model model,
                                @RequestParam(required = false) String buscar,
                                @RequestParam(required = false) String estado,
-                               @RequestParam(required = false) String tipo) {
-        
-        List<Equipo> equipos;
-        
+                               @RequestParam(required = false) String tipo,
+                               @RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "20") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Equipo> equiposPage;
         if (buscar != null && !buscar.trim().isEmpty()) {
-            equipos = equipoService.buscarEquiposPorTermino(buscar);
+            equiposPage = equipoService.buscarEquiposPorTermino(buscar, pageable);
         } else if (estado != null && !estado.equals("TODOS")) {
-            equipos = equipoService.findByEstado(estado);
+            equiposPage = equipoService.findByEstado(estado, pageable);
         } else if (tipo != null && !tipo.equals("TODOS")) {
-            equipos = equipoService.findByTipo(tipo);
+            equiposPage = equipoService.findByTipo(tipo, pageable);
         } else {
-            equipos = equipoService.findAll();
+            equiposPage = equipoService.findAll(pageable);
         }
 
-        // Estadísticas
-        Long totalEquipos = (long) equipos.size();
+        List<Equipo> equipos = equiposPage.getContent();
+
+        // Estadísticas (respecto al resultado filtrado)
+        Long totalEquipos = equiposPage.getTotalElements();
         Long equiposActivos = equipoService.contarEquiposPorEstado("ACTIVO");
         Long equiposEnMantenimiento = equipoService.contarEquiposPorEstado("MANTENIMIENTO");
         Long equiposDanados = equipoService.contarEquiposPorEstado("DAÑADO");
         Long equiposFueraServicio = equipoService.contarEquiposPorEstado("FUERA_DE_SERVICIO");
 
         model.addAttribute("equipos", equipos);
+        model.addAttribute("equiposPage", equiposPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", equiposPage.getTotalPages());
+        model.addAttribute("size", size);
         model.addAttribute("totalEquipos", totalEquipos);
         model.addAttribute("equiposActivos", equiposActivos);
         model.addAttribute("equiposEnMantenimiento", equiposEnMantenimiento);
         model.addAttribute("equiposDanados", equiposDanados);
         model.addAttribute("equiposFueraServicio", equiposFueraServicio);
-        
+
         // Filtros
         model.addAttribute("buscar", buscar);
         model.addAttribute("estadoSeleccionado", estado != null ? estado : "TODOS");
         model.addAttribute("tipoSeleccionado", tipo != null ? tipo : "TODOS");
-        
+
         // Equipos con mantenimiento pendiente
         List<Equipo> equiposMantenimientoPendiente = equipoService.findEquiposConMantenimientoPendiente();
         model.addAttribute("equiposMantenimientoPendiente", equiposMantenimientoPendiente);
-        
+
+        // Objeto para el formulario del modal "Nuevo Equipo"
+        model.addAttribute("equipo", new Equipo());
+
         model.addAttribute("activeMenu", "equipos");
         return "admin/equipos/listado";
     }

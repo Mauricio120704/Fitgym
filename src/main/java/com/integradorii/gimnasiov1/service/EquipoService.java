@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class EquipoService {
@@ -81,5 +83,22 @@ public class EquipoService {
             return equipoRepository.save(equipo);
         }
         return null;
+    }
+
+    // Pageable variants
+    public Page<Equipo> findAll(Pageable pageable) {
+        return equipoRepository.findAll(pageable);
+    }
+
+    public Page<Equipo> findByEstado(String estado, Pageable pageable) {
+        return equipoRepository.findByEstado(estado, pageable);
+    }
+
+    public Page<Equipo> findByTipo(String tipo, Pageable pageable) {
+        return equipoRepository.findByTipo(tipo, pageable);
+    }
+
+    public Page<Equipo> buscarEquiposPorTermino(String termino, Pageable pageable) {
+        return equipoRepository.buscarEquiposPorTermino(termino, pageable);
     }
 }
