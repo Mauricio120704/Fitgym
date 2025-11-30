@@ -60,9 +60,12 @@ document.addEventListener('DOMContentLoaded', function () {
         document.documentElement.classList.remove('sidebar-expanded');
     }
 
+    // Detectar si el usuario es deportista (CLIENTE)
+    const isDportista = document.querySelector('[sec\\:authorize="hasRole(\'CLIENTE\')"]') !== null;
+
     const savedExpanded = localStorage.getItem('sidebarExpanded');
     // Si nunca se ha guardado preferencia, asumimos expandido por defecto
-    if (savedExpanded === 'false') {
+    if (savedExpanded === 'false' && !isDportista) {
         collapseSidebar();
     } else {
         expandSidebar();
@@ -73,10 +76,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (window.innerWidth < 768) {
                 sidebar.classList.toggle('-translate-x-full');
             } else {
-                if (sidebar.classList.contains('w-20')) {
+                // Los deportistas siempre mantienen el sidebar expandido
+                if (isDportista) {
                     expandSidebar();
                 } else {
-                    collapseSidebar();
+                    if (sidebar.classList.contains('w-20')) {
+                        expandSidebar();
+                    } else {
+                        collapseSidebar();
+                    }
                 }
             }
         });

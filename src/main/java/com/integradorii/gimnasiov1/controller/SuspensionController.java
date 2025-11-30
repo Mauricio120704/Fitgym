@@ -75,6 +75,8 @@ public class SuspensionController {
         LocalDate hoy = LocalDate.now();
         model.addAttribute("hoy", hoy);
 
+        model.addAttribute("activeMenu", "suspension");
+
         return "suspension";
     }
 

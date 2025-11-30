@@ -11,8 +11,8 @@ formReclamo.addEventListener("submit", async (e) => {
   const descripcion = document.getElementById("descripcion").value;
   const prioridad = document.getElementById("prioridad").value;
 
-  // Validación básica
-  if (!categoria || !asunto || !descripcion) {
+  // Validación básica (incluye prioridad)
+  if (!categoria || !asunto || !descripcion || !prioridad) {
     mostrarMensaje("Por favor, completa todos los campos obligatorios.", "danger");
     return;
   }

@@ -58,6 +58,7 @@ public class ReservasController {
         
         // Pasar datos del deportista a la vista
         model.addAttribute("usuario", persona);
+        model.addAttribute("activeMenu", "reservas");
         return "reservas";
     }
 

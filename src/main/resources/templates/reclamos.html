@@ -19,12 +19,9 @@
     <link rel="stylesheet" th:href="@{/Estilos/reclamos.css}">
     <script>
         (function() {
-            const expanded = localStorage.getItem('sidebarExpanded') === 'true';
-            if (expanded) {
-                document.documentElement.style.setProperty('--sidebar-width', '16rem');
-            } else {
-                document.documentElement.style.setProperty('--sidebar-width', '5rem');
-            }
+            // Deportistas siempre tienen sidebar expandido
+            localStorage.setItem('sidebarExpanded', 'true');
+            document.documentElement.style.setProperty('--sidebar-width', '16rem');
         })();
     </script>
 </head>
@@ -88,9 +85,10 @@
                                 <!-- Prioridad -->
                                 <div class="mb-3">
                                     <label for="prioridad" class="form-label">Prioridad</label>
-                                    <select class="form-select" id="prioridad">
+                                    <select class="form-select" id="prioridad" required>
+                                        <option value="" selected>Selecciona una prioridad</option>
                                         <option value="Baja">Baja</option>
-                                        <option value="Normal" selected>Normal</option>
+                                        <option value="Normal">Normal</option>
                                         <option value="Alta">Alta</option>
                                         <option value="Crítica">Crítica</option>
                                     </select>

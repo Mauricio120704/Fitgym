@@ -84,6 +84,61 @@ body {
     gap: 20px;
 }
 
+.pagination {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 600px;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.page-summary {
+    color: #6b7280;
+}
+
+.page-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-btn {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    border: 1px solid #f97316;
+    background-color: #fff;
+    color: #f97316;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.page-btn:hover:enabled {
+    background-color: #f97316;
+    color: #fff;
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.page-info {
+    font-size: 13px;
+    color: #4b5563;
+}
+
 .clase-card {
     background: white;
     border-radius: 8px;
@@ -236,7 +291,7 @@ body {
     display: flex;
     align-items: center;
     gap: 4px;
-    color: #333;
+    color: #f97316; /* naranja consistente con el sistema */
     font-weight: 500;
 }
 
@@ -335,6 +390,9 @@ body {
     max-width: 750px;
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-close {
@@ -385,6 +443,9 @@ body {
 
 .rating-form {
     padding: 20px 30px;
+    overflow-y: auto;
+    flex: 1;
+    max-height: calc(90vh - 200px);
 }
 
 .form-group {
@@ -401,7 +462,17 @@ body {
 
 .star-rating {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.star-number {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+    min-width: 20px;
+    text-align: center;
 }
 
 .star {
@@ -471,12 +542,12 @@ body {
     font-weight: 500;
     cursor: pointer;
     border: none;
-    background-color: #6c9bcf;
+    background-color: #f97316; /* naranja principal del sistema */
     color: white;
 }
 
 .btn-submit:hover {
-    background-color: #5a89bd;
+    background-color: #ea580c; /* naranja más oscuro al hover */
 }
 
 @media (max-width: 768px) {
