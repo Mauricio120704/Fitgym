@@ -11,4 +11,5 @@ public interface PromocionRepository extends JpaRepository<Promocion, Long> {
     List<Promocion> findByEstadoIn(List<Promocion.Estado> estados);
     List<Promocion> findByEstado(Promocion.Estado estado);
     List<Promocion> findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(String nombre, String descripcion);
+    void deleteByClase_Id(Long claseId);
 }

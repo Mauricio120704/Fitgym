@@ -304,11 +304,13 @@
 <span class="line-num">51</span>    <span class="keyword">@DeleteMapping</span>(<span class="string">"/by-reserva/{reservaId}"</span>)
 <span class="line-num">52</span>    <span class="keyword">public ResponseEntity&lt;?&gt;</span> <span class="method">deleteByReserva</span>(@PathVariable Long reservaId) {
 <span class="line-num">53</span>        Optional&lt;ClaseCalificacion&gt; existing = repo.findByReservaId(reservaId);
-<span class="line-num">54</span>        <span class="keyword">if</span> (existing.isEmpty()) <span class="keyword">return</span> ResponseEntity.notFound().build();
-<span class="line-num">55</span>        repo.deleteByReservaId(reservaId);
-<span class="line-num">56</span>        <span class="keyword">return</span> ResponseEntity.ok(Map.of(<span class="string">"deleted"</span>, <span class="keyword">true</span>));
-<span class="line-num">57</span>    }
-<span class="line-num">58</span> }
+<span class="line-num">54</span>        <span class="comment">// Si no existe la calificación asociada a la reserva respondemos 404</span>
+<span class="line-num">55</span>        <span class="keyword">if</span> (existing.isEmpty()) <span class="keyword">return</span> ResponseEntity.notFound().build();
+<span class="line-num">56</span>        <span class="comment">// Eliminamos usando la entidad encontrada</span>
+<span class="line-num">57</span>        repo.delete(existing.get());
+<span class="line-num">58</span>        <span class="keyword">return</span> ResponseEntity.ok(Map.of(<span class="string">"deleted"</span>, <span class="keyword">true</span>));
+<span class="line-num">59</span>    }
+<span class="line-num">60</span> }
                     </div>
                 </div>
 
@@ -325,7 +327,7 @@
                         <p>- Si ya existe una calificación para esa <code>reservaId</code>, la actualiza (PUT implícito).</p>
                         <p>- Si no existe, crea una nueva y responde con <code>201 Created</code>.</p>
                         <p><strong>DELETE /by-reserva/{reservaId}:</strong> si hay una calificación asociada a esa reserva la elimina y devuelve
-                            <code>{ "deleted": true }</code>. Si no existe, responde 404.</p>
+                            <code>{ "deleted": true }</code>. Si no existe, responde 404 (el frontend trata 200 y 404 como estados válidos al refrescar la lista).</p>
                         <p><strong>Relación con la UI:</strong> el JavaScript de <em>mis-clases</em> llama a estos endpoints para guardar, editar o eliminar
                             la calificación de cada clase directamente desde el navegador.</p>
                     </div>
@@ -355,7 +357,8 @@
 <span class="line-num">8</span>   &lt;meta th:if=<span class="string">"${_csrf != null}"</span> name=<span class="string">"_csrf_header"</span> th:content=<span class="string">"${_csrf.headerName}"</span>&gt;
 <span class="line-num">9</span>   &lt;script src=<span class="string">"https://cdn.tailwindcss.com"</span>&gt;&lt;/script&gt;
 <span class="line-num">10</span>  &lt;link rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/Estilos/sidebar-common.css}"</span>&gt;
-<span class="line-num">11</span>  &lt;link rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/deportista/mis-clases.css}"</span>&gt;
+<span class="line-num">11</span>  &lt;link rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/Estilos/custom-select.css}"</span>&gt;
+<span class="line-num">12</span>  &lt;link rel=<span class="string">"stylesheet"</span> th:href=<span class="string">"@{/deportista/mis-clases.css}"</span>&gt;
 <span class="line-num">25</span>  &lt;div class=<span class="string">"flex h-screen bg-gray-200"</span>&gt;
 <span class="line-num">27</span>    &lt;div th:replace=<span class="string">"~{fragments/sidebar :: sidebar('mis-clases')}"</span>&gt;&lt;/div&gt;
 <span class="line-num">31</span>    &lt;header class=<span class="string">"flex justify-between items-center p-4 bg-white border-b shadow-sm"</span>&gt; ... &lt;/header&gt;
@@ -365,8 +368,9 @@
 <span class="line-num">51</span>        &lt;option value=<span class="string">"proximas"</span>&gt;Próximas clases&lt;/option&gt;
 <span class="line-num">52</span>        &lt;option value=<span class="string">"pendientes"</span>&gt;Pendientes de calificar&lt;/option&gt;
 <span class="line-num">53</span>        &lt;option value=<span class="string">"calificadas"</span>&gt;Calificadas&lt;/option&gt;
-<span class="line-num">59</span>      &lt;select id=<span class="string">"instructor"</span>&gt; ... &lt;/select&gt;
+<span class="line-num">54</span>      &lt;/select&gt;
 <span class="line-num">71</span>    &lt;div id=<span class="string">"clasesList"</span> class=<span class="string">"clases-list mt-6"</span>&gt;&lt;/div&gt;
+<span class="line-num">72</span>    &lt;div id=<span class="string">"pagination"</span> class=<span class="string">"pagination"</span>&gt;&lt;/div&gt;
 
 <span class="line-num">79</span>  &lt;!-- Modal para calificar --&gt;
 <span class="line-num">80</span>  &lt;div id=<span class="string">"modalCalificar"</span> class=<span class="string">"modal"</span>&gt;
@@ -393,12 +397,13 @@
                     <h4>💡 Explicación HTML</h4>
                     <div class="explanation">
                         <p><strong>Encabezado y estilos:</strong> reutiliza Tailwind y el CSS común del sidebar, más un CSS específico para las tarjetas
-                            de clases (<code>mis-clases.css</code>).</p>
+                            de clases (<code>mis-clases.css</code>) y el componente de selects personalizados naranja (<code>custom-select.css</code>).</p>
                         <p><strong>CSRF:</strong> incluye dos <code>&lt;meta&gt;</code> con el token y el nombre del header para poder llamar a las APIs
                             <code>POST</code> y <code>DELETE</code> de forma segura desde JavaScript.</p>
-                        <p><strong>Filtros:</strong> los <code>&lt;select&gt;</code> con ids <code>estado</code> e <code>instructor</code> permiten filtrar
-                            la lista de clases ya cargadas en memoria.</p>
-                        <p><strong>Contenedor de lista:</strong> <code>clasesList</code> comienza vacío; el JS creará dentro todas las tarjetas de clases.</p>
+                        <p><strong>Filtros:</strong> el <code>&lt;select&gt;</code> con id <code>estado</code>, renderizado con <code>custom-select.js</code>, permite filtrar
+                            la lista de clases ya cargadas en memoria por estado (todas, próximas, pendientes, calificadas).</p>
+                        <p><strong>Contenedores de lista y paginación:</strong> <code>clasesList</code> comienza vacío; el JS creará dentro todas las tarjetas de clases y usará
+                            <code>pagination</code> para dibujar los controles de paginación (texto de resumen y botones Anterior/Siguiente).</p>
                         <p><strong>Modal de calificación:</strong> el <code>div</code> <code>modalCalificar</code> contiene el título, descripción,<br>
                             información de clase y un <code>modalBody</code> donde se inyecta dinámicamente el formulario de estrellas y comentarios.</p>
                         <p><strong>Variable global deportistaId:</strong> en el script inline se expone <code>window.__deportistaId</code> con el ID del deportista
@@ -415,10 +420,10 @@
                     <div class="code-block">
 <span class="line-num">1</span> <span class="comment">// Datos recibidos del backend</span>
 <span class="line-num">2</span> <span class="keyword">let</span> clasesData = [];
-<span class="line-num">7</span> <span class="keyword">function</span> renderClases(filtroEstado = <span class="string">'todas'</span>, filtroInstructor = <span class="string">'todos'</span>) {
+<span class="line-num">7</span> <span class="keyword">function</span> renderClases(filtroEstado = <span class="string">'todas'</span>) {
 <span class="line-num">12</span>   <span class="keyword">let</span> clasesFiltradas = clasesData;
 <span class="line-num">15</span>   <span class="comment">// Filtrar por estado: proxima, pendiente, calificada</span>
-<span class="line-num">24</span>   <span class="comment">// Filtrar por instructor (demo con nombres fijos)</span>
+<span class="line-num">24</span>   <span class="comment">// (El filtro por instructor se eliminó; solo se filtra por estado)</span>
 <span class="line-num">34</span>   clasesFiltradas.forEach(clase =&gt; {
 <span class="line-num">35</span>       <span class="keyword">const</span> card = createClaseCard(clase);
 <span class="line-num">36</span>       clasesList.appendChild(card);
@@ -498,14 +503,20 @@
                             <code>window.__deportistaId</code>.</p>
                         <p><strong>Unificación:</strong> las listas <code>proximas</code>, <code>pendientes</code> y <code>calificadas</code> que vienen del backend
                             se combinan en un solo arreglo <code>clasesData</code>, agregando un <code>id</code> interno para manejar el renderizado.</p>
-                        <p><strong>Renderizado de tarjetas:</strong> <code>renderClases()</code> aplica filtros de estado/instructor y llama a
+                        <p><strong>Renderizado de tarjetas:</strong> <code>renderClases()</code> aplica el filtro de estado y llama a
                             <code>createClaseCard()</code> para generar el HTML de cada tarjeta.</p>
+                        <p><strong>Paginación en memoria:</strong> además del filtro, <code>renderClases()</code> aplica una paginación cliente de 20 elementos por página
+                            (<code>PAGE_SIZE = 20</code>), calculando la página actual con <code>currentPage</code> y delegando en <code>renderPagination()</code> la creación
+                            del texto "Mostrando X–Y de N clases" y de los botones Anterior/Siguiente. Cuando cambia el filtro de estado o se recargan datos desde la API,
+                            <code>currentPage</code> se resetea a 1 para comenzar siempre desde el inicio de la lista filtrada.</p>
                         <p><strong>Estados de clase:</strong></p>
                         <p>- <code>proxima</code>: muestra un texto indicando que la clase aún no ocurrió.</p>
                         <p>- <code>pendiente</code>: muestra un botón "Calificar Clase" que abre el modal.</p>
                         <p>- <code>calificada</code>: muestra el rating promedio, el detalle por aspecto y botones para editar o eliminar la calificación.</p>
-                        <p><strong>Modal de calificación:</strong> al abrirlo, se construye un formulario con cinco grupos de estrellas (general, instructor,
-                            instalaciones, música y dificultad) más un textarea de comentarios.</p>
+                        <p><strong>Modal de calificación:</strong> al abrirlo, se construye un formulario con cinco grupos de estrellas: Calificación General y cuatro
+                            aspectos específicos (Instructor, <strong>Clase / Rutina</strong>, <strong>Ambiente y Entorno</strong>, <strong>Experiencia del Usuario</strong>),
+                            mapeados internamente a <code>ratingInstructor</code>, <code>ratingInstalaciones</code>, <code>ratingMusica</code> y <code>ratingDificultad</code>,
+                            más un textarea de comentarios.</p>
                         <p><strong>Guardado de calificación:</strong> las funciones <code>guardarCalificacion()</code> y <code>submitFromModal()</code> envían un
                             <code>POST</code> a <code>/api/clases/calificaciones</code> con todos los ratings y el comentario. Tras un guardado exitoso, se
                             cierra el modal y se vuelve a llamar a <code>cargarDesdeApi()</code> para refrescar la lista.</p>

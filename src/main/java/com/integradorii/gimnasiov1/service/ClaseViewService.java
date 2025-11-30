@@ -37,12 +37,19 @@ public class ClaseViewService {
         System.out.println("Hora convertida en toView: " + zdt);
     }
 
-    int cuposPremium = c.getCapacidad();
-    int cuposElite = 0;
+    // Obtener cupos por membresía desde la entidad (persistidos en BD)
+    int cuposBasico = c.getCuposBasico() != null ? c.getCuposBasico() : 0;
+    int cuposPremium = c.getCuposPremium() != null ? c.getCuposPremium() : 0;
+    int cuposElite = c.getCuposElite() != null ? c.getCuposElite() : 0;
 
+    // Contar ocupados totales
     long ocupados = c.getId() == null ? 0 : reservaClaseRepository.countOcupados(c.getId());
-    long ocupadosPremium = Math.min(ocupados, cuposPremium);
-    long ocupadosElite = 0L;
+
+    // Distribuir ocupados: primero Básico, luego Premium y finalmente Elite
+    long ocupadosBasico = Math.min(ocupados, cuposBasico);
+    long restantes = ocupados - ocupadosBasico;
+    long ocupadosPremium = Math.min(restantes, cuposPremium);
+    long ocupadosElite = Math.max(0, restantes - cuposPremium);
 
     Long tipoClaseId = (c.getTipoClase() != null) ? c.getTipoClase().getId() : null;
     String tipoClaseNombre = (c.getTipoClase() != null) ? c.getTipoClase().getNombre() : null;
@@ -56,6 +63,7 @@ public class ClaseViewService {
             c.getDuracionMinutos(),
             cuposPremium,
             cuposElite,
+            ocupadosBasico,
             ocupadosPremium,
             ocupadosElite,
             tipoClaseId,

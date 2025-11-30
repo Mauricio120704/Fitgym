@@ -8,10 +8,13 @@ import com.integradorii.gimnasiov1.repository.ClaseRepository;
 import com.integradorii.gimnasiov1.repository.TipoClaseRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
 import com.integradorii.gimnasiov1.repository.ReservaClaseRepository;
+import com.integradorii.gimnasiov1.repository.ClaseCalificacionRepository;
+import com.integradorii.gimnasiov1.repository.PromocionRepository;
 import com.integradorii.gimnasiov1.service.ClaseViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.util.*;
@@ -31,17 +34,23 @@ public class ClasesController {
     private final UsuarioRepository usuarioRepository;
     private final ClaseViewService claseViewService;
     private final TipoClaseRepository tipoClaseRepository;
+    private final ClaseCalificacionRepository claseCalificacionRepository;
+    private final PromocionRepository promocionRepository;
 
     public ClasesController(ClaseRepository claseRepository,
                             ReservaClaseRepository reservaClaseRepository,
                             UsuarioRepository usuarioRepository,
                             ClaseViewService claseViewService,
-                            TipoClaseRepository tipoClaseRepository) {
+                            TipoClaseRepository tipoClaseRepository,
+                            ClaseCalificacionRepository claseCalificacionRepository,
+                            PromocionRepository promocionRepository) {
         this.claseRepository = claseRepository;
         this.reservaClaseRepository = reservaClaseRepository;
         this.usuarioRepository = usuarioRepository;
         this.claseViewService = claseViewService;
         this.tipoClaseRepository = tipoClaseRepository;
+        this.claseCalificacionRepository = claseCalificacionRepository;
+        this.promocionRepository = promocionRepository;
     }
 
     /**
@@ -218,12 +227,19 @@ public class ClasesController {
 
     /**
      * DELETE /clases/{id} - API REST: Elimina clase
-     * Elimina primero las reservas asociadas
+     * Elimina primero calificaciones, luego reservas y promociones asociadas
      */
     @DeleteMapping("/clases/{id}")
     @ResponseBody
+    @Transactional
     public void eliminar(@PathVariable long id) {
+        // Eliminar calificaciones vinculadas a esta clase
+        claseCalificacionRepository.deleteByClaseId(id);
+        // Eliminar reservas asociadas a la clase
         reservaClaseRepository.deleteByClase_Id(id);
+        // Eliminar promociones configuradas para esta clase
+        promocionRepository.deleteByClase_Id(id);
+        // Finalmente eliminar la clase
         claseRepository.deleteById(id);
     }
 
@@ -236,7 +252,11 @@ public class ClasesController {
         int cuposElite = parseInt(body.get("cuposElite"), 0);
         int cuposBasico = parseInt(body.get("cuposBasico"), 0);
 
+        // Guardar cupos por tipo de membresía
         c.setCuposBasico(cuposBasico);
+        c.setCuposPremium(cuposPremium);
+        c.setCuposElite(cuposElite);
+
         // Capacidad total = cupos para todos los tipos de usuario
         c.setCapacidad(cuposPremium + cuposElite + cuposBasico);
 

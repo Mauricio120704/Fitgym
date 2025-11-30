@@ -13,4 +13,5 @@ public interface ClaseCalificacionRepository extends JpaRepository<ClaseCalifica
     List<ClaseCalificacion> findByDeportistaId(Long deportistaId);
     void deleteByReservaId(Long reservaId);
     boolean existsByReservaId(Long reservaId);
+    void deleteByClaseId(Long claseId);
 }

@@ -5,159 +5,257 @@
     <title>Documentación - Gestión de Clases</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f3f4f6;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
             color: #111827;
         }
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 24px 16px 40px;
-        }
-        .header {
-            margin-bottom: 24px;
-            padding: 20px 24px;
-            background: white;
+            background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(15,23,42,0.08);
-            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
         .header h1 {
-            margin: 0 0 8px;
-            font-size: 24px;
-            color: #111827;
+            font-size: 2.2em;
+            margin-bottom: 10px;
         }
+
         .header p {
-            margin: 0;
-            color: #4b5563;
+            font-size: 1.05em;
+            opacity: 0.9;
         }
+
         .nav-buttons {
             display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 24px;
         }
+
         .nav-btn {
-            border: 1px solid #d1d5db;
-            background: white;
-            color: #374151;
-            padding: 8px 14px;
+            padding: 10px 18px;
+            border: 2px solid #667eea;
+            background: #ffffff;
+            color: #667eea;
             border-radius: 999px;
-            font-size: 13px;
             cursor: pointer;
-            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
         }
+
         .nav-btn:hover {
-            background: #f97316;
-            border-color: #f97316;
-            color: white;
+            background: #667eea;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
+
+        .nav-btn.active {
+            background: #667eea;
+            color: #ffffff;
+        }
+
         .section {
-            margin-bottom: 32px;
-            padding: 20px 24px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-title,
         .section h2 {
-            margin: 0 0 12px;
-            font-size: 18px;
-            color: #111827;
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
         }
+
         .section h3 {
             margin: 20px 0 8px;
-            font-size: 15px;
+            font-size: 1.1em;
             color: #16a34a;
         }
+
         .badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 2px 8px;
             border-radius: 999px;
-            font-size: 11px;
+            font-size: 0.8em;
             font-weight: 600;
             background: #ecfdf3;
             color: #166534;
             border: 1px solid #bbf7d0;
             margin-right: 6px;
         }
+
         .tag {
             display: inline-block;
             padding: 2px 8px;
             border-radius: 999px;
-            font-size: 11px;
+            font-size: 0.8em;
             background: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
             margin-right: 4px;
         }
+
+        .purpose-box {
+            background: #e7f3ff;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin-bottom: 35px;
+            border-radius: 8px;
+        }
+
+        .purpose-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .purpose-box p {
+            color: #333333;
+            line-height: 1.8;
+            font-size: 0.98em;
+        }
+
         .explanation {
-            font-size: 14px;
-            line-height: 1.7;
-            color: #374151;
+            color: #333333;
+            line-height: 1.8;
+            font-size: 0.98em;
         }
+
         .explanation p {
-            margin: 4px 0 8px;
+            margin-bottom: 12px;
         }
+
         .explanation ul {
             margin: 4px 0 12px 18px;
             padding: 0;
         }
+
         .explanation li {
             margin-bottom: 4px;
         }
+
         .two-columns {
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr);
-            gap: 20px;
-            align-items: flex-start;
+            grid-template-columns: 1.1fr 1.5fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
             overflow-x: auto;
             min-width: 900px;
         }
+
+        .two-columns > div {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .two-columns h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.05em;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            font-weight: 700;
+        }
+
         .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre;
             width: 100%;
             min-height: 200px;
             max-height: 520px;
-            padding: 14px 16px;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            font-size: 12px;
-            line-height: 1.5;
             box-sizing: border-box;
-            overflow-x: auto;
-            overflow-y: auto;
+            border: none;
             resize: vertical;
         }
+
         .code-block:focus {
             outline: none;
         }
+
         .hint-box {
             margin-top: 12px;
             padding: 10px 12px;
             border-radius: 8px;
             background: #fef3c7;
             border: 1px solid #fde68a;
-            font-size: 13px;
+            font-size: 0.9em;
             color: #92400e;
         }
+
         .footer {
-            margin-top: 24px;
-            font-size: 13px;
-            color: #6b7280;
+            background: #f8f9fa;
+            padding: 20px;
             text-align: center;
+            color: #666666;
+            border-top: 1px solid #e9ecef;
         }
-        @media (max-width: 900px) {
+
+        @media (max-width: 1024px) {
             .two-columns {
-                grid-template-columns: minmax(0, 1fr);
+                grid-template-columns: 1fr;
                 min-width: auto;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                text-align: center;
             }
         }
     </style>
