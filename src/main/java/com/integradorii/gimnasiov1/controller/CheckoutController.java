@@ -16,8 +16,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Locale;
@@ -137,15 +135,7 @@ public class CheckoutController {
      * POST /checkout/create-session
      *
      * Crea una sesión de Checkout de Stripe para el pago de una membresía.
-     *
-     * Flujo principal:
-     * - Calcula el monto final a cobrar (aplicando promoción si corresponde).
-     * - Construye las URLs de éxito y cancelación que Stripe utilizará.
-     * - Crea una sesión de pago con un solo ítem (la membresía seleccionada).
-     * - Devuelve el ID de sesión para que el frontend redireccione a Stripe.
-     *
-     * Los metadatos de la sesión incluyen usuario, plan, período y precio, para
-     * que en el callback de éxito se pueda reconstruir la suscripción.
+     * 
      */
     @PostMapping("/create-session")
     @ResponseBody
@@ -182,18 +172,7 @@ public class CheckoutController {
             }
 
             String successUrl = baseUrl + "/checkout/success?session_id={CHECKOUT_SESSION_ID}";
-
-            StringBuilder cancelUrlBuilder = new StringBuilder(baseUrl)
-                    .append("/checkout/cancel")
-                    .append("?plan=").append(URLEncoder.encode(plan, StandardCharsets.UTF_8))
-                    .append("&periodo=").append(URLEncoder.encode(periodo, StandardCharsets.UTF_8))
-                    .append("&precio=").append(URLEncoder.encode(precio, StandardCharsets.UTF_8));
-
-            if (usuario != null && !usuario.isBlank()) {
-                cancelUrlBuilder.append("&usuario=").append(URLEncoder.encode(usuario, StandardCharsets.UTF_8));
-            }
-
-            String cancelUrl = cancelUrlBuilder.toString();
+            String cancelUrl = baseUrl + "/checkout/cancel?session_id={CHECKOUT_SESSION_ID}";
 
             SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -251,12 +230,6 @@ public class CheckoutController {
      *
      * Muestra la pantalla de pago para una clase de pago individual.
      *
-     * Validaciones:
-     * - El usuario debe estar autenticado.
-     * - La clase debe existir y estar marcada como de pago.
-     *
-     * Si se pasa una promoción, calcula y muestra el precio con descuento
-     * estimado. El pago real se gestiona luego vía Stripe.
      */
     @GetMapping("/clase")
     public String mostrarCheckoutClase(@RequestParam("claseId") Long claseId,
@@ -310,14 +283,10 @@ public class CheckoutController {
      *
      * Crea una sesión de Stripe para el pago de una clase individual.
      *
-     * Flujo principal:
-     * - Valida que la clase exista.
-     * - Calcula el monto final (aplicando promoción si corresponde).
-     * - Configura las URLs de éxito y cancelación.
-     * - Registra en metadatos: usuario, clase, precio y tipo de pago (CLASE).
      */
     @PostMapping("/clase/create-session")
     @ResponseBody
+    @Transactional(readOnly = true) // Solo lectura para validaciones
     public ResponseEntity<Map<String, String>> createCheckoutSessionClase(
             @RequestParam Long claseId,
             @RequestParam String usuario,
@@ -326,45 +295,51 @@ public class CheckoutController {
             HttpServletRequest request) {
 
         Map<String, String> response = new HashMap<>();
+        
+        // 1. Validar que la clase exista y esté disponible
+        Clase clase = claseRepository.findById(claseId).orElse(null);
+        if (clase == null) {
+            response.put("error", "Clase no encontrada");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 2. Validar que el usuario exista
+        Persona persona = personaRepository.findByEmail(usuario).orElse(null);
+        if (persona == null) {
+            response.put("error", "Usuario no encontrado");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 3. Validar disponibilidad de la clase
+        if (!"Programada".equalsIgnoreCase(clase.getEstado())) {
+            response.put("error", "La clase no está disponible para reserva.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 4. Validar fecha futura
+        java.time.OffsetDateTime ahora = java.time.OffsetDateTime.now();
+        if (clase.getFecha() == null || !clase.getFecha().isAfter(ahora)) {
+            response.put("error", "La clase ya ocurrió o no tiene fecha válida.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 5. Validar que el usuario no tenga ya una reserva activa
+        boolean yaReservada = reservaClaseRepository.existsByClase_IdAndDeportista_IdAndEstadoNot(
+                clase.getId(), persona.getId(), "Cancelado");
+        if (yaReservada) {
+            response.put("error", "Ya tienes una reserva para esta clase.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 6. Validar capacidad disponible
+        long ocupados = reservaClaseRepository.countOcupados(clase.getId());
+        if (ocupados >= clase.getCapacidad()) {
+            response.put("error", "La clase está completa. No es posible procesar el pago.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // 7. Si todo está bien, proceder con la creación de la sesión de pago
         try {
-            Clase clase = claseRepository.findById(claseId).orElse(null);
-            if (clase == null) {
-                response.put("error", "Clase no encontrada");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            // Validar que el usuario exista
-            Persona persona = personaRepository.findByEmail(usuario).orElse(null);
-            if (persona == null) {
-                response.put("error", "Usuario no encontrado");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            // Validar que la clase esté disponible para pago (estado, fecha, duplicados y capacidad)
-            if (!"Programada".equalsIgnoreCase(clase.getEstado())) {
-                response.put("error", "La clase no está disponible para reserva.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            java.time.OffsetDateTime ahora = java.time.OffsetDateTime.now();
-            if (clase.getFecha() == null || !clase.getFecha().isAfter(ahora)) {
-                response.put("error", "La clase ya ocurrió o no tiene fecha válida.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            boolean yaReservada = reservaClaseRepository.existsByClase_IdAndDeportista_IdAndEstadoNot(
-                    clase.getId(), persona.getId(), "Cancelado");
-            if (yaReservada) {
-                response.put("error", "Ya tienes una reserva para esta clase.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            long ocupados = reservaClaseRepository.countOcupados(clase.getId());
-            if (ocupados >= clase.getCapacidad()) {
-                response.put("error", "La clase está completa. No es posible procesar el pago.");
-                return ResponseEntity.badRequest().body(response);
-            }
-
             Promocion promo = null;
             if (promoId != null) {
                 promo = obtenerPromocionClaseAplicable(promoId, clase);
@@ -446,14 +421,6 @@ public class CheckoutController {
      *
      * Callback de éxito de Stripe para el pago de una clase.
      *
-     * Pasos:
-     * - Recupera la sesión en Stripe y verifica que el pago esté "paid".
-     * - Obtiene usuario, clase y precio desde los metadatos de la sesión.
-     * - Verifica capacidad y si el usuario ya está reservado.
-     * - Crea la reserva si aún no existe.
-     * - Registra un pago en la tabla de pagos y marca la promoción como usada
-     *   si corresponde.
-     * - Redirige a la pantalla de reservas con el resultado del flujo.
      */
     @GetMapping("/clase/success")
     @Transactional
@@ -482,11 +449,6 @@ public class CheckoutController {
 
             Clase clase = claseRepository.findById(claseId)
                     .orElseThrow(() -> new RuntimeException("Clase no encontrada: " + claseId));
-
-            long ocupados = reservaClaseRepository.countOcupados(clase.getId());
-            if (ocupados >= clase.getCapacidad()) {
-                return "redirect:/reservas?claseLlena=true";
-            }
 
             boolean yaReservada = reservaClaseRepository.existsByClase_IdAndDeportista_IdAndEstadoNot(
                     clase.getId(), persona.getId(), "Cancelado");
@@ -541,16 +503,6 @@ public class CheckoutController {
      *
      * Callback de éxito de Stripe para el pago de una membresía.
      *
-     * Pasos principales:
-     * - Recupera la sesión en Stripe y valida que el pago esté "paid".
-     * - Extrae de metadatos usuario, plan, período, precio y promoción.
-     * - Crea o actualiza la suscripción del deportista, fijando fecha de fin
-     *   y próximo pago según el período.
-     * - Registra un pago en la tabla `pagos` y marca la membresía del deportista
-     *   como activa.
-     * - Incrementa el contador de usos de la promoción si se utilizó una.
-     * - Redirige al perfil si el usuario está autenticado o a login si es un
-     *   nuevo registro.
      */
     @GetMapping("/success")
     @Transactional
@@ -651,149 +603,32 @@ public class CheckoutController {
 
     /**
      * GET /checkout/cancel
+     * Callback de cancelación de Stripe para membresías.
+     * Recupera los datos de la sesión de Stripe (no de parámetros URL).
      */
     @GetMapping("/cancel")
-    public String stripeCancel(@RequestParam String plan,
-                               @RequestParam String periodo,
-                               @RequestParam String precio,
-                               @RequestParam(required = false) String usuario,
-                               Model model) {
-
-        model.addAttribute("planNombre", plan);
-        model.addAttribute("periodo", periodo);
-        model.addAttribute("precio", precio);
-        model.addAttribute("usuario", usuario);
-        model.addAttribute("stripePublishableKey", stripePublishableKey);
-        model.addAttribute("error", "El pago fue cancelado. No se ha realizado ningún cargo.");
-        return "checkout";
-    }
-
-    /**
-     * POST /checkout/pagar - Procesa pago de membresía
-     * Transaccional: crea/actualiza suscripción, registra pago, activa membresía
-     * Rollback automático si falla cualquier paso
-     */
-    @PostMapping("/pagar")
-    @Transactional
-    public String pagar(@RequestParam String usuario,
-                       @RequestParam String plan,
-                       @RequestParam String periodo,
-                       @RequestParam String precio,
-                       @RequestParam(required = false) String nombreTitular,
-                       @RequestParam(required = false) String numeroTarjeta,
-                       @RequestParam(required = false) String fechaExpiracion,
-                       @RequestParam(required = false) String cvv,
-                       Model model,
-                       @AuthenticationPrincipal UserDetails userDetails) {
+    public String stripeCancel(@RequestParam String session_id, Model model) {
         try {
-            // Validación básica de datos de tarjeta (además de los required del formulario)
-            String numeroNormalizado = numeroTarjeta != null ? numeroTarjeta.replaceAll("\\s+", "") : "";
-            boolean datosInvalidos =
-                    nombreTitular == null || nombreTitular.isBlank() ||
-                    numeroNormalizado.length() < 13 || numeroNormalizado.length() > 19 ||
-                    fechaExpiracion == null || !fechaExpiracion.matches("\\d{2}/\\d{2}") ||
-                    cvv == null || !cvv.matches("\\d{3}");
+            Session session = Session.retrieve(session_id);
 
-            if (datosInvalidos) {
-                model.addAttribute("error", "Datos de tarjeta inválidos. Por favor, verifica la información ingresada.");
-                model.addAttribute("planNombre", plan);
-                model.addAttribute("periodo", periodo);
-                model.addAttribute("precio", precio);
-                model.addAttribute("usuario", usuario);
-                return "checkout";
-            }
+            String plan = session.getMetadata() != null ? session.getMetadata().get("plan") : null;
+            String periodo = session.getMetadata() != null ? session.getMetadata().get("periodo") : null;
+            String precio = session.getMetadata() != null ? session.getMetadata().get("precio") : null;
+            String usuario = session.getMetadata() != null ? session.getMetadata().get("usuario") : null;
 
-            // Paso 1: Verificar que el deportista existe
-            Persona persona = personaRepository.findByEmail(usuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + usuario));
-
-            // Paso 2: Buscar plan existente o crear nuevo
-            Plan planEntity = planRepository.findByNombre(plan)
-                .orElseGet(() -> {
-                    Plan nuevoPlan = new Plan();
-                    nuevoPlan.setNombre(plan);
-                    nuevoPlan.setPrecio(parsePrecio(precio));
-                    nuevoPlan.setFrecuencia(periodo.equalsIgnoreCase("anual") ? "Anual" : "Mensual");
-                    return planRepository.save(nuevoPlan);
-                });
-
-            // Paso 3: Crear o actualizar suscripción
-            Optional<Suscripcion> suscripcionExistente = suscripcionRepository.findActiveByDeportistaId(persona.getId());
-            Suscripcion suscripcion;
-            
-            if (suscripcionExistente.isPresent()) {
-                // Actualizar suscripción existente
-                suscripcion = suscripcionExistente.get();
-                suscripcion.setPlan(planEntity);
-                suscripcion.setEstado("Activa");
-            } else {
-                // Crear nueva suscripción
-                suscripcion = new Suscripcion();
-                suscripcion.setDeportista(persona);
-                suscripcion.setPlan(planEntity);
-                suscripcion.setEstado("Activa");
-                suscripcion.setFechaInicio(LocalDate.now());
-            }
-            
-            // Actualizar fechas
-            suscripcion.setFechaFin(calcularFechaFin(periodo));
-            suscripcion.setProximoPago(calcularProximoPago(periodo));
-            
-            try {
-                // Guardar la suscripción
-                suscripcion = suscripcionRepository.save(suscripcion);
-                System.out.println("Suscripción guardada con ID: " + suscripcion.getId());
-            } catch (Exception e) {
-                System.err.println("Error al guardar la suscripción: " + e.getMessage());
-                throw new RuntimeException("Error al guardar la suscripción: " + e.getMessage(), e);
-            }
-
-            // Paso 4: Registrar pago en historial
-            Pago pago = new Pago();
-            pago.setCodigoPago(generarCodigoPago());
-            pago.setDeportista(persona);
-            pago.setFecha(LocalDate.now());
-            pago.setMetodoPago("Tarjeta de Crédito");
-            pago.setMonto(parsePrecio(precio));
-            pago.setEstado("Completado");
-            pago.setPlanServicio(plan);
-            pagoRepository.save(pago);
-
-            // Paso 5: Activar membresía del deportista
-            persona.setMembresiaActiva(true);
-            personaRepository.save(persona);
-
-            // Paso 6: Redirigir según contexto
-            boolean esDeportistaAutenticado =
-                    userDetails != null &&
-                    userDetails.getUsername() != null &&
-                    userDetails.getUsername().equalsIgnoreCase(usuario);
-
-            if (esDeportistaAutenticado) {
-                // Si el deportista ya está autenticado (flujo desde su perfil), volver a su perfil
-                return "redirect:/perfil";
-            } else {
-                // Flujo original para nuevos registros: volver a login con mensaje
-                return "redirect:/login?registroExitoso=true&mensaje=¡Pago+procesado+correctamente!+Ya+puedes+iniciar+sesión.";
-            }
-            
-        } catch (Exception e) {
-            // En caso de error, hacer rollback completo de la transacción
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            
-            // Registrar el error
-            System.err.println("Error al procesar el pago: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Devolver a la página de checkout con el error
-            model.addAttribute("error", "Error al procesar el pago. Por favor, verifica tus datos e inténtalo nuevamente.");
             model.addAttribute("planNombre", plan);
             model.addAttribute("periodo", periodo);
             model.addAttribute("precio", precio);
             model.addAttribute("usuario", usuario);
+            model.addAttribute("stripePublishableKey", stripePublishableKey);
+            model.addAttribute("error", "El pago fue cancelado. No se ha realizado ningún cargo.");
             return "checkout";
+        } catch (Exception e) {
+            System.err.println("Error al procesar cancelación de Stripe: " + e.getMessage());
+            return "redirect:/planes?errorCancel=true";
         }
     }
+
 
     private Promocion obtenerPromocionAplicable(Long promoId, String periodo) {
         if (promoId == null) {
@@ -808,7 +643,7 @@ public class CheckoutController {
         Promocion promo = opt.get();
         LocalDate hoy = LocalDate.now();
 
-        boolean vigentePorFecha =
+        boolean vigentePorFecha = 
                 (promo.getFechaInicio() == null || !promo.getFechaInicio().isAfter(hoy)) &&
                 (promo.getFechaFin() == null || !promo.getFechaFin().isBefore(hoy));
 
