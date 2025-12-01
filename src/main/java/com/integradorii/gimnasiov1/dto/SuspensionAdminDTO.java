@@ -15,6 +15,9 @@ public class SuspensionAdminDTO {
     private Long days;
     private String status;
 
+    private String attachmentName;
+    private String attachmentUrl;
+
     public Long getId() {
         return id;
     }
@@ -109,5 +112,21 @@ public class SuspensionAdminDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAttachmentName() {
+        return attachmentName;
+    }
+
+    public void setAttachmentName(String attachmentName) {
+        this.attachmentName = attachmentName;
+    }
+
+    public String getAttachmentUrl() {
+        return attachmentUrl;
+    }
+
+    public void setAttachmentUrl(String attachmentUrl) {
+        this.attachmentUrl = attachmentUrl;
     }
 }

@@ -140,6 +140,14 @@
                     </a>
                 </li>
                 <li sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/powerbi}" th:classappend="${activeMenu == 'powerbi'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Power BI">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h2v8H3zM8 6h2v12H8zM13 12h2v6h-2zM18 8h2v10h-2z" />
+                        </svg>
+                        <span class="sidebar-text ml-3 hidden">Power BI</span>
+                    </a>
+                </li>
+                <li sec:authorize="hasRole('ADMINISTRADOR')">
                     <a th:href="@{/pagos}" th:classappend="${activeMenu == 'pagos'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Pagos">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18a2 2 0 012 2v8a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z" />
