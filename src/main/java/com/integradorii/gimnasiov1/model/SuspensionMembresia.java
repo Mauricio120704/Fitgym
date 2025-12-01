@@ -32,6 +32,9 @@ public class SuspensionMembresia {
     @Column(nullable = false, length = 20)
     private String estado = "pendiente"; // pendiente, aprobada, rechazada, activa
 
+    @Column(name = "archivo_adjunto", length = 255)
+    private String archivoAdjunto;
+
     @Column(name = "aprobado_por")
     private Long aprobadoPor;
 
@@ -58,6 +61,9 @@ public class SuspensionMembresia {
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    public String getArchivoAdjunto() { return archivoAdjunto; }
+    public void setArchivoAdjunto(String archivoAdjunto) { this.archivoAdjunto = archivoAdjunto; }
 
     public Long getAprobadoPor() { return aprobadoPor; }
     public void setAprobadoPor(Long aprobadoPor) { this.aprobadoPor = aprobadoPor; }

@@ -37,7 +37,7 @@
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
                 <div class="max-w-3xl mx-auto">
                     <div class="suspension-container border border-gray-200 rounded-2xl shadow-sm p-6">
-                        <form id="suspensionForm" th:action="@{/suspension}" method="post">
+                        <form id="suspensionForm" th:action="@{/suspension}" method="post" enctype="multipart/form-data">
                             <h1>Suspensión Temporal de Membresía</h1>
                             <p>Solicita una pausa en tu membresía para no perder los días pagados mientras no puedes asistir.</p>
 
@@ -105,6 +105,17 @@
                             <div class="form-group form-section">
                                 <label for="detalles">Detalles Adicionales (Opcional)</label>
                                 <textarea id="detalles" name="detalles" placeholder="Proporciona más información sobre tu solicitud..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"></textarea>
+                            </div>
+
+                            <div class="form-group form-section">
+                                <label for="archivo-adjunto">Documento de respaldo (Opcional)</label>
+                                <input type="file"
+                                       id="archivo-adjunto"
+                                       name="archivo"
+                                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                                <p id="archivo-error" class="mt-1 text-xs text-red-500 hidden">Formato de archivo no permitido. Usa PDF, DOC, DOCX, JPG o PNG.</p>
+                                <p class="mt-1 text-xs text-gray-500">Formatos permitidos: PDF, DOC, DOCX, JPG, PNG.</p>
                             </div>
 
                             <div id="impacto-suspension" class="impact-info form-section">

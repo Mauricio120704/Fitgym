@@ -15,10 +15,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controlador para la suspensión temporal de una membresía activa.
@@ -98,6 +104,7 @@ public class SuspensionController {
                                       @RequestParam("fecha_inicio") String fechaInicioStr,
                                       @RequestParam("fecha_fin") String fechaFinStr,
                                       @RequestParam(name = "detalles", required = false) String detalles,
+                                      @RequestParam(name = "archivo", required = false) MultipartFile archivo,
                                       Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
@@ -218,6 +225,45 @@ public class SuspensionController {
             return "suspension";
         }
 
+        String storedFileName = null;
+        if (archivo != null && !archivo.isEmpty()) {
+            String originalFilename = archivo.getOriginalFilename();
+            String lowerName = originalFilename != null ? originalFilename.toLowerCase() : "";
+            String extension = "";
+            int dotIndex = lowerName.lastIndexOf('.');
+            if (dotIndex > -1 && dotIndex < lowerName.length() - 1) {
+                extension = lowerName.substring(dotIndex + 1);
+            }
+
+            boolean extensionValida = "pdf".equals(extension)
+                    || "doc".equals(extension)
+                    || "docx".equals(extension)
+                    || "jpg".equals(extension)
+                    || "jpeg".equals(extension)
+                    || "png".equals(extension);
+
+            if (!extensionValida) {
+                model.addAttribute("error", "El archivo adjunto debe ser PDF, DOC, DOCX, JPG o PNG.");
+                return "suspension";
+            }
+
+            try {
+                String safeBaseName = originalFilename != null
+                        ? originalFilename.replaceAll("[^a-zA-Z0-9\\.\\-_]", "_")
+                        : "adjunto";
+                String uuid = UUID.randomUUID().toString();
+                storedFileName = uuid + "_" + safeBaseName;
+
+                Path uploadDir = Paths.get("uploads", "suspensiones").toAbsolutePath().normalize();
+                Files.createDirectories(uploadDir);
+                Path targetPath = uploadDir.resolve(storedFileName);
+                archivo.transferTo(targetPath.toFile());
+            } catch (IOException ex) {
+                model.addAttribute("error", "No se pudo guardar el archivo adjunto. Inténtalo nuevamente más tarde.");
+                return "suspension";
+            }
+        }
+
         // Motivo completo (tipo + detalles)
         String motivoFinal = motivo;
         if (detalles != null && !detalles.isBlank()) {
@@ -232,6 +278,9 @@ public class SuspensionController {
         suspension.setFechaFin(fechaFin);
         suspension.setMotivo(motivoFinal);
         suspension.setEstado("pendiente");
+        if (storedFileName != null) {
+            suspension.setArchivoAdjunto(storedFileName);
+        }
         suspensionRepository.save(suspension);
 
         // La extensión de fechas de la suscripción se realizará cuando un administrador apruebe la suspensión.
