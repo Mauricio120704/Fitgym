@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class IncidenciaViewService {
@@ -13,7 +14,13 @@ public class IncidenciaViewService {
     public IncidenciaViewDTO toView(Incidencia i) {
         String originalDesc = i.getDescripcion();
         String desc = originalDesc;
-        byte[] imagenes = i.getImagenes();
+        byte[] imagenesBytes = i.getImagenes();
+        String imagenes = null;
+        if (imagenesBytes != null && imagenesBytes.length > 0) {
+            try {
+                imagenes = new String(imagenesBytes, StandardCharsets.UTF_8);
+            } catch (Exception ignore) {}
+        }
         String fallbackReportado = null;
         String fallbackAsignado = null;
         if (originalDesc != null) {

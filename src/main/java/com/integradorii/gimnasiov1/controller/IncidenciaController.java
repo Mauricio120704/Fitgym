@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,7 @@ public class IncidenciaController {
             @RequestParam(required = false) String reportado,
             @RequestParam(required = false) String asignado,
             @RequestParam String prioridad,
-            @RequestParam(required = false) byte[] imagenes
+            @RequestParam(required = false) String imagenes
     ) {
         Incidencia i = new Incidencia();
         i.setTitulo(titulo);
@@ -98,7 +99,17 @@ public class IncidenciaController {
         }
         String descToSave = descBuilder.toString();
         i.setDescripcion(descToSave);
-        i.setImagenes(imagenes);
+
+        // Procesar imágenes: guardar el JSON completo (array de data URLs) como UTF-8
+        byte[] imagenesBytes = null;
+        if (imagenes != null && !imagenes.isBlank()) {
+            try {
+                imagenesBytes = imagenes.getBytes(StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                imagenesBytes = null;
+            }
+        }
+        i.setImagenes(imagenesBytes);
         i.setCategoria("General");
 
         String pr = "Media";

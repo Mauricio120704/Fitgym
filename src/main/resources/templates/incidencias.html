@@ -660,9 +660,19 @@
                 // Incluir imágenes en el hidden antes de serializar
                 const hiddenImgs = document.getElementById('inc-imagenes');
                 if (hiddenImgs) {
-                    hiddenImgs.value = imagenesDataUrls.length > 0 ? JSON.stringify(imagenesDataUrls) : '';
+                    // Enviar solo la primera imagen como JSON string (no array)
+                    if (imagenesDataUrls.length > 0) {
+                        hiddenImgs.value = JSON.stringify(imagenesDataUrls);
+                    } else {
+                        // Si no hay imágenes, no incluir el campo
+                        hiddenImgs.value = '';
+                    }
                 }
                 const fd = new FormData(form);
+                // Remover campo vacío de imagenes si está vacío
+                if (!fd.get('imagenes') || fd.get('imagenes').trim() === '') {
+                    fd.delete('imagenes');
+                }
                 const params = new URLSearchParams(fd);
                 fetch('/incidencias', {
                     method: 'POST',

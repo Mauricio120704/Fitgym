@@ -12,13 +12,13 @@ public class IncidenciaViewDTO {
     private OffsetDateTime fechaReporte;
     private String reportadoPor;
     private String asignadoA; // puede ser null
-    private byte[] imagenes;  // Datos binarios de la imagen
+    private String imagenes;  // Datos binarios de la imagen
 
     public IncidenciaViewDTO() {}
 
     public IncidenciaViewDTO(Long id, String titulo, String descripcion, String categoria, String prioridad,
                              String estado, OffsetDateTime fechaReporte, String reportadoPor,
-                             String asignadoA, byte[] imagenes) {
+                             String asignadoA, String imagenes) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -49,6 +49,6 @@ public class IncidenciaViewDTO {
     public void setReportadoPor(String reportadoPor) { this.reportadoPor = reportadoPor; }
     public String getAsignadoA() { return asignadoA; }
     public void setAsignadoA(String asignadoA) { this.asignadoA = asignadoA; }
-    public byte[] getImagenes() { return imagenes; }
-    public void setImagenes(byte[] imagenes) { this.imagenes = imagenes; }
+    public String getImagenes() { return imagenes; }
+    public void setImagenes(String imagenes) { this.imagenes = imagenes; }
 }

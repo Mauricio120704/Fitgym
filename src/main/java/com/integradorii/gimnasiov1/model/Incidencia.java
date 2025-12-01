@@ -42,7 +42,6 @@ public class Incidencia {
     @Column(name = "ultima_actualizacion", nullable = false)
     private OffsetDateTime ultimaActualizacion;
 
-    @Lob
     @Column(name = "imagenes", columnDefinition = "BYTEA")
     private byte[] imagenes;
 
