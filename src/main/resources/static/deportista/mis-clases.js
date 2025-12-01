@@ -4,9 +4,14 @@ let clasesData = [];
 // Almacenar estados de expansión
 const expandedStates = {};
 
-// Renderizar clases
-function renderClases(filtroEstado = 'todas', filtroInstructor = 'todos') {
+// Paginación
+let currentPage = 1;
+const PAGE_SIZE = 20;
+
+// Renderizar clases con filtro y paginación
+function renderClases(filtroEstado = 'todas') {
     const clasesList = document.getElementById('clasesList');
+    if (!clasesList) return;
     clasesList.innerHTML = '';
 
     let clasesFiltradas = clasesData;
@@ -21,20 +26,88 @@ function renderClases(filtroEstado = 'todas', filtroInstructor = 'todos') {
         });
     }
 
-    // Filtrar por instructor
-    if (filtroInstructor !== 'todos') {
-        clasesFiltradas = clasesFiltradas.filter(clase => {
-            if (filtroInstructor === 'carlos') return clase.instructor === 'Carlos Ruiz';
-            if (filtroInstructor === 'maria') return clase.instructor === 'María González';
-            if (filtroInstructor === 'ana') return clase.instructor === 'Ana Martínez';
-            return true;
-        });
+    const totalItems = clasesFiltradas.length;
+    const totalPages = totalItems === 0 ? 1 : Math.ceil(totalItems / PAGE_SIZE);
+
+    // Ajustar página actual si se sale de rango
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
     }
 
-    clasesFiltradas.forEach(clase => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
+    const pageItems = clasesFiltradas.slice(startIndex, endIndex);
+
+    pageItems.forEach(clase => {
         const card = createClaseCard(clase);
         clasesList.appendChild(card);
     });
+
+    renderPagination(totalItems, totalPages, filtroEstado);
+}
+
+function renderPagination(totalItems, totalPages, filtroEstado) {
+    const container = document.getElementById('pagination');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (totalItems === 0) {
+        return;
+    }
+
+    const infoWrapper = document.createElement('div');
+    infoWrapper.className = 'pagination-inner';
+
+    const startItem = (currentPage - 1) * PAGE_SIZE + 1;
+    const endItem = Math.min(currentPage * PAGE_SIZE, totalItems);
+
+    const summary = document.createElement('span');
+    summary.className = 'page-summary';
+    summary.textContent = `Mostrando ${startItem}-${endItem} de ${totalItems} clases`;
+
+    const controls = document.createElement('div');
+    controls.className = 'page-controls';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.className = 'page-btn';
+    prevBtn.textContent = 'Anterior';
+    prevBtn.disabled = currentPage <= 1;
+    prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderClases(filtroEstado);
+        }
+    });
+
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'page-info';
+    pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'page-btn';
+    nextBtn.textContent = 'Siguiente';
+    nextBtn.disabled = currentPage >= totalPages;
+    nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderClases(filtroEstado);
+        }
+    });
+
+    controls.appendChild(prevBtn);
+    controls.appendChild(pageInfo);
+    controls.appendChild(nextBtn);
+
+    infoWrapper.appendChild(summary);
+    infoWrapper.appendChild(controls);
+
+    container.appendChild(infoWrapper);
 }
 
 function createClaseCard(clase) {
@@ -81,6 +154,11 @@ function createClaseCard(clase) {
             <p class="clase-message">${clase.mensaje || 'Esta clase aún no ha ocurrido. Podrás calificarla después de asistir.'}</p>
         `;
     } else if (clase.estado === 'calificada') {
+        const valInstructor = clase.ratingInstructor != null ? clase.ratingInstructor : '–';
+        const valClase = clase.ratingInstalaciones != null ? clase.ratingInstalaciones : '–';
+        const valAmbiente = clase.ratingMusica != null ? clase.ratingMusica : '–';
+        const valExperiencia = clase.ratingDificultad != null ? clase.ratingDificultad : '–';
+
         contentHTML += `
             <div class="clase-review ${isExpanded ? 'expanded' : ''}">
                 ${clase.review}
@@ -92,19 +170,19 @@ function createClaseCard(clase) {
             <div class="clase-ratings ${isExpanded ? 'expanded' : 'collapsed'}">
                 <div class="rating-item">
                     <span class="rating-label">Instructor:</span>
-                    <span class="rating-value">⭐ ${clase.ratingInstructor}</span>
+                    <span class="rating-value">★ ${valInstructor}</span>
                 </div>
                 <div class="rating-item">
-                    <span class="rating-label">Instalaciones:</span>
-                    <span class="rating-value">⭐ ${clase.ratingInstalaciones}</span>
+                    <span class="rating-label">Clase / Rutina:</span>
+                    <span class="rating-value">★ ${valClase}</span>
                 </div>
                 <div class="rating-item">
-                    <span class="rating-label">Música:</span>
-                    <span class="rating-value">⭐ ${clase.ratingMusica}</span>
+                    <span class="rating-label">Ambiente y Entorno:</span>
+                    <span class="rating-value">★ ${valAmbiente}</span>
                 </div>
                 <div class="rating-item">
-                    <span class="rating-label">Dificultad:</span>
-                    <span class="rating-value">⭐ ${clase.ratingDificultad}</span>
+                    <span class="rating-label">Experiencia del Usuario:</span>
+                    <span class="rating-value">★ ${valExperiencia}</span>
                 </div>
             </div>
             <div class="clase-actions right">
@@ -122,10 +200,9 @@ function createClaseCard(clase) {
 
 function toggleExpand(claseId) {
     expandedStates[claseId] = !expandedStates[claseId];
-    renderClases(
-        document.getElementById('estado').value,
-        document.getElementById('instructor').value
-    );
+    const estadoSelect = document.getElementById('estado');
+    const estado = estadoSelect ? estadoSelect.value : 'todas';
+    renderClases(estado);
 }
 
 function abrirModalCalificar(claseId) {
@@ -144,7 +221,7 @@ function abrirModalCalificar(claseId) {
             <div class="form-group">
                 <label>Calificación General</label>
                 <div class="star-rating" id="rating-general">
-                    ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating('general', ${i})">☆</span>`).join('')}
+                    ${[1,2,3,4,5].map(i => `<span class="star-number">${i}</span><span class="star" onclick="setRating('general', ${i})">☆</span>`).join('')}
                 </div>
             </div>
             <div class="form-group">
@@ -153,30 +230,30 @@ function abrirModalCalificar(claseId) {
             <div class="form-group">
                 <label>Instructor</label>
                 <div class="star-rating" id="rating-instructor">
-                    ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating('instructor', ${i})">☆</span>`).join('')}
+                    ${[1,2,3,4,5].map(i => `<span class="star-number">${i}</span><span class="star" onclick="setRating('instructor', ${i})">☆</span>`).join('')}
                 </div>
             </div>
             <div class="form-group">
-                <label>Instalaciones</label>
+                <label>Clase / Rutina</label>
                 <div class="star-rating" id="rating-instalaciones">
-                    ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating('instalaciones', ${i})">☆</span>`).join('')}
+                    ${[1,2,3,4,5].map(i => `<span class="star-number">${i}</span><span class="star" onclick="setRating('instalaciones', ${i})">☆</span>`).join('')}
                 </div>
             </div>
             <div class="form-group">
-                <label>Música</label>
+                <label>Ambiente y Entorno</label>
                 <div class="star-rating" id="rating-musica">
-                    ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating('musica', ${i})">☆</span>`).join('')}
+                    ${[1,2,3,4,5].map(i => `<span class="star-number">${i}</span><span class="star" onclick="setRating('musica', ${i})">☆</span>`).join('')}
                 </div>
             </div>
             <div class="form-group">
-                <label>Dificultad</label>
+                <label>Experiencia del Usuario</label>
                 <div class="star-rating" id="rating-dificultad">
-                    ${[1,2,3,4,5].map(i => `<span class="star" onclick="setRating('dificultad', ${i})">☆</span>`).join('')}
+                    ${[1,2,3,4,5].map(i => `<span class="star-number">${i}</span><span class="star" onclick="setRating('dificultad', ${i})">☆</span>`).join('')}
                 </div>
             </div>
             <div class="form-group">
                 <label>Comentarios (opcional)</label>
-                <textarea id="comentarios" maxlength="500" placeholder="Comparte tu experiencia con esta clase... ¿Qué te gustó? ¿Qué se puede mejorar?" oninput="updateCharCount()"></textarea>
+                <textarea id="comentarios" maxlength="500" placeholder="Comparte tu experiencia con esta clase... ¿Qué te gustó? ¿Qué se puede mejorar?" oninput="updateCharCount()">${clase.review || ''}</textarea>
                 <div class="char-count" id="charCount">0/500</div>
             </div>
         </form>
@@ -186,6 +263,16 @@ function abrirModalCalificar(claseId) {
         </div>
     `;
     
+    // Si ya está calificada, prellenar estrellas y contador de caracteres
+    if (clase.estado === 'calificada') {
+        if (clase.rating != null) setRating('general', clase.rating);
+        if (clase.ratingInstructor != null) setRating('instructor', clase.ratingInstructor);
+        if (clase.ratingInstalaciones != null) setRating('instalaciones', clase.ratingInstalaciones);
+        if (clase.ratingMusica != null) setRating('musica', clase.ratingMusica);
+        if (clase.ratingDificultad != null) setRating('dificultad', clase.ratingDificultad);
+        updateCharCount();
+    }
+
     modal.style.display = 'block';
 }
 
@@ -254,7 +341,13 @@ function eliminarCalificacion(claseId) {
         fetch(`/api/clases/calificaciones/by-reserva/${clase.reservaId}`, {
             method: 'DELETE',
             headers: { [csrfHeader]: csrf }
-        }).then(r => r.ok ? r.json() : Promise.reject(r)).then(() => {
+        }).then(r => {
+            // Consideramos 200 OK y 404 (ya no existe) como estados válidos
+            if (!r.ok && r.status !== 404) {
+                throw new Error('HTTP ' + r.status);
+            }
+        }).then(() => {
+            // Recargar datos para que la clase pase a "Pendiente" (sin calificación)
             cargarDesdeApi();
         }).catch(() => { alert('Error eliminando la calificación'); });
     }
@@ -327,7 +420,8 @@ function cargarDesdeApi(){
             
             console.log('Total clases cargadas:', clasesData.length);
             console.log('Estados:', clasesData.map(c => c.estado));
-            
+            // Resetear a la primera página al recargar datos
+            currentPage = 1;
             renderClases();
         }).catch(() => { clasesData=[]; renderClases(); });
 }
@@ -336,21 +430,29 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarDesdeApi();
 
     // Filtros
-    document.getElementById('estado').addEventListener('change', (e) => {
-        renderClases(e.target.value, document.getElementById('instructor').value);
-    });
+    const estadoSelect = document.getElementById('estado');
 
-    document.getElementById('instructor').addEventListener('change', (e) => {
-        renderClases(document.getElementById('estado').value, e.target.value);
-    });
+    if (estadoSelect) {
+        estadoSelect.addEventListener('change', (e) => {
+            // Cambiar de filtro siempre vuelve a la página 1
+            currentPage = 1;
+            renderClases(e.target.value);
+        });
+    }
 
-    // Cerrar modal
-    document.querySelector('.modal-close').addEventListener('click', cerrarModal);
-    
-    window.addEventListener('click', (e) => {
-        const modal = document.getElementById('modalCalificar');
-        if (e.target === modal) {
-            cerrarModal();
+    // Cerrar modal solo con el botón X o Cancelar
+    const closeBtn = document.querySelector('.modal-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', cerrarModal);
+    }
+
+    // Cerrar modal con tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            const modal = document.getElementById('modalCalificar');
+            if (modal && modal.style.display === 'block') {
+                cerrarModal();
+            }
         }
     });
 });

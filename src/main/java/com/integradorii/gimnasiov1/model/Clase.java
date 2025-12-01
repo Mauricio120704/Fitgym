@@ -31,6 +31,12 @@ public class Clase {
     @Column(name = "cupos_basico", nullable = false)
     private Integer cuposBasico = 0;
 
+    @Column(name = "cupos_premium", nullable = false)
+    private Integer cuposPremium = 0;
+
+    @Column(name = "cupos_elite", nullable = false)
+    private Integer cuposElite = 0;
+
     @Column(nullable = false)
     private OffsetDateTime fecha; // fecha/hora de la clase
 
@@ -63,6 +69,10 @@ public class Clase {
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
     public Integer getCuposBasico() { return cuposBasico; }
     public void setCuposBasico(Integer cuposBasico) { this.cuposBasico = cuposBasico; }
+    public Integer getCuposPremium() { return cuposPremium; }
+    public void setCuposPremium(Integer cuposPremium) { this.cuposPremium = cuposPremium; }
+    public Integer getCuposElite() { return cuposElite; }
+    public void setCuposElite(Integer cuposElite) { this.cuposElite = cuposElite; }
     public OffsetDateTime getFecha() { return fecha; }
     public void setFecha(OffsetDateTime fecha) { this.fecha = fecha; }
     public Integer getDuracionMinutos() { return duracionMinutos; }

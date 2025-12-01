@@ -47,6 +47,7 @@ public class ReclamoController {
         
         model.addAttribute("usuario", persona);
         model.addAttribute("reclamos", reclamos);
+        model.addAttribute("activeMenu", "reclamos");
         return "reclamos";
     }
     

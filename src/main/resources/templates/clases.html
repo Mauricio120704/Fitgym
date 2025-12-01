@@ -200,8 +200,7 @@
                                         <th class="px-4 py-3">Instructor</th>
                                         <th class="px-4 py-3">Fecha y Hora</th>
                                         <th class="px-4 py-3">Duración</th>
-                                        <th class="px-4 py-3">Cupos Premium/Elite</th>
-                                        <th class="px-4 py-3">Ocupación Actual</th>
+                                        <th class="px-4 py-3">Cupos</th>
                                         <th class="px-4 py-3">Estado</th>
                                         <th class="px-4 py-3">Acciones</th>
                                     </tr>
@@ -209,7 +208,7 @@
                                 <tbody class="text-sm text-gray-700">
                                     <!-- Mensaje cuando no hay resultados para el filtro aplicado -->
                                     <tr th:if="${#lists.isEmpty(clases)}">
-                                        <td class="px-4 py-6 text-center text-gray-500" colspan="8"
+                                        <td class="px-4 py-6 text-center text-gray-500" colspan="7"
                                             th:text="${buscarActual != null && !#strings.isEmpty(buscarActual) ?
                                                       'No se encontraron clases para el periodo seleccionado que coincidan con ' + buscarActual + '.' :
                                                       'No se encontraron clases para el periodo seleccionado.'}">
@@ -226,14 +225,26 @@
                                         </td>
                                         <td class="px-4 py-3"><span th:text="${clase.duracion}">60</span> min</td>
                                         <td class="px-4 py-3">
-                                            <span th:text="${clase.cuposPremium}">15</span> / <span th:text="${clase.cuposElite}">10</span>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <div class="font-semibold">
-                                                <span th:text="${clase.ocupadosPremium + clase.ocupadosElite}">20</span>/<span th:text="${clase.cuposPremium + clase.cuposElite}">25</span>
-                                            </div>
-                                            <div class="text-xs text-gray-500">
-                                                Premium: <span th:text="${clase.ocupadosPremium}">12</span> | Elite: <span th:text="${clase.ocupadosElite}">8</span>
+                                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs items-center">
+                                                <!-- Básico: Gris si no hay cupos, normal si hay -->
+                                                <span th:if="${clase.cuposBasico > 0}" class="flex items-center gap-1">
+                                                    <span class="font-semibold text-gray-900">Básico:</span>
+                                                    <span th:text="${clase.ocupadosBasico}">0</span>/<span th:text="${clase.cuposBasico}">15</span>
+                                                </span>
+                                                <span th:unless="${clase.cuposBasico > 0}" class="flex items-center gap-1 text-gray-400">
+                                                    <span class="font-semibold">Básico:</span>
+                                                    <span>-</span>
+                                                </span>
+                                                <!-- Premium -->
+                                                <span class="flex items-center gap-1">
+                                                    <span class="font-semibold text-gray-900">Premium:</span>
+                                                    <span th:text="${clase.ocupadosPremium}">12</span>/<span th:text="${clase.cuposPremium}">50</span>
+                                                </span>
+                                                <!-- Elite -->
+                                                <span class="flex items-center gap-1">
+                                                    <span class="font-semibold text-gray-900">Elite:</span>
+                                                    <span th:text="${clase.ocupadosElite}">8</span>/<span th:text="${clase.cuposElite}">0</span>
+                                                </span>
                                             </div>
                                         </td>
                                         <td class="px-4 py-3">

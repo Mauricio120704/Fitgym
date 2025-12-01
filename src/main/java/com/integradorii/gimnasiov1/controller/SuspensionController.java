@@ -75,6 +75,8 @@ public class SuspensionController {
         LocalDate hoy = LocalDate.now();
         model.addAttribute("hoy", hoy);
 
+        model.addAttribute("activeMenu", "suspension");
+
         return "suspension";
     }
 
@@ -113,10 +115,15 @@ public class SuspensionController {
                 .orElse(null);
         if (suscripcion == null) {
             model.addAttribute("error", "No tienes una suscripción activa para suspender.");
+            LocalDate hoy = LocalDate.now();
+            model.addAttribute("hoy", hoy);
+            model.addAttribute("activeMenu", "suspension");
             return "suspension";
         }
 
         LocalDate hoy = LocalDate.now();
+        model.addAttribute("hoy", hoy);
+        model.addAttribute("activeMenu", "suspension");
         LocalDate fechaInicio;
         LocalDate fechaFin;
         try {
@@ -152,19 +159,27 @@ public class SuspensionController {
         // cualquier otra suspensión ya aprobada/activa del mismo usuario.
         // Dos rangos se consideran solapados si comparten al menos un día en común.
         boolean haySuperposicion = suspensionesUsuario.stream().anyMatch(s -> {
-            // Solo se consideran suspensiones que ya están aprobadas o activas.
-            if (!"aprobada".equalsIgnoreCase(s.getEstado())
-                    && !"activa".equalsIgnoreCase(s.getEstado())) {
+            String estado = s.getEstado();
+            if (estado == null) {
                 return false;
             }
+
+            // Solo se consideran suspensiones que ya están aprobadas o activas.
+            if (!"aprobada".equalsIgnoreCase(estado)
+                    && !"activa".equalsIgnoreCase(estado)) {
+                return false;
+            }
+
             LocalDate ini = s.getFechaInicio();
             LocalDate fin = s.getFechaFin();
             if (ini == null || fin == null) {
                 return false;
             }
-            // Se solapan si el fin de uno no es anterior al inicio del otro
-            // y el inicio de uno no es posterior al fin del otro.
-            return !fechaFin.isBefore(ini) && !fechaInicio.isAfter(fin);
+
+            // Se solapan si [fechaInicio, fechaFin] y [ini, fin] comparten al menos un día.
+            // Equivale a: fechaInicio <= fin && fechaFin >= ini (rangos cerrados).
+            boolean seSolapan = !fechaInicio.isAfter(fin) && !fechaFin.isBefore(ini);
+            return seSolapan;
         });
 
         if (haySuperposicion) {
@@ -209,24 +224,17 @@ public class SuspensionController {
             motivoFinal = motivo + " - " + detalles.trim();
         }
 
-        // Crear suspensión (auto aprobada)
+        // Crear suspensión (se registra inicialmente como pendiente)
         SuspensionMembresia suspension = new SuspensionMembresia();
         suspension.setSuscripcion(suscripcion);
         suspension.setUsuario(persona);
         suspension.setFechaInicio(fechaInicio);
         suspension.setFechaFin(fechaFin);
         suspension.setMotivo(motivoFinal);
-        suspension.setEstado("aprobada");
+        suspension.setEstado("pendiente");
         suspensionRepository.save(suspension);
 
-        // Extender fechas de suscripción según días suspendidos
-        if (suscripcion.getFechaFin() != null) {
-            suscripcion.setFechaFin(suscripcion.getFechaFin().plusDays(diasSuspension));
-        }
-        if (suscripcion.getProximoPago() != null) {
-            suscripcion.setProximoPago(suscripcion.getProximoPago().plusDays(diasSuspension));
-        }
-        suscripcionRepository.save(suscripcion);
+        // La extensión de fechas de la suscripción se realizará cuando un administrador apruebe la suspensión.
 
         // Redirigir al perfil del deportista
         return "redirect:/perfil";

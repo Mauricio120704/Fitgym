@@ -233,6 +233,34 @@
                                     disabled>
                                 Solicitar suspensión temporal
                             </button>
+                            <div class="mt-4 pt-3 border-t border-gray-200"></div>
+                            <div class="info-item">
+                                <span class="info-label">Solicitud de Suspensión</span>
+                                <span class="info-value text-sm text-gray-500">
+                                    Resumen de tu última solicitud
+                                </span>
+                            </div>
+                            <div class="info-item" th:if="${!tieneSolicitudSuspension}">
+                                <span class="info-value text-sm text-gray-500">
+                                    Aún no has registrado ninguna solicitud de suspensión.
+                                </span>
+                            </div>
+                            <div class="info-item" th:if="${tieneSolicitudSuspension}">
+                                <span class="info-label">Estado</span>
+                                <span class="info-value" th:text="${ultimaSuspensionEstado}">Pendiente</span>
+                            </div>
+                            <div class="info-item" th:if="${tieneSolicitudSuspension}">
+                                <span class="info-label">Rango de fechas</span>
+                                <span class="info-value">
+                                    <span th:text="${ultimaSuspensionFechaInicioStr}">01/01/2025</span>
+                                    <span> - </span>
+                                    <span th:text="${ultimaSuspensionFechaFinStr}">10/01/2025</span>
+                                </span>
+                            </div>
+                            <div class="info-item" th:if="${tieneSolicitudSuspension}">
+                                <span class="info-label">Motivo</span>
+                                <span class="info-value" th:text="${ultimaSuspensionMotivo}">Viaje - Más detalles...</span>
+                            </div>
                         </section>
 
                         <!-- Notificaciones -->

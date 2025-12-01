@@ -8,6 +8,7 @@
     <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <link rel="stylesheet" th:href="@{/deportista/mis-clases.css}">
     <script>
         // Asegurar que la variable CSS --sidebar-width esté definida (igual que en otras vistas)
@@ -54,23 +55,12 @@
                                 </select>
                             </div>
                         </div>
-
-                        <div class="filter-group">
-                            <label for="instructor">Instructor:</label>
-                            <div class="select-wrapper">
-                                <select id="instructor">
-                                    <option value="todos">Todos</option>
-                                    <option value="carlos">Carlos Ruiz</option>
-                                    <option value="maria">María González</option>
-                                    <option value="ana">Ana Martínez</option>
-                                </select>
-                            </div>
-                        </div>
                     </div>
 
                     <div id="clasesList" class="clases-list mt-6">
                         <!-- Las clases se cargarán dinámicamente aquí -->
                     </div>
+                    <div id="pagination" class="pagination"></div>
                 </div>
             </main>
         </div>
@@ -97,5 +87,6 @@
     </script>
     <script th:src="@{/deportista/mis-clases.js}"></script>
     <script th:src="@{/sidebar.js}"></script>
+    <script th:src="@{/custom-select.js}"></script>
 </body>
 </html>

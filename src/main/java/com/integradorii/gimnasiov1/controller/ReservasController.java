@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Locale;
+import java.text.Normalizer;
 
 /**
  * Controlador de Reservas - Sistema de reserva de clases
@@ -58,6 +60,7 @@ public class ReservasController {
         
         // Pasar datos del deportista a la vista
         model.addAttribute("usuario", persona);
+        model.addAttribute("activeMenu", "reservas");
         return "reservas";
     }
 
@@ -217,7 +220,7 @@ public class ReservasController {
             return ResponseEntity.badRequest().body(res);
         }
 
-        // Validación 7: Verificar capacidad disponible
+        // Validación 7: Verificar capacidad disponible (total)
         long ocupados = reservaClaseRepository.countOcupados(clase.getId());
         if (ocupados >= clase.getCapacidad()) {
             res.put("success", false);
@@ -225,20 +228,33 @@ public class ReservasController {
             return ResponseEntity.badRequest().body(res);
         }
 
-        // Validación 8: Manejar clases pagadas según membresía y bandera "para todos"
+        // Obtener información de membresía del deportista (si existe)
+        var suscripcionActivaOpt = suscripcionRepository.findActiveByDeportistaId(deportista.getId());
+        String nombrePlanNormalizado = "";
+        if (suscripcionActivaOpt.isPresent() && suscripcionActivaOpt.get().getPlan() != null) {
+            String raw = Optional.ofNullable(suscripcionActivaOpt.get().getPlan().getNombre()).orElse("");
+            String sinAcentos = Normalizer.normalize(raw, Normalizer.Form.NFD)
+                    .replaceAll("\\p{M}+", "");
+            nombrePlanNormalizado = sinAcentos.toLowerCase(Locale.ROOT);
+        }
+
+        boolean esPremiumOElite = nombrePlanNormalizado.contains("premium") || nombrePlanNormalizado.contains("elite");
+
+        // Validación 8: Clases marcadas como "solo miembros" (paraTodos = false)
+        // En la interfaz esto representa "Solo miembros (Premium/Elite)".
+        // En este caso, un deportista Básico o sin membresía no puede reservar,
+        // aunque la clase no sea de pago.
+        if (!Boolean.TRUE.equals(clase.getParaTodos())) {
+            if (!esPremiumOElite) {
+                res.put("success", false);
+                res.put("message", "Esta clase es solo para miembros Premium/Elite.");
+                return ResponseEntity.badRequest().body(res);
+            }
+        }
+
+        // Validación 9: Manejar clases pagadas según membresía y bandera "para todos"
         if (Boolean.TRUE.equals(clase.getEsPago())) {
             boolean requierePago = false;
-
-            var suscripcionActivaOpt = suscripcionRepository.findActiveByDeportistaId(deportista.getId());
-            boolean esPremiumOElite = false;
-            if (suscripcionActivaOpt.isPresent() && suscripcionActivaOpt.get().getPlan() != null) {
-                String nombrePlan = Optional.ofNullable(suscripcionActivaOpt.get().getPlan().getNombre())
-                        .orElse("").toLowerCase();
-                // Premium o Elite reservan gratis
-                if (nombrePlan.contains("premium") || nombrePlan.contains("elite")) {
-                    esPremiumOElite = true;
-                }
-            }
 
             if (esPremiumOElite) {
                 // Miembros Premium/Elite reservan sin pago adicional

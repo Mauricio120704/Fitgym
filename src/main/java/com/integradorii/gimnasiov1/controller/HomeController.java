@@ -367,6 +367,7 @@ public class HomeController {
             model.addAttribute("usuario", persona);
             model.addAttribute("miembro", persona);
             model.addAttribute("mostrarTutorial", mostrarTutorial);
+            model.addAttribute("activeMenu", "perfil");
 
             // Muchas plantillas (originalmente pensadas para 'Usuario') esperan propiedades como 'tipo' o
             // 'rol.nombre' que no existen en Persona; proporcionar valores por defecto evita excepciones en Thymeleaf.

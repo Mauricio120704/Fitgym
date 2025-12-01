@@ -33,6 +33,7 @@ public class EvaluacionesController {
         List<EvaluacionViewDTO> view = evals.stream().map(evaluacionViewService::toView).collect(Collectors.toList());
 
         model.addAttribute("evaluaciones", view);
+        model.addAttribute("activeMenu", "evaluaciones");
         return "evaluaciones";
     }
 

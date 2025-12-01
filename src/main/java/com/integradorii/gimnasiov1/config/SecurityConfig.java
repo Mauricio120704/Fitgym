@@ -180,6 +180,7 @@ public class SecurityConfig {
                 // - /lockers: Gestión de lockers
                 // - /monitoreo: Monitoreo de capacidad del gimnasio
                 .requestMatchers("/lockers", "/lockers/**", "/monitoreo", "/monitoreo/**", "/api/lockers/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
+                .requestMatchers("/admin/suspensiones/**").hasRole("ADMINISTRADOR")
                 
                 // ===== RUTAS EXCLUSIVAS PARA ENTRENADORES =====
                 // - /entrenador/**: Panel y funciones específicas de entrenadores

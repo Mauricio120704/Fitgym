@@ -23,35 +23,35 @@
         <div sec:authorize="hasRole('CLIENTE')">
             <ul class="mt-2">
                 <li>
-                    <a th:href="@{/perfil}" th:classappend="${activeMenu == 'perfil'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Mi Perfil">
+                    <a th:href="@{/perfil}" th:classappend="${activeMenu == 'perfil'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Mi Perfil">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         <span class="sidebar-text ml-3 hidden">Mi Perfil</span>
                     </a>
                 </li>
-                <li th:if="${tieneSuscripcionActiva}">
-                    <a th:href="@{/evaluaciones}" th:classappend="${activeMenu == 'evaluaciones'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Evaluaciones">
+                <li>
+                    <a th:href="@{/evaluaciones}" th:classappend="${activeMenu == 'evaluaciones'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Evaluaciones">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2"></path></svg>
                         <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
                     </a>
                 </li>
-                <li th:if="${tieneSuscripcionActiva}">
-                    <a th:href="@{/reservas}" th:classappend="${activeMenu == 'reservas'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Reservas">
+                <li>
+                    <a th:href="@{/reservas}" th:classappend="${activeMenu == 'reservas'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Reservas">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M5 19h14M5 11a2 2 0 012-2h10a2 2 0 012 2M5 19a2 2 0 002 2h10a2 2 0 002-2"/></svg>
                         <span class="sidebar-text ml-3 hidden">Reservas</span>
                     </a>
                 </li>
-                <li th:if="${tieneSuscripcionActiva}">
-                    <a th:href="@{/deportista/mis-clases}" th:classappend="${activeMenu == 'mis-clases'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Mis Clases">
+                <li>
+                    <a th:href="@{/deportista/mis-clases}" th:classappend="${activeMenu == 'mis-clases'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Mis Clases">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h2v4H3zM7 9h2v6H7zM9 11h6v2H9zM15 9h2v6h-2zM19 10h2v4h-2z" />
                         </svg>
                         <span class="sidebar-text ml-3 hidden">Mis Clases</span>
                     </a>
                 </li>
-                <li th:if="${tieneSuscripcionActiva}">
-                    <a th:href="@{/suspension}" th:classappend="${activeMenu == 'suspension'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Suspensión">
+                <li>
+                    <a th:href="@{/suspension}" th:classappend="${activeMenu == 'suspension'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Suspensión">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
                         </svg>
@@ -59,7 +59,7 @@
                     </a>
                 </li>
                 <li>
-                    <a th:href="@{/deportista/comunidad}" th:classappend="${activeMenu == 'comunidad'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Comunidad">
+                    <a th:href="@{/deportista/comunidad}" th:classappend="${activeMenu == 'comunidad'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Comunidad">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
@@ -67,7 +67,7 @@
                     </a>
                 </li>
                 <li>
-                    <a th:href="@{/deportista/promociones}" th:classappend="${activeMenu == 'promociones-cliente'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Promociones">
+                    <a th:href="@{/deportista/promociones}" th:classappend="${activeMenu == 'promociones-cliente'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Promociones">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 5L5 19" />
                             <circle cx="7" cy="7" r="2" />
@@ -76,8 +76,8 @@
                         <span class="sidebar-text ml-3 hidden">Promociones</span>
                     </a>
                 </li>
-                <li th:if="${tieneSuscripcionActiva}">
-                    <a th:href="@{/reclamos}" th:classappend="${activeMenu == 'reclamos'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Reclamos">
+                <li>
+                    <a th:href="@{/reclamos}" th:classappend="${activeMenu == 'reclamos'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Reclamos">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4"></path></svg>
                         <span class="sidebar-text ml-3 hidden">Reclamos</span>
                     </a>
@@ -103,6 +103,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         <span class="sidebar-text ml-3 hidden">Deportistas</span>
+                    </a>
+                </li>
+                <li sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a th:href="@{/admin/suspensiones}" th:classappend="${activeMenu == 'suspensiones-admin'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Solicitudes de suspensión">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
+                        </svg>
+                        <span class="sidebar-text ml-3 hidden">Solicitudes de suspensión</span>
                     </a>
                 </li>
                 <li sec:authorize="hasAnyRole('RECEPCIONISTA','ENTRENADOR')">
