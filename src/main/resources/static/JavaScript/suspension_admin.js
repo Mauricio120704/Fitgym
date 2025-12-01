@@ -4,6 +4,8 @@ let selectedRequestId = null;
 
 // Referencias al DOM
 const tableBody = document.getElementById('requests-table-body');
+const filesContainer = document.getElementById('files-container') || document.querySelector('.files-container');
+const noFilesMessage = document.getElementById('no-files-message');
 
 async function cargarSolicitudes() {
 	try {
@@ -68,6 +70,55 @@ function selectRequest(id) {
     document.getElementById('detail-days').textContent = req.days;
     document.getElementById('detail-status').textContent = req.status || 'Pendiente de Aprobación';
     
+    // Actualizar documentación adjunta
+    if (filesContainer) {
+        filesContainer.innerHTML = '';
+    }
+    if (noFilesMessage) {
+        noFilesMessage.style.display = 'block';
+    }
+
+    if (filesContainer && req.attachmentUrl && req.attachmentName) {
+        const card = document.createElement('div');
+        card.className = 'file-card';
+
+        const icon = document.createElement('i');
+        const lowerName = req.attachmentName.toLowerCase();
+        if (lowerName.endsWith('.pdf')) {
+            icon.className = 'far fa-file-pdf file-icon';
+        } else if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png')) {
+            icon.className = 'far fa-image file-icon';
+        } else {
+            icon.className = 'far fa-file file-icon';
+        }
+
+        const info = document.createElement('div');
+        info.className = 'file-info';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'file-name';
+        nameSpan.textContent = req.attachmentName;
+
+        const actionSpan = document.createElement('span');
+        actionSpan.className = 'file-action';
+        actionSpan.textContent = 'Descargar archivo';
+
+        info.appendChild(nameSpan);
+        info.appendChild(actionSpan);
+
+        card.appendChild(icon);
+        card.appendChild(info);
+
+        card.addEventListener('click', () => {
+            window.open(req.attachmentUrl, '_blank');
+        });
+
+        filesContainer.appendChild(card);
+        if (noFilesMessage) {
+            noFilesMessage.style.display = 'none';
+        }
+    }
+
     // Limpiar textarea
     document.getElementById('notes').value = '';
 }

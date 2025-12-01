@@ -9,6 +9,10 @@ import com.integradorii.gimnasiov1.model.Usuario;
 import com.integradorii.gimnasiov1.repository.SuscripcionRepository;
 import com.integradorii.gimnasiov1.repository.SuspensionMembresiaRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +23,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -137,6 +146,54 @@ public class AdminSuspensionApiController {
         return ResponseEntity.ok(mapToDto(suspension));
     }
 
+    @GetMapping("/{id}/archivo")
+    public ResponseEntity<Resource> descargarAdjunto(@PathVariable Long id) {
+        Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        SuspensionMembresia suspension = opt.get();
+        String archivo = suspension.getArchivoAdjunto();
+        if (archivo == null || archivo.isBlank()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Path uploadDir = Paths.get("uploads", "suspensiones").toAbsolutePath().normalize();
+            Path filePath = uploadDir.resolve(archivo).normalize();
+
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Resource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            String visibleName = archivo;
+            int idx = archivo.indexOf('_');
+            if (idx > 0 && idx < archivo.length() - 1) {
+                visibleName = archivo.substring(idx + 1);
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + visibleName + "\"")
+                    .body(resource);
+        } catch (MalformedURLException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     private SuspensionAdminDTO mapToDto(SuspensionMembresia suspension) {
         SuspensionAdminDTO dto = new SuspensionAdminDTO();
         dto.setId(suspension.getId());
@@ -191,6 +248,17 @@ public class AdminSuspensionApiController {
             dto.setStatus(capitalized);
         } else {
             dto.setStatus("Pendiente");
+        }
+
+        String archivo = suspension.getArchivoAdjunto();
+        if (archivo != null && !archivo.isBlank()) {
+            String visibleName = archivo;
+            int idx = archivo.indexOf('_');
+            if (idx > 0 && idx < archivo.length() - 1) {
+                visibleName = archivo.substring(idx + 1);
+            }
+            dto.setAttachmentName(visibleName);
+            dto.setAttachmentUrl("/api/admin/suspensiones/" + suspension.getId() + "/archivo");
         }
 
         return dto;

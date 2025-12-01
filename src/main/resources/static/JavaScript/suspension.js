@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Añadimos el input de detalles
     const detailsInput = document.getElementById("detalles");
+    const fileInput = document.getElementById("archivo-adjunto");
+    const fileError = document.getElementById("archivo-error");
 
     // Botón cancelar: volver al perfil del deportista
     const cancelButton = document.querySelector(".btn-cancel");
@@ -45,7 +47,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const reasonSelected = document.querySelector('input[name="motivo"]:checked') !== null;
 
         let datesAreValid = false;
-        
+        let fileIsValid = true;
+
         // 1. Validar lógica de fechas
         if (startDateValue && endDateValue) {
             const startDate = new Date(startDateValue);
@@ -65,8 +68,31 @@ document.addEventListener("DOMContentLoaded", function() {
             impactInfo.textContent = "Selecciona las fechas para ver el impacto";
         }
 
-        // 2. Validar todos los campos para habilitar el botón
-        if (reasonSelected && startDateValue && endDateValue && datesAreValid && detailsValue !== "") {
+        // 2. Validar tipo de archivo (si se seleccionó alguno)
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            const name = (fileInput.files[0].name || "").toLowerCase();
+            const allowed = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png"];
+            const hasAllowedExt = allowed.some(ext => name.endsWith(ext));
+
+            if (!hasAllowedExt) {
+                fileIsValid = false;
+                if (fileError) {
+                    fileError.classList.remove("hidden");
+                }
+            } else {
+                if (fileError) {
+                    fileError.classList.add("hidden");
+                }
+            }
+        } else {
+            // Sin archivo, no hay problema
+            if (fileError) {
+                fileError.classList.add("hidden");
+            }
+        }
+
+        // 3. Validar todos los campos para habilitar el botón
+        if (reasonSelected && startDateValue && endDateValue && datesAreValid && detailsValue !== "" && fileIsValid) {
             submitButton.disabled = false;
         } else {
             submitButton.disabled = true;
@@ -77,6 +103,9 @@ document.addEventListener("DOMContentLoaded", function() {
     startDateInput.addEventListener("change", validateForm);
     endDateInput.addEventListener("change", validateForm);
     detailsInput.addEventListener("input", validateForm); // "input" reacciona a cada tecla
+    if (fileInput) {
+        fileInput.addEventListener("change", validateForm);
+    }
 
     // --- Lógica del Formulario ---
     // Dejamos que el formulario se envíe al backend cuando el botón está habilitado.
