@@ -48,6 +48,7 @@ public class NotificacionMasivaController {
         if (!model.containsAttribute("filtroPlan")) {
             model.addAttribute("filtroPlan", "TODOS");
         }
+        model.addAttribute("activeMenu", "notificaciones");
         return "admin/notificaciones";
     }
 

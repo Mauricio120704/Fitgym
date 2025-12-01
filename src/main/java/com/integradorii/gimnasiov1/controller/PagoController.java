@@ -84,6 +84,7 @@ public class PagoController {
         model.addAttribute("totalPages", totalPages);         // Total de páginas
         model.addAttribute("pageSize", pageSize);             // Tamaño de página
         model.addAttribute("totalPagos", totalPagos);         // Total de pagos
+        model.addAttribute("activeMenu", "pagos");           // Marcar menú activo en sidebar
 
         return "historial-pagos";
     }

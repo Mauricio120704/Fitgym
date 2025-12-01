@@ -5,3 +5,37 @@
 #sidebar {
     width: var(--sidebar-width) !important;
 }
+
+/* Los enlaces del sidebar ocupan todo el ancho de la columna */
+#sidebar nav a {
+    width: 100%;
+}
+
+/* Resaltado global del ítem activo en el sidebar */
+#sidebar nav a.bg-blue-100 {
+    background-color: #fed7aa !important;
+    box-shadow: inset 4px 0 0 #f97316;
+    color: #92400e !important;
+}
+
+/* Botón flotante de acción principal (estilo global tipo "Nuevo") */
+.fab-add {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background-color: #f97316;
+    color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.fab-add:hover {
+    transform: scale(1.1);
+}
