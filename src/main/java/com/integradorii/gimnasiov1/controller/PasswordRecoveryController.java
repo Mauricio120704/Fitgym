@@ -127,17 +127,16 @@ public class PasswordRecoveryController {
             boolean enviado = passwordRecoveryService.generarYEnviarCodigo(email.trim());
 
             if (enviado) {
-                logger.info("Código de recuperación enviado exitosamente a: {}", email);
-                response.put("success", true);
-                response.put("message", "Se ha enviado un código de verificación a tu correo electrónico. " +
-                        "Por favor revisa tu bandeja de entrada y spam.");
-                return ResponseEntity.ok(response);
+                logger.info("Código de recuperación procesado para email existente: {}", email);
             } else {
-                logger.warn("Email no encontrado en el sistema: {}", email);
-                response.put("success", false);
-                response.put("message", "El correo electrónico no está registrado en nuestro sistema");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                logger.warn("Solicitud de recuperación para email no encontrado en el sistema: {}", email);
             }
+
+            // Respuesta genérica para evitar revelar si el email existe o no
+            response.put("success", true);
+            response.put("message", "Se ha enviado un correo con las instrucciones para restablecer tu contraseña. " +
+                    "Por favor revisa tu bandeja de entrada y la carpeta de spam.");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error al procesar solicitud de recuperación para email: {}", email, e);
             response.put("success", false);
