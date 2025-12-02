@@ -40,20 +40,82 @@
 
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
             <div class="max-w-7xl mx-auto space-y-6">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <div class="relative" style="padding-top: 56.25%;">
-                        <iframe title="gimnasio20112025"
-                                src="https://app.powerbi.com/view?r=eyJrIjoiMjU1ZTczMWMtOTgyYi00ODM0LWJmM2EtNDRiNzU2ZTZiODRmIiwidCI6ImM0YTY2YzM0LTJiYjctNDUxZi04YmUxLWIyYzI2YTQzMDE1OCIsImMiOjR9"
-                                class="absolute top-0 left-0 w-full h-full"
-                                frameborder="0" allowfullscreen="true"></iframe>
+                <div class="bg-white rounded-lg shadow">
+                    <div class="border-b border-gray-200 px-4 pt-4 overflow-x-auto">
+                        <nav class="flex space-x-4" aria-label="Tabs">
+                            <button type="button"
+                                    id="tab-asistencias"
+                                    data-tab="asistencias"
+                                    class="whitespace-nowrap px-4 py-2 text-sm border-b-2 border-blue-600 text-blue-600 font-semibold bg-gray-50 focus:outline-none">
+                                Reporte de asistencias
+                            </button>
+                            <button type="button"
+                                    id="tab-ingresos"
+                                    data-tab="ingresos"
+                                    class="whitespace-nowrap px-4 py-2 text-sm border-b-2 border-transparent text-gray-600 hover:text-blue-600 focus:outline-none">
+                                Reporte de ingresos
+                            </button>
+                        </nav>
                     </div>
-                    <p class="mt-3 text-xs text-gray-500">Si no se visualiza, verifica que el enlace sea público y que tu red permita cargar app.powerbi.com.</p>
+                    <div class="p-4">
+                        <div id="panel-asistencias" class="tab-panel">
+                            <div class="relative" style="padding-top: 56.25%;">
+                                <iframe title="gimnasio20112025"
+                                        src="https://app.powerbi.com/view?r=eyJrIjoiMjU1ZTczMWMtOTgyYi00ODM0LWJmM2EtNDRiNzU2ZTZiODRmIiwidCI6ImM0YTY2YzM0LTJiYjctNDUxZi04YmUxLWIyYzI2YTQzMDE1OCIsImMiOjR9"
+                                        class="absolute top-0 left-0 w-full h-full"
+                                        frameborder="0" allowfullscreen="true"></iframe>
+                            </div>
+                            <p class="mt-3 text-xs text-gray-500">Si no se visualiza, verifica que el enlace sea público y que tu red permita cargar app.powerbi.com.</p>
+                        </div>
+                        <div id="panel-ingresos" class="tab-panel hidden">
+                            <div class="relative" style="padding-top: 56.25%;">
+                                <iframe title="Coreccion HU"
+                                        src="https://app.powerbi.com/view?r=eyJrIjoiYjlkNTVmODItMTAxOC00ZDMzLWJhMmMtNzFjYzQ0ZmI1Y2RhIiwidCI6ImM0YTY2YzM0LTJiYjctNDUxZi04YmUxLWIyYzI2YTQzMDE1OCIsImMiOjR9"
+                                        class="absolute top-0 left-0 w-full h-full"
+                                        frameborder="0" allowfullscreen="true"></iframe>
+                            </div>
+                            <p class="mt-3 text-xs text-gray-500">Si no se visualiza, verifica que el enlace sea público y que tu red permita cargar app.powerbi.com.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('button[data-tab]');
+        const panels = {
+            asistencias: document.getElementById('panel-asistencias'),
+            ingresos: document.getElementById('panel-ingresos')
+        };
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                const selected = tab.getAttribute('data-tab');
+
+                tabs.forEach(function (t) {
+                    t.classList.remove('border-blue-600', 'text-blue-600', 'font-semibold', 'bg-gray-50');
+                    t.classList.add('border-transparent', 'text-gray-600');
+                });
+
+                tab.classList.remove('border-transparent', 'text-gray-600');
+                tab.classList.add('border-blue-600', 'text-blue-600', 'font-semibold', 'bg-gray-50');
+
+                Object.keys(panels).forEach(function (key) {
+                    if (panels[key]) {
+                        if (key === selected) {
+                            panels[key].classList.remove('hidden');
+                        } else {
+                            panels[key].classList.add('hidden');
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>
 <script th:src="@{/sidebar.js}"></script>
 <script th:src="@{/custom-select.js}"></script>
 </body>

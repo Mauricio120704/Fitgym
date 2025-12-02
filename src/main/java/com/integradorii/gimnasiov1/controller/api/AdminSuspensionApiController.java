@@ -6,6 +6,7 @@ import com.integradorii.gimnasiov1.model.Plan;
 import com.integradorii.gimnasiov1.model.Suscripcion;
 import com.integradorii.gimnasiov1.model.SuspensionMembresia;
 import com.integradorii.gimnasiov1.model.Usuario;
+import com.integradorii.gimnasiov1.service.EmailService;
 import com.integradorii.gimnasiov1.repository.SuscripcionRepository;
 import com.integradorii.gimnasiov1.repository.SuspensionMembresiaRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -45,14 +47,17 @@ public class AdminSuspensionApiController {
     private final SuspensionMembresiaRepository suspensionRepository;
     private final SuscripcionRepository suscripcionRepository;
     private final UsuarioRepository usuarioRepository;
+    private final EmailService emailService;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public AdminSuspensionApiController(SuspensionMembresiaRepository suspensionRepository,
                                         SuscripcionRepository suscripcionRepository,
-                                        UsuarioRepository usuarioRepository) {
+                                        UsuarioRepository usuarioRepository,
+                                        EmailService emailService) {
         this.suspensionRepository = suspensionRepository;
         this.suscripcionRepository = suscripcionRepository;
         this.usuarioRepository = usuarioRepository;
+        this.emailService = emailService;
     }
 
     @GetMapping("/pendientes")
@@ -112,6 +117,8 @@ public class AdminSuspensionApiController {
         suscripcionRepository.save(suscripcion);
         suspensionRepository.save(suspension);
 
+        notificarResultadoSuspension(suspension, "Aprobada");
+
         return ResponseEntity.ok(mapToDto(suspension));
     }
 
@@ -142,6 +149,8 @@ public class AdminSuspensionApiController {
 
         suspension.setEstado("rechazada");
         suspensionRepository.save(suspension);
+
+        notificarResultadoSuspension(suspension, "Rechazada");
 
         return ResponseEntity.ok(mapToDto(suspension));
     }
@@ -191,6 +200,60 @@ public class AdminSuspensionApiController {
             return ResponseEntity.notFound().build();
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    private void notificarResultadoSuspension(SuspensionMembresia suspension, String estadoFinal) {
+        Persona usuario = suspension.getUsuario();
+        if (usuario == null) {
+            return;
+        }
+
+        String email = usuario.getEmail();
+        if (email == null || email.isBlank()) {
+            return;
+        }
+
+        String sanitizedEmail = email.replaceAll("[\\r\\n]", "").trim();
+        if (sanitizedEmail.isEmpty() || !sanitizedEmail.contains("@")) {
+            return;
+        }
+
+        String nombreCompleto = usuario.getNombreCompleto();
+        LocalDate inicio = suspension.getFechaInicio();
+        LocalDate fin = suspension.getFechaFin();
+        String fechas;
+        if (inicio != null && fin != null) {
+            fechas = inicio.format(dateFormatter) + " al " + fin.format(dateFormatter);
+        } else {
+            fechas = "No disponible";
+        }
+
+        String motivo = suspension.getMotivo();
+        if (motivo == null || motivo.isBlank()) {
+            motivo = "No especificado";
+        }
+
+        String asunto = "Actualización de tu solicitud de suspensión de membresía - " + estadoFinal;
+
+        String mensaje = "Estimado/a " + nombreCompleto + ",\n\n" +
+                "Te informamos que tu solicitud de suspensión temporal de tu membresía ha sido " + estadoFinal.toLowerCase() + ".\n\n" +
+                "Detalles de la solicitud:\n" +
+                "- Estado final: " + estadoFinal + "\n" +
+                "- Fechas solicitadas: " + fechas + "\n" +
+                "- Motivo: " + motivo + "\n\n" +
+                "Ante cualquier consulta adicional, puedes comunicarte con la administración de FitGym.\n\n" +
+                "Atentamente,\n" +
+                "Equipo FitGym";
+
+        try {
+            emailService.enviarNotificacionGeneral(
+                    sanitizedEmail,
+                    nombreCompleto,
+                    asunto,
+                    mensaje
+            );
+        } catch (MessagingException | IllegalArgumentException ex) {
         }
     }
 
