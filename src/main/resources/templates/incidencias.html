@@ -142,6 +142,7 @@
                                         <span><strong>Reportado por:</strong> <span th:text="${inc.reportadoPor}">Usuario</span></span>
                                         <span><strong>Asignado a:</strong> <span th:text="${inc.asignadoA != null ? inc.asignadoA : 'Sin asignar'}">Asignado</span></span>
                                         <span><strong>Fecha:</strong> <span th:text="${inc.fechaReporte != null ? #temporals.format(inc.fechaReporte, 'dd/MM/yyyy HH:mm') : 'N/A'}">28/01/2025 10:30</span></span>
+                                        <span th:if="${inc.fechaCierre != null}"><strong>Resuelto:</strong> <span th:text="${#temporals.format(inc.fechaCierre, 'dd/MM/yyyy HH:mm')}">28/01/2025 15:30</span></span>
                                     </div>
                                 </div>
                                 
@@ -631,6 +632,9 @@
                             // Deshabilitar el select
                             select.disabled = true;
                             select.classList.add('opacity-50', 'cursor-not-allowed');
+
+                            // Recargar la página para actualizar contadores y filtros
+                            window.location.reload();
                         })
                         .catch(error => {
                             console.error('Error al actualizar estado:', error);

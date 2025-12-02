@@ -2,6 +2,7 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.dto.IncidenciaViewDTO;
 import com.integradorii.gimnasiov1.model.Incidencia;
+import com.integradorii.gimnasiov1.model.Persona;
 import com.integradorii.gimnasiov1.repository.IncidenciaRepository;
 import com.integradorii.gimnasiov1.repository.PersonaRepository;
 import com.integradorii.gimnasiov1.repository.UsuarioRepository;
@@ -14,6 +15,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -119,13 +121,9 @@ public class IncidenciaController {
         i.setFechaReporte(OffsetDateTime.now(ZoneId.systemDefault()));
         i.setUltimaActualizacion(OffsetDateTime.now(ZoneId.systemDefault()));
 
-        // Intentar resolver personas por email (si se enviara email), o dejar null
-        if (reportado != null && !reportado.isBlank() && reportado.contains("@")) {
-            personaRepository.findByEmail(reportado.trim()).ifPresent(i::setReportadoPor);
-        }
-        if (asignado != null && !asignado.isBlank() && asignado.contains("@")) {
-            personaRepository.findByEmail(asignado.trim()).ifPresent(i::setAsignadoA);
-        }
+        // Asigancion de por quien y a quien se dirige
+        asignarPersonaSiExiste(reportado, i::setReportadoPor);
+        asignarPersonaSiExiste(asignado, i::setAsignadoA);
 
         incidenciaRepository.save(i);
         return "redirect:/incidencias";
@@ -146,6 +144,14 @@ public class IncidenciaController {
         if (i == null) {
             resp.put("success", false);
             resp.put("message", "Incidencia no encontrada");
+            return resp;
+        }
+
+        String estadoActual = i.getEstado();
+        if ("Resuelto".equalsIgnoreCase(estadoActual)) {
+            // Ya estaba resuelta: no permitir cambios de estado
+            resp.put("success", true);
+            resp.put("estado", i.getEstado());
             return resp;
         }
 
@@ -185,5 +191,11 @@ public class IncidenciaController {
             m.put("email", p.getEmail());
             return m;
         }).toList();
+    }
+
+    private void asignarPersonaSiExiste(String email, Consumer<Persona> asignador) {
+        if (email != null && !email.isBlank() && email.contains("@")) {
+            personaRepository.findByEmail(email.trim()).ifPresent(asignador);
+        }
     }
 }
