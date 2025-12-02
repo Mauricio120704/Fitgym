@@ -46,15 +46,23 @@ public class IncidenciaViewService {
             if (cut >= 0) desc = metaSegment.substring(0, cut);
         }
 
-        String prioridadUi = i.getPrioridad() == null ? null : i.getPrioridad().toUpperCase();
-        String estadoUi = null;
-        if ("Abierta".equalsIgnoreCase(i.getEstado())) estadoUi = "ABIERTO";
-        else if ("Resuelto".equalsIgnoreCase(i.getEstado())) estadoUi = "RESUELTO";
+        Incidencia.Prioridad prioridadEnum = Incidencia.Prioridad.fromDbValue(i.getPrioridad());
+        String prioridadUi = prioridadEnum != null ? prioridadEnum.getUiCode() : null;
+
+        Incidencia.Estado estadoEnum = Incidencia.Estado.fromDbValue(i.getEstado());
+        String estadoUi = estadoEnum != null ? estadoEnum.getUiCode() : null;
 
         OffsetDateTime fr = i.getFechaReporte();
         if (fr != null) {
             try {
                 fr = fr.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime();
+            } catch (Exception ignore) {}
+        }
+
+        OffsetDateTime fc = i.getFechaCierre();
+        if (fc != null) {
+            try {
+                fc = fc.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime();
             } catch (Exception ignore) {}
         }
 
@@ -81,6 +89,7 @@ public class IncidenciaViewService {
                 prioridadUi,
                 estadoUi,
                 fr,
+                fc,
                 nombreReportado,
                 nombreAsignado,
                 imagenes

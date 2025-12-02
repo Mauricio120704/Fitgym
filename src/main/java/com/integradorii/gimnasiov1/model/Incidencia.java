@@ -69,4 +69,77 @@ public class Incidencia {
     public void setUltimaActualizacion(OffsetDateTime ultimaActualizacion) { this.ultimaActualizacion = ultimaActualizacion; }
     public byte[] getImagenes() { return imagenes; }
     public void setImagenes(byte[] imagenes) { this.imagenes = imagenes; }
+
+    public enum Estado {
+        ABIERTA("Abierta", "ABIERTO"),
+        RESUELTA("Resuelto", "RESUELTO");
+
+        private final String dbValue;
+        private final String uiCode;
+
+        Estado(String dbValue, String uiCode) {
+            this.dbValue = dbValue;
+            this.uiCode = uiCode;
+        }
+
+        public String getDbValue() { return dbValue; }
+        public String getUiCode() { return uiCode; }
+
+        public static Estado fromDbValue(String value) {
+            if (value == null) return null;
+            for (Estado e : values()) {
+                if (e.dbValue.equalsIgnoreCase(value)) {
+                    return e;
+                }
+            }
+            return null;
+        }
+
+        public static Estado fromUiCode(String code) {
+            if (code == null) return null;
+            for (Estado e : values()) {
+                if (e.uiCode.equalsIgnoreCase(code)) {
+                    return e;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum Prioridad {
+        BAJA("Baja", "BAJA"),
+        MEDIA("Media", "MEDIA"),
+        ALTA("Alta", "ALTA");
+
+        private final String dbValue;
+        private final String uiCode;
+
+        Prioridad(String dbValue, String uiCode) {
+            this.dbValue = dbValue;
+            this.uiCode = uiCode;
+        }
+
+        public String getDbValue() { return dbValue; }
+        public String getUiCode() { return uiCode; }
+
+        public static Prioridad fromDbValue(String value) {
+            if (value == null) return null;
+            for (Prioridad p : values()) {
+                if (p.dbValue.equalsIgnoreCase(value)) {
+                    return p;
+                }
+            }
+            return null;
+        }
+
+        public static Prioridad fromUiCode(String code) {
+            if (code == null) return null;
+            for (Prioridad p : values()) {
+                if (p.uiCode.equalsIgnoreCase(code)) {
+                    return p;
+                }
+            }
+            return null;
+        }
+    }
 }

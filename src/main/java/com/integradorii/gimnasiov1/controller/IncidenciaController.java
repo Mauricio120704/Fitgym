@@ -42,15 +42,18 @@ public class IncidenciaController {
             @RequestParam(required = false) String buscar,
             Model model) {
 
-        // Mapear valores UI -> BD
+        // Mapear valores UI -> BD usando enums de la entidad
         String estadoDb = null;
-        if ("ABIERTO".equalsIgnoreCase(estado)) estadoDb = "Abierta";
-        else if ("RESUELTO".equalsIgnoreCase(estado)) estadoDb = "Resuelto";
+        Incidencia.Estado estadoEnum = Incidencia.Estado.fromUiCode(estado);
+        if (estadoEnum != null) {
+            estadoDb = estadoEnum.getDbValue();
+        }
 
         String prioridadDb = null;
-        if ("ALTA".equalsIgnoreCase(prioridad)) prioridadDb = "Alta";
-        else if ("MEDIA".equalsIgnoreCase(prioridad)) prioridadDb = "Media";
-        else if ("BAJA".equalsIgnoreCase(prioridad)) prioridadDb = "Baja";
+        Incidencia.Prioridad prioridadEnum = Incidencia.Prioridad.fromUiCode(prioridad);
+        if (prioridadEnum != null) {
+            prioridadDb = prioridadEnum.getDbValue();
+        }
 
         List<Incidencia> list = incidenciaRepository.findFiltered(
                 estado == null ? "todos" : estado,
@@ -114,10 +117,12 @@ public class IncidenciaController {
         i.setImagenes(imagenesBytes);
         i.setCategoria("General");
 
-        String pr = "Media";
-        if ("ALTA".equalsIgnoreCase(prioridad)) pr = "Alta"; else if ("BAJA".equalsIgnoreCase(prioridad)) pr = "Baja";
-        i.setPrioridad(pr);
-        i.setEstado("Abierta");
+        Incidencia.Prioridad prioridadEnum = Incidencia.Prioridad.fromUiCode(prioridad);
+        if (prioridadEnum == null) {
+            prioridadEnum = Incidencia.Prioridad.MEDIA;
+        }
+        i.setPrioridad(prioridadEnum.getDbValue());
+        i.setEstado(Incidencia.Estado.ABIERTA.getDbValue());
         i.setFechaReporte(OffsetDateTime.now(ZoneId.systemDefault()));
         i.setUltimaActualizacion(OffsetDateTime.now(ZoneId.systemDefault()));
 
@@ -147,19 +152,20 @@ public class IncidenciaController {
             return resp;
         }
 
-        String estadoActual = i.getEstado();
-        if ("Resuelto".equalsIgnoreCase(estadoActual)) {
+        Incidencia.Estado estadoActualEnum = Incidencia.Estado.fromDbValue(i.getEstado());
+        if (estadoActualEnum == Incidencia.Estado.RESUELTA) {
             // Ya estaba resuelta: no permitir cambios de estado
             resp.put("success", true);
             resp.put("estado", i.getEstado());
             return resp;
         }
 
-        if ("RESUELTO".equalsIgnoreCase(nuevoEstado)) {
-            i.setEstado("Resuelto");
+        Incidencia.Estado nuevoEstadoEnum = Incidencia.Estado.fromUiCode(nuevoEstado);
+        if (nuevoEstadoEnum == Incidencia.Estado.RESUELTA) {
+            i.setEstado(nuevoEstadoEnum.getDbValue());
             i.setFechaCierre(OffsetDateTime.now(ZoneId.systemDefault()));
         } else {
-            i.setEstado("Abierta");
+            i.setEstado(Incidencia.Estado.ABIERTA.getDbValue());
             i.setFechaCierre(null);
         }
         i.setUltimaActualizacion(OffsetDateTime.now(ZoneId.systemDefault()));
