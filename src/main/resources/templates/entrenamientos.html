@@ -35,7 +35,7 @@
                     </button>
                     <div class="text-xl font-semibold text-gray-800">Planificador de Entrenamientos</div>
                 </div>
-                <a href="/evaluaciones" class="text-blue-600 hover:text-blue-800 font-semibold">
+                <a href="/evaluaciones" class="text-orange-500 hover:text-orange-700 font-semibold">
                     Volver al Perfil
                 </a>
             </header>
@@ -48,7 +48,7 @@
 
                 <!-- Tabs -->
                 <div class="flex gap-2 mb-6">
-                    <button onclick="switchTab('calendar')" id="tab-calendar" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold">
+                    <button onclick="switchTab('calendar')" id="tab-calendar" class="px-6 py-2 bg-orange-500 text-white rounded-lg font-semibold">
                         Vista Calendario
                     </button>
                     <button onclick="switchTab('manage')" id="tab-manage" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">
@@ -67,10 +67,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="calendar-grid">
-                        <div class="border rounded-lg p-3" data-day="Domingo">
-                            <div class="font-bold text-center mb-2">Domingo</div>
-                            <div class="space-y-2 day-events"></div>
-                        </div>
                         <div class="border rounded-lg p-3" data-day="Lunes">
                             <div class="font-bold text-center mb-2">Lunes</div>
                             <div class="space-y-2 day-events"></div>
@@ -95,6 +91,10 @@
                             <div class="font-bold text-center mb-2">Sábado</div>
                             <div class="space-y-2 day-events"></div>
                         </div>
+                        <div class="border rounded-lg p-3" data-day="Domingo">
+                            <div class="font-bold text-center mb-2">Domingo</div>
+                            <div class="space-y-2 day-events"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -103,7 +103,7 @@
                     <div class="bg-white p-6 rounded-lg shadow mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold">Información de la Rutina</h3>
-                            <button class="text-blue-600 hover:text-blue-800">✏️ Editar</button>
+                            <button class="text-orange-500 hover:text-orange-700">✏️ Editar</button>
                         </div>
                         <div class="space-y-3">
                             <div>
@@ -252,16 +252,16 @@
             if (tab === 'calendar') {
                 calendarView.classList.remove('hidden');
                 manageView.classList.add('hidden');
-                tabCalendar.classList.add('bg-blue-600', 'text-white');
+                tabCalendar.classList.add('bg-orange-500', 'text-white');
                 tabCalendar.classList.remove('bg-gray-200', 'text-gray-700');
-                tabManage.classList.remove('bg-blue-600', 'text-white');
+                tabManage.classList.remove('bg-orange-500', 'text-white');
                 tabManage.classList.add('bg-gray-200', 'text-gray-700');
             } else {
                 calendarView.classList.add('hidden');
                 manageView.classList.remove('hidden');
-                tabManage.classList.add('bg-blue-600', 'text-white');
+                tabManage.classList.add('bg-orange-500', 'text-white');
                 tabManage.classList.remove('bg-gray-200', 'text-gray-700');
-                tabCalendar.classList.remove('bg-blue-600', 'text-white');
+                tabCalendar.classList.remove('bg-orange-500', 'text-white');
                 tabCalendar.classList.add('bg-gray-200', 'text-gray-700');
             }
         }
@@ -363,7 +363,7 @@
                 const col = document.querySelector(`#calendar-grid [data-day="${e.diaSemana}"] .day-events`);
                 if (!col) return;
                 const card = document.createElement('div');
-                card.className = 'bg-blue-50 border border-blue-200 p-2 rounded shadow-sm';
+                card.className = 'bg-orange-50 border border-orange-200 p-2 rounded shadow-sm';
                 card.innerHTML = `
                     <div class="font-semibold text-sm">${e.emoji || ''} ${e.tipo}</div>
                     <div class="text-xs text-gray-600">⏰ ${e.horaInicio} • ${e.duracion}min</div>
@@ -401,7 +401,7 @@
                         <div class="text-sm text-gray-500">${e.notas || ''}</div>
                     </div>
                     <div class="flex gap-3">
-                        <button type="button" class="text-blue-600 hover:text-blue-800" data-id="${e.id}" onclick="editarEntrenamiento(this)">✏️</button>
+                        <button type="button" class="text-orange-500 hover:text-orange-700" data-id="${e.id}" onclick="editarEntrenamiento(this)">✏️</button>
                         <button type="button" class="text-red-500 hover:text-red-700" data-id="${e.id}" onclick="eliminarEntrenamiento(this)">🗑️</button>
                     </div>
                 `;

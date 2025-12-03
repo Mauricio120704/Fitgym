@@ -48,7 +48,7 @@
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold text-gray-700">Estado de Aforo</h2>
-                        <button onclick="actualizarCapacidad()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        <button onclick="actualizarCapacidad()" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors">
                             <i class="fas fa-sync-alt mr-2"></i>Actualizar
                         </button>
                     </div>
@@ -397,7 +397,7 @@
                     // Contenedor de la barra
                     const barra = document.createElement('div');
                     barra.className = `w-full rounded-t-sm transition-all duration-300 relative group ${
-                        esHoraActual ? 'bg-blue-600' : 'bg-blue-200 hover:bg-blue-300'
+                        esHoraActual ? 'bg-orange-500' : 'bg-orange-200 hover:bg-orange-300'
                     }`;
                     barra.style.height = `${altura}%`;
                     barra.style.minHeight = '20px'; // Mínimo para que sea visible

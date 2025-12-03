@@ -2,12 +2,15 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.dto.EntrenamientoViewDTO;
 import com.integradorii.gimnasiov1.model.Entrenamiento;
+import com.integradorii.gimnasiov1.model.Persona;
 import com.integradorii.gimnasiov1.repository.EntrenamientoRepository;
+import com.integradorii.gimnasiov1.repository.PersonaRepository;
 import com.integradorii.gimnasiov1.service.EntrenamientoViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,17 +19,30 @@ public class EntrenamientosController {
 
     private final EntrenamientoRepository entrenamientoRepository;
     private final EntrenamientoViewService viewService;
+    private final PersonaRepository personaRepository;
 
     public EntrenamientosController(EntrenamientoRepository entrenamientoRepository,
-                                   EntrenamientoViewService viewService) {
+                                    EntrenamientoViewService viewService,
+                                    PersonaRepository personaRepository) {
         this.entrenamientoRepository = entrenamientoRepository;
         this.viewService = viewService;
+        this.personaRepository = personaRepository;
     }
 
-    // GET /entrenamientos: llena la vista con la lista de entrenamientos mapeados a los campos esperados
+    // GET /entrenamientos: llena la vista con la lista de entrenamientos del deportista autenticado
     @GetMapping("/entrenamientos")
-    public String listar(Model model) {
-        List<Entrenamiento> lista = entrenamientoRepository.findAllByOrderByIdDesc();
+    public String listar(Model model, Principal principal) {
+        List<Entrenamiento> lista;
+        if (principal != null) {
+            Persona deportista = personaRepository.findByEmail(principal.getName()).orElse(null);
+            if (deportista != null) {
+                lista = entrenamientoRepository.findByCreadoPorOrderByIdDesc(deportista);
+            } else {
+                lista = entrenamientoRepository.findAllByOrderByIdDesc();
+            }
+        } else {
+            lista = entrenamientoRepository.findAllByOrderByIdDesc();
+        }
         List<EntrenamientoViewDTO> view = lista.stream().map(viewService::toView).collect(Collectors.toList());
         model.addAttribute("entrenamientos", view);
         // Campos de cabecera opcionales: rutina
@@ -41,10 +57,15 @@ public class EntrenamientosController {
                                        @RequestParam String diaSemana,
                                        @RequestParam String horaInicio,
                                        @RequestParam Integer duracion,
-                                       @RequestParam(required = false) String notas) {
+                                       @RequestParam(required = false) String notas,
+                                       Principal principal) {
         Entrenamiento e = new Entrenamiento();
         e.setNombre(tipo);
         e.setDescripcion(viewService.serialize(diaSemana, horaInicio, duracion, notas));
+        // Asociar entrenamiento al deportista autenticado, si existe
+        if (principal != null) {
+            personaRepository.findByEmail(principal.getName()).ifPresent(e::setCreadoPor);
+        }
         entrenamientoRepository.save(e);
 
         Map<String, Object> resp = new HashMap<>();

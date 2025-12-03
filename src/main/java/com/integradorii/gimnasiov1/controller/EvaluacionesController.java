@@ -1,8 +1,12 @@
 package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.dto.EvaluacionViewDTO;
+import com.integradorii.gimnasiov1.dto.EntrenamientoViewDTO;
 import com.integradorii.gimnasiov1.model.Evaluacion;
+import com.integradorii.gimnasiov1.model.Entrenamiento;
+import com.integradorii.gimnasiov1.repository.EntrenamientoRepository;
 import com.integradorii.gimnasiov1.repository.EvaluacionRepository;
+import com.integradorii.gimnasiov1.service.EntrenamientoViewService;
 import com.integradorii.gimnasiov1.service.EvaluacionViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,11 +20,17 @@ public class EvaluacionesController {
 
     private final EvaluacionRepository evaluacionRepository;
     private final EvaluacionViewService evaluacionViewService;
+    private final EntrenamientoRepository entrenamientoRepository;
+    private final EntrenamientoViewService entrenamientoViewService;
 
     public EvaluacionesController(EvaluacionRepository evaluacionRepository,
-                                  EvaluacionViewService evaluacionViewService) {
+                                  EvaluacionViewService evaluacionViewService,
+                                  EntrenamientoRepository entrenamientoRepository,
+                                  EntrenamientoViewService entrenamientoViewService) {
         this.evaluacionRepository = evaluacionRepository;
         this.evaluacionViewService = evaluacionViewService;
+        this.entrenamientoRepository = entrenamientoRepository;
+        this.entrenamientoViewService = entrenamientoViewService;
     }
 
     @GetMapping("/evaluaciones")
@@ -33,6 +43,12 @@ public class EvaluacionesController {
         List<EvaluacionViewDTO> view = evals.stream().map(evaluacionViewService::toView).collect(Collectors.toList());
 
         model.addAttribute("evaluaciones", view);
+        List<Entrenamiento> entrenamientos = entrenamientoRepository.findAllByOrderByIdDesc();
+        List<EntrenamientoViewDTO> entrenamientosView = entrenamientos.stream()
+                .map(entrenamientoViewService::toView)
+                .collect(Collectors.toList());
+        model.addAttribute("entrenamientos", entrenamientosView);
+        model.addAttribute("rutina", null);
         model.addAttribute("activeMenu", "evaluaciones");
         return "evaluaciones";
     }

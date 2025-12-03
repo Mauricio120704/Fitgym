@@ -10,6 +10,7 @@ const listaProximas = document.getElementById("listaProximas");
 // AÑADIR: Nuevos elementos
 const subtituloClases = document.getElementById("subtituloClases");
 const inputFecha = document.getElementById("fechaSeleccionada"); 
+const btnHistorial = document.getElementById("btnHistorial");
 let claseSeleccionada = null;
 
 function mostrarClases(filtro = "todas") {
@@ -171,6 +172,13 @@ document.addEventListener("DOMContentLoaded", function() {
   cargarClases(iso, "todas");
   cargarProximas();
 });
+
+// Historial de Clases -> Mis Clases
+if (btnHistorial) {
+  btnHistorial.addEventListener("click", () => {
+    window.location.href = "/deportista/mis-clases";
+  });
+}
 
 // Cambiar filtro
 filtroTipo.addEventListener("change", () => {

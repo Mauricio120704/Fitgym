@@ -56,7 +56,6 @@
                                 <option value="" th:selected="${estadoActual == ''}">Todos</option>
                                 <option value="ACTIVO" th:selected="${estadoActual == 'ACTIVO'}">Activos</option>
                                 <option value="FINALIZADO" th:selected="${estadoActual == 'FINALIZADO'}">Finalizados</option>
-                                <option value="CANCELADO" th:selected="${estadoActual == 'CANCELADO'}">Cancelados</option>
                             </select>
                         </div>
                         <div class="flex-1">
@@ -120,6 +119,52 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Paginación -->
+                <div th:if="${totalPages != null and totalPages > 1}" class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="text-sm text-gray-600">
+                        Mostrando
+                        <span th:text="${totalVisitantes == 0 ? 0 : (currentPage * pageSize + 1)}">1</span>
+                        a
+                        <span th:text="${T(java.lang.Math).min((currentPage + 1) * pageSize, totalVisitantes)}">20</span>
+                        de
+                        <span th:text="${totalVisitantes}">0</span>
+                        visitantes
+                    </div>
+                    <nav class="flex gap-2 flex-wrap justify-center md:justify-end">
+                        <a th:if="${currentPage > 0}"
+                           th:href="@{/admin/visitantes/listado(page=${currentPage - 1}, estado=${estadoActual}, documento=${documentoActual})}"
+                           class="px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm">
+                            ← Anterior
+                        </a>
+                        <span th:if="${currentPage == 0}"
+                              class="px-3 py-2 bg-gray-300 text-gray-500 rounded text-sm cursor-not-allowed">
+                            ← Anterior
+                        </span>
+
+                        <th:block th:each="p : ${#numbers.sequence(0, totalPages - 1)}">
+                            <a th:if="${p != currentPage}"
+                               th:href="@{/admin/visitantes/listado(page=${p}, estado=${estadoActual}, documento=${documentoActual})}"
+                               th:text="${p + 1}"
+                               class="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
+                            </a>
+                            <span th:if="${p == currentPage}"
+                                  th:text="${p + 1}"
+                                  class="px-3 py-2 bg-orange-500 text-white rounded text-sm font-semibold">
+                            </span>
+                        </th:block>
+
+                        <a th:if="${currentPage < totalPages - 1}"
+                           th:href="@{/admin/visitantes/listado(page=${currentPage + 1}, estado=${estadoActual}, documento=${documentoActual})}"
+                           class="px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm">
+                            Siguiente →
+                        </a>
+                        <span th:if="${currentPage >= totalPages - 1}"
+                              class="px-3 py-2 bg-gray-300 text-gray-500 rounded text-sm cursor-not-allowed">
+                            Siguiente →
+                        </span>
+                    </nav>
                 </div>
 
                 <!-- Botón flotante para nuevo visitante -->

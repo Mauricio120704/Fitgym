@@ -128,10 +128,13 @@
                                             <span th:if="${pago.estado == 'Fallido'}" class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Fallido</span>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <button class="flex items-center text-blue-600 hover:underline">
+                                            <a th:if="${param.usuario == null}"
+                                               th:href="@{/pagos/{id}/recibo(id=${pago.id})}"
+                                               class="flex items-center text-blue-600 hover:underline">
                                                 <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                                 Recibo
-                                            </button>
+                                            </a>
+                                            <span th:if="${param.usuario != null}" class="text-xs text-gray-400">-</span>
                                         </td>
                                     </tr>
                                 </tbody>

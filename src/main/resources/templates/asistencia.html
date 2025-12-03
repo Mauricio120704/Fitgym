@@ -22,8 +22,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
+            margin: 0 0 20px 0;
+            width: 100%;
         }
         .status-badge {
             padding: 5px 10px;
@@ -32,8 +32,8 @@
             font-size: 0.875rem;
         }
         .status-active {
-            background-color: #DCFCE7;
-            color: #16A34A;
+            background-color: #FFEDD5; /* orange-100 */
+            color: #EA580C;           /* orange-600 */
         }
         .status-inactive {
             background-color: #FEE2E2;
@@ -78,11 +78,11 @@
                         <h2 class="text-xl font-semibold mb-4">Registrar Asistencia</h2>
                         <div class="flex">
                             <input type="text" id="dniInput"
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                                    placeholder="Ingrese DNI del deportista"
                                    onkeypress="if(event.key === 'Enter') buscarSocio()">
                             <button onclick="buscarSocio()"
-                                    class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    class="bg-orange-500 text-white px-6 py-2 rounded-r-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 Buscar
                             </button>
                         </div>

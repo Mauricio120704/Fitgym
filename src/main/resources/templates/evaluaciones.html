@@ -6,6 +6,7 @@
     <title>Evaluaciones - FitGym</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/Estilos/modal-common.css}">
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -37,201 +38,551 @@
             </header>
 
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-                <!-- Estadísticas -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-white p-6 rounded-lg shadow text-center">
-                        <div class="text-3xl font-bold text-gray-800">12</div>
-                        <div class="text-gray-600 text-sm">Este mes</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow text-center">
-                        <div class="text-3xl font-bold text-gray-800">45</div>
-                        <div class="text-gray-600 text-sm">Total clases</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow text-center">
-                        <div class="text-3xl font-bold text-gray-800">5</div>
-                        <div class="text-gray-600 text-sm">Días seguidos</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow text-center">
-                        <div class="text-lg font-bold text-gray-800">Yoga Flow</div>
-                        <div class="text-gray-600 text-sm">Favorita</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Rutina Semanal -->
+                <!-- Estadísticas rápidas de actividad del deportista -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Tarjeta: Tu Rutina Semanal -->
                     <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-xl font-bold mb-2">🔥 Tu Rutina Semanal</h2>
-                        <p class="text-gray-600 text-sm mb-4">Entrenamientos programados esta semana</p>
-                        
-                        <div class="flex justify-around mb-6">
-                            <div class="text-center">
-                                <div class="text-4xl font-bold text-orange-500">3</div>
-                                <div class="text-gray-600 text-sm">Esta semana</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-4xl font-bold text-orange-500">180</div>
-                                <div class="text-gray-600 text-sm">Min totales</div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800">Tu Rutina Semanal</h2>
+                                <p class="text-sm text-gray-500">Entrenamientos programados esta semana</p>
                             </div>
                         </div>
-                        
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-2xl">💪</span>
-                                    <div>
-                                        <div class="font-semibold">Fuerza - Piernas</div>
-                                        <div class="text-sm text-gray-600">Lunes 07:00 • 60 min</div>
-                                    </div>
-                                </div>
-                                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">Hoy</span>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-gray-50 rounded-lg p-3 text-center">
+                                <div id="stat-entr-count" class="text-3xl font-bold text-gray-800">0</div>
+                                <div class="text-xs text-gray-500">Esta semana</div>
                             </div>
-                            
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-2xl">🏃</span>
-                                    <div>
-                                        <div class="font-semibold">Cardio - HIIT</div>
-                                        <div class="text-sm text-gray-600">Miércoles 18:00 • 45 min</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-2xl">🧘</span>
-                                    <div>
-                                        <div class="font-semibold">Yoga - Relajación</div>
-                                        <div class="text-sm text-gray-600">Viernes 09:00 • 75 min</div>
-                                    </div>
-                                </div>
+                            <div class="bg-gray-50 rounded-lg p-3 text-center">
+                                <div id="stat-total-min" class="text-3xl font-bold text-gray-800">0</div>
+                                <div class="text-xs text-gray-500">Horas totales</div>
                             </div>
                         </div>
-                        
-                        <button onclick="window.location.href='/entrenamientos'" class="w-full mt-4 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition">
-                            🔧 Gestionar Entrenamientos
-                        </button>
+
+                        <div id="stat-week-preview" class="space-y-2 text-sm mb-4">
+                            <!-- Vista rápida de hasta 3 entrenamientos -->
+                        </div>
+
+                        <div class="mt-2">
+                            <button type="button" onclick="switchTab('manage')" class="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition">
+                                ⚙️ Gestionar Entrenamientos
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Progreso del Mes -->
+                    <!-- Tarjeta: Progreso del Mes -->
                     <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-xl font-bold mb-2">⚡ Progreso del Mes</h2>
-                        <p class="text-gray-600 text-sm mb-4">Tu rendimiento en diciembre</p>
-                        
-                        <div class="space-y-4 mb-6">
+                        <div class="flex items-center justify-between mb-4">
                             <div>
-                                <div class="flex justify-between mb-2">
-                                    <span class="font-semibold">💪 Fuerza</span>
-                                    <span class="text-gray-600">8 sesiones</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 80%"></div>
-                                </div>
+                                <h2 class="text-lg font-bold text-gray-800">Progreso del Mes</h2>
+                                <p class="text-sm text-gray-500">Tu rendimiento en este mes</p>
                             </div>
+                        </div>
 
-                            <div>
-                                <div class="flex justify-between mb-2">
-                                    <span class="font-semibold">🏃 Cardio</span>
-                                    <span class="text-gray-600">6 sesiones</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 60%"></div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between mb-2">
-                                    <span class="font-semibold">🧘 Flexibilidad</span>
-                                    <span class="text-gray-600">4 sesiones</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 40%"></div>
-                                </div>
-                            </div>
+                        <div id="stat-type-bars" class="space-y-3 mb-6">
+                            <!-- Barras por tipo de entrenamiento -->
                         </div>
 
                         <div class="text-center">
-                            <div class="text-5xl font-bold text-orange-500">18</div>
-                            <p class="text-gray-600 mt-2">Entrenamientos completados</p>
+                            <div id="stat-days" class="text-3xl font-bold text-gray-800">0</div>
+                            <div class="text-sm text-gray-500">Entrenamientos en tu rutina</div>
+                            <div class="text-xs text-gray-400 mt-1">
+                                Tipo favorito: <span id="stat-fav-type">-</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Historial de Evaluaciones -->
-                <div class="bg-white p-6 rounded-lg shadow mt-6">
-                    <h2 class="text-xl font-bold mb-4">Historial de Evaluaciones Físicas</h2>
-                    
-                    <div class="bg-gray-100 p-8 rounded-lg text-center mb-6">
-                        <span class="text-4xl">📈</span>
-                        <p class="text-gray-600 mt-2">Gráfico de evolución física</p>
+                <!-- Planificador de Entrenamientos embebido -->
+                <div class="mt-6">
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Planificador de Entrenamientos</h1>
+                        <p class="text-gray-600">Organiza tu rutina semanal de entrenamiento personal</p>
                     </div>
 
-                    <div class="space-y-4">
-                        <div th:if="${evaluaciones.empty}" class="text-center text-gray-500 py-8">
-                            No hay evaluaciones registradas
+                    <!-- Tabs -->
+                    <div class="flex gap-2 mb-6">
+                        <button onclick="switchTab('calendar')" id="tab-calendar" class="px-6 py-2 bg-orange-500 text-white rounded-lg font-semibold">
+                            Vista Calendario
+                        </button>
+                        <button onclick="switchTab('manage')" id="tab-manage" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300">
+                            Gestionar Rutina
+                        </button>
+                    </div>
+
+                    <!-- Vista Calendario -->
+                    <div id="calendar-view" class="bg-white p-6 rounded-lg shadow">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h2 class="text-xl font-bold">📅 <span th:text="${rutina != null ? rutina.nombre : 'Rutina Semanal'}">Rutina Semanal</span></h2>
+                            </div>
                         </div>
-                        <div th:each="evaluacion : ${evaluaciones}" class="border rounded-lg p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="font-semibold text-gray-700" th:text="${#temporals.format(evaluacion.fecha, 'dd MMMM yyyy')}">15 Septiembre 2025</div>
-                                <button onclick="eliminarEvaluacion(this)" th:attr="data-id=${evaluacion.id}" class="text-red-500 hover:text-red-700 text-sm">🗑️ Eliminar</button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-7 gap-4" id="calendar-grid">
+                            <div class="border rounded-lg p-3" data-day="Lunes">
+                                <div class="font-bold text-center mb-2">Lunes</div>
+                                <div class="space-y-2 day-events"></div>
                             </div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-gray-800"><span th:text="${evaluacion.peso}">72.5</span>kg</div>
-                                    <div class="text-sm text-gray-600">Peso</div>
+                            <div class="border rounded-lg p-3" data-day="Martes">
+                                <div class="font-bold text-center mb-2">Martes</div>
+                                <div class="space-y-2 day-events"></div>
+                            </div>
+                            <div class="border rounded-lg p-3" data-day="Miércoles">
+                                <div class="font-bold text-center mb-2">Miércoles</div>
+                                <div class="space-y-2 day-events"></div>
+                            </div>
+                            <div class="border rounded-lg p-3" data-day="Jueves">
+                                <div class="font-bold text-center mb-2">Jueves</div>
+                                <div class="space-y-2 day-events"></div>
+                            </div>
+                            <div class="border rounded-lg p-3" data-day="Viernes">
+                                <div class="font-bold text-center mb-2">Viernes</div>
+                                <div class="space-y-2 day-events"></div>
+                            </div>
+                            <div class="border rounded-lg p-3" data-day="Sábado">
+                                <div class="font-bold text-center mb-2">Sábado</div>
+                                <div class="space-y-2 day-events"></div>
+                            </div>
+                            <div class="border rounded-lg p-3" data-day="Domingo">
+                                <div class="font-bold text-center mb-2">Domingo</div>
+                                <div class="space-y-2 day-events"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vista Gestionar Rutina -->
+                    <div id="manage-view" class="hidden mt-6">
+                        <div class="bg-white p-6 rounded-lg shadow mb-6">
+                            <h3 class="text-lg font-bold mb-2">Tipos de Entrenamiento</h3>
+                            <p class="text-gray-600 text-sm mb-4">Estos son los tipos de entrenamiento que puedes agregar a tu rutina</p>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                    <div class="text-4xl mb-2">💪</div>
+                                    <div class="font-semibold">Fuerza</div>
+                                    <div class="h-1 bg-red-500 rounded mt-2"></div>
                                 </div>
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-gray-800"><span th:text="${evaluacion.grasaCorporal}">15.2</span>%</div>
-                                    <div class="text-sm text-gray-600">Grasa</div>
+                                <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                    <div class="text-4xl mb-2">🏃</div>
+                                    <div class="font-semibold">Cardio</div>
+                                    <div class="h-1 bg-orange-500 rounded mt-2"></div>
                                 </div>
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-gray-800"><span th:text="${evaluacion.masaMuscular}">58.1</span>kg</div>
-                                    <div class="text-sm text-gray-600">Músculo</div>
+                                <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                    <div class="text-4xl mb-2">🧘</div>
+                                    <div class="font-semibold">Yoga</div>
+                                    <div class="h-1 bg-green-500 rounded mt-2"></div>
                                 </div>
-                                <div class="text-center">
-                                    <div class="text-2xl font-bold text-gray-800" th:text="${evaluacion.imc}">22.8</div>
-                                    <div class="text-sm text-gray-600">IMC</div>
+                                <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                    <div class="text-4xl mb-2">🤸</div>
+                                    <div class="font-semibold">Pilates</div>
+                                    <div class="h-1 bg-cyan-500 rounded mt-2"></div>
+                                </div>
+                                <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                    <div class="text-4xl mb-2">⚡</div>
+                                    <div class="font-semibold">Funcional</div>
+                                    <div class="h-1 bg-purple-500 rounded mt-2"></div>
+                                </div>
+                                <div class="border rounded-lg p-4 text-center hover:shadow-lg transition">
+                                    <div class="text-4xl mb-2">🤲</div>
+                                    <div class="font-semibold">Flexibilidad</div>
+                                    <div class="h-1 bg-gray-400 rounded mt-2"></div>
                                 </div>
                             </div>
-                            <div th:if="${evaluacion.notas != null && !evaluacion.notas.isEmpty()}" class="mt-3 text-sm text-gray-600 italic">
-                                <span th:text="${evaluacion.notas}">Notas</span>
-                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-lg font-bold mb-2">Entrenamientos Programados</h3>
+                            <p class="text-gray-600 text-sm mb-4">Gestiona los entrenamientos de tu rutina semanal</p>
+                            
+                            <button onclick="openModal()" class="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition mb-4">
+                                ➕ Agregar Entrenamiento
+                            </button>
+
+                            <div class="space-y-3" id="lista-entrenamientos"></div>
                         </div>
                     </div>
                 </div>
             </main>
         </div>
-        <!-- Botón flotante para nueva reserva/entrenamiento -->
-        <a href="/entrenamientos" class="fab-add" title="Nueva reserva">
-            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-        </a>
+        <!-- Modal para gestionar entrenamientos (reutilizado) -->
+        <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Agregar Entrenamiento</h2>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <p class="text-gray-600 mb-6">Configura un nuevo entrenamiento en tu rutina semanal</p>
+
+                <form id="formEntrenamiento" onsubmit="guardarEntrenamiento(event)">
+                    <input type="hidden" id="entrenamientoId" name="id" />
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-2">Tipo de Entrenamiento</label>
+                        <select id="tipo" name="tipo" class="w-full border rounded-lg px-4 py-2" required>
+                            <option value="">Selecciona el tipo</option>
+                            <option value="Fuerza">💪 Fuerza</option>
+                            <option value="Cardio">🏃 Cardio</option>
+                            <option value="Yoga">🧘 Yoga</option>
+                            <option value="Pilates">🤸 Pilates</option>
+                            <option value="Funcional">⚡ Funcional</option>
+                            <option value="Flexibilidad">🤲 Flexibilidad</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-2">Día de la Semana</label>
+                        <select id="diaSemana" name="diaSemana" class="w-full border rounded-lg px-4 py-2" required>
+                            <option value="">Selecciona el día</option>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miércoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Hora de Inicio</label>
+                            <input type="time" id="horaInicio" name="horaInicio" value="09:00" class="w-full border rounded-lg px-4 py-2" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Duración (min)</label>
+                            <input type="number" id="duracion" name="duracion" value="60" min="15" max="180" class="w-full border rounded-lg px-4 py-2" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold mb-2">Notas (Opcional)</label>
+                        <textarea id="notas" name="notas" class="w-full border rounded-lg px-4 py-2" rows="3" placeholder="Ej: Enfocarse en piernas, usar pesas ligeras..."></textarea>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-300">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600">
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script th:src="@{/sidebar.js}"></script>
+    <script th:inline="javascript">
+        // Datos iniciales desde el modelo para JS (planificador)
+        const entrenamientosData = /*[[${entrenamientos}]]*/ [];
+        // Datos de clases reales del deportista para estadísticas (se cargan vía API)
+        let actividadClases = null;
+    </script>
     <script>
-        function eliminarEvaluacion(button) {
+        function switchTab(tab) {
+            const calendarView = document.getElementById('calendar-view');
+            const manageView = document.getElementById('manage-view');
+            const tabCalendar = document.getElementById('tab-calendar');
+            const tabManage = document.getElementById('tab-manage');
+
+            if (tab === 'calendar') {
+                calendarView.classList.remove('hidden');
+                manageView.classList.add('hidden');
+                tabCalendar.classList.add('bg-orange-500', 'text-white');
+                tabCalendar.classList.remove('bg-gray-200', 'text-gray-700');
+                tabManage.classList.remove('bg-orange-500', 'text-white');
+                tabManage.classList.add('bg-gray-200', 'text-gray-700');
+            } else {
+                calendarView.classList.add('hidden');
+                manageView.classList.remove('hidden');
+                tabManage.classList.add('bg-orange-500', 'text-white');
+                tabManage.classList.remove('bg-gray-200', 'text-gray-700');
+                tabCalendar.classList.remove('bg-orange-500', 'text-white');
+                tabCalendar.classList.add('bg-gray-200', 'text-gray-700');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.getElementById('formEntrenamiento').reset();
+            document.getElementById('entrenamientoId').value = '';
+        }
+
+        function guardarEntrenamiento(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const params = new URLSearchParams(formData);
+            const id = document.getElementById('entrenamientoId').value;
+            const url = id ? `/entrenamientos/${id}` : '/entrenamientos/agregar';
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar estructura local y re-renderizar calendario y lista
+                    if (id) {
+                        const idx = entrenamientosData.findIndex(e => String(e.id) === String(id));
+                        if (idx >= 0) entrenamientosData[idx] = data.entrenamiento;
+                    } else {
+                        entrenamientosData.push(data.entrenamiento);
+                    }
+                    renderCalendar();
+                    renderList();
+                    // Recalcular encabezados tras cambios en la rutina
+                    if (typeof cargarActividadClases === 'function') {
+                        cargarActividadClases();
+                    }
+                    closeModal();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al guardar el entrenamiento');
+            });
+        }
+
+        function eliminarEntrenamiento(button) {
             const id = button.getAttribute('data-id');
             
-            if (confirm('¿Estás seguro de eliminar esta evaluación?')) {
-                fetch('/evaluaciones/eliminar/' + id, {
+            if (confirm('¿Estás seguro de eliminar este entrenamiento?')) {
+                fetch('/entrenamientos/eliminar/' + id, {
                     method: 'POST'
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Evaluación eliminada exitosamente');
-                        window.location.reload();
+                        const idx = entrenamientosData.findIndex(e => String(e.id) === String(id));
+                        if (idx >= 0) entrenamientosData.splice(idx, 1);
+                        renderCalendar();
+                        renderList();
+                        // Recalcular encabezados tras eliminar un entrenamiento
+                        if (typeof cargarActividadClases === 'function') {
+                            cargarActividadClases();
+                        }
                     } else {
                         alert('Error: ' + data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error al eliminar la evaluación');
+                    alert('Error al eliminar el entrenamiento');
                 });
             }
         }
+
+        function editarEntrenamiento(btn) {
+            const id = btn.getAttribute('data-id');
+            const e = entrenamientosData.find(x => String(x.id) === String(id));
+            if (!e) return;
+            document.getElementById('entrenamientoId').value = e.id;
+            document.getElementById('tipo').value = e.tipo;
+            document.getElementById('diaSemana').value = e.diaSemana;
+            document.getElementById('horaInicio').value = e.horaInicio;
+            document.getElementById('duracion').value = e.duracion;
+            document.getElementById('notas').value = e.notas || '';
+            openModal();
+        }
+
+        function renderCalendar() {
+            // Limpia columnas
+            document.querySelectorAll('#calendar-grid [data-day]').forEach(col => {
+                const list = col.querySelector('.day-events');
+                if (list) list.innerHTML = '';
+            });
+            // Pinta eventos del planificador semanal
+            if (Array.isArray(entrenamientosData)) {
+                entrenamientosData.forEach(e => {
+                    const col = document.querySelector(`#calendar-grid [data-day="${e.diaSemana}"] .day-events`);
+                    if (!col) return;
+                    const card = document.createElement('div');
+                    card.className = 'bg-orange-50 border border-orange-200 p-2 rounded shadow-sm';
+                    card.innerHTML = `
+                        <div class="font-semibold text-sm">${e.emoji || ''} ${e.tipo}</div>
+                        <div class="text-xs text-gray-600">⏰ ${e.horaInicio} • ${e.duracion}min</div>
+                        <div class="text-xs text-gray-500 mt-1 truncate">${e.notas || ''}</div>
+                    `;
+                    col.appendChild(card);
+                });
+            }
+        }
+
+        function cargarActividadClases() {
+            // Ahora las estadísticas se basan directamente en los entrenamientos planificados
+            updateStats();
+        }
+
+        function updateStats() {
+            const countEl = document.getElementById('stat-entr-count');
+            const totalEl = document.getElementById('stat-total-min');
+            const totalRutinaEl = document.getElementById('stat-days');
+            const favEl = document.getElementById('stat-fav-type');
+            const previewEl = document.getElementById('stat-week-preview');
+            const barsEl = document.getElementById('stat-type-bars');
+            if (!countEl || !totalEl || !totalRutinaEl || !favEl) return;
+
+            const lista = Array.isArray(entrenamientosData) ? entrenamientosData : [];
+
+            // Totales de la rutina semanal
+            let totalEntr = lista.length;
+            let totalMin = 0;
+            const diasSet = new Set();
+            const tipos = {};
+
+            lista.forEach(e => {
+                const dur = parseInt(e.duracion, 10);
+                if (!isNaN(dur)) totalMin += dur;
+                if (e.diaSemana) diasSet.add(e.diaSemana);
+                if (e.tipo) {
+                    const key = e.tipo;
+                    tipos[key] = (tipos[key] || 0) + 1;
+                }
+            });
+
+            // Convertir minutos a formato X h Y min
+            const formatMinutesToHours = (minutes) => {
+                if (isNaN(minutes) || minutes <= 0) return '0 h 0 min';
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours} h ${mins} min`;
+            };
+
+            // Actualizar tarjetas numéricas de la izquierda
+            countEl.textContent = totalEntr;
+            totalEl.textContent = formatMinutesToHours(totalMin);
+
+            // Vista rápida de hasta 3 entrenamientos
+            if (previewEl) {
+                previewEl.innerHTML = '';
+                if (lista.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'text-gray-500 text-sm';
+                    empty.textContent = 'Aún no tienes entrenamientos en tu rutina semanal';
+                    previewEl.appendChild(empty);
+                } else {
+                    const hoy = new Date();
+                    const ordenDias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+                    const nombreHoy = ordenDias[hoy.getDay()];
+                    lista.slice(0, 3).forEach(e => {
+                        const row = document.createElement('div');
+                        row.className = 'flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2';
+                        const esHoy = e.diaSemana === nombreHoy;
+                        row.innerHTML = `
+                            <div>
+                                <div class="font-medium text-gray-800">${e.tipo}</div>
+                                <div class="text-xs text-gray-500">${e.diaSemana} ${e.horaInicio || ''} • ${formatMinutesToHours(parseInt(e.duracion) || 0)}</div>
+                            </div>
+                            <div class="text-xs font-semibold text-green-600">${esHoy ? 'Hoy' : ''}</div>
+                        `;
+                        previewEl.appendChild(row);
+                    });
+                }
+            }
+
+            // Progreso del mes: barras por tipo
+            let favorita = '-';
+            let maxCount = 0;
+            Object.keys(tipos).forEach(t => {
+                if (tipos[t] > maxCount) {
+                    maxCount = tipos[t];
+                    favorita = t;
+                }
+            });
+
+            if (barsEl) {
+                barsEl.innerHTML = '';
+                const entries = Object.entries(tipos);
+                if (entries.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'text-gray-500 text-sm';
+                    empty.textContent = 'Aún no hay entrenamientos para mostrar el progreso.';
+                    barsEl.appendChild(empty);
+                } else {
+                    entries.forEach(([tipo, cant]) => {
+                        const wrapper = document.createElement('div');
+                        const porcentaje = maxCount > 0 ? Math.round((cant / maxCount) * 100) : 0;
+                        wrapper.innerHTML = `
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>${tipo}</span>
+                                <span class="text-gray-500">${cant} sesiones</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-2 bg-orange-500 rounded-full" style="width: ${porcentaje}%;"></div>
+                            </div>
+                        `;
+                        barsEl.appendChild(wrapper);
+                    });
+                }
+            }
+
+            // Resumen inferior: total entrenamientos en la rutina y tipo favorito
+            totalRutinaEl.textContent = totalEntr;
+            favEl.textContent = favorita;
+        }
+
+        function renderList() {
+            const list = document.getElementById('lista-entrenamientos');
+            if (!list) return;
+            list.innerHTML = '';
+            if (!entrenamientosData || entrenamientosData.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'text-center text-gray-500 py-8';
+                empty.textContent = 'No hay entrenamientos programados';
+                list.appendChild(empty);
+                updateStats();
+                return;
+            }
+            entrenamientosData.forEach(e => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center p-4 border rounded-lg';
+                row.innerHTML = `
+                    <div>
+                        <div class="font-semibold">
+                            <span>${e.emoji || ''}</span>
+                            <span>${e.tipo}</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span>${e.diaSemana}</span> • 
+                            <span>${e.horaInicio}</span> • 
+                            <span>${e.duracion}</span> min
+                        </div>
+                        <div class="text-sm text-gray-500">${e.notas || ''}</div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" class="flex items-center gap-1 text-orange-500 hover:text-orange-700" data-id="${e.id}" onclick="editarEntrenamiento(this)">
+                            <span>✏️</span>
+                            <span>Editar</span>
+                        </button>
+                        <button type="button" class="flex items-center gap-1 text-red-500 hover:text-red-700" data-id="${e.id}" onclick="eliminarEntrenamiento(this)">
+                            <span>🗑️</span>
+                            <span>Eliminar</span>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+            updateStats();
+        }
+
+        // Inicializa calendario, lista del planificador y estadísticas de actividad
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalendar();
+            renderList();
+            cargarActividadClases();
+        });
     </script>
 </body>
 </html>

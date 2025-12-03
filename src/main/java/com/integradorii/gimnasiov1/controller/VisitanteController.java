@@ -65,24 +65,43 @@ public class VisitanteController {
     public String listarVisitantes(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) String documento,
+            @RequestParam(defaultValue = "0") int page,
             Model model) {
-        
-        List<Visitante> visitantes;
-        
+
+        List<Visitante> visitantesFiltrados;
+
         // Prioridad: primero documento, luego estado
         if (documento != null && !documento.isEmpty()) {
-            visitantes = visitanteRepository.findByDocumentoIdentidad(documento);
+            visitantesFiltrados = visitanteRepository.findByDocumentoIdentidad(documento);
         } else if (estado != null && !estado.isEmpty()) {
-            visitantes = visitanteRepository.findByEstado(estado);
+            visitantesFiltrados = visitanteRepository.findByEstado(estado);
         } else {
             // Si no hay filtros, mostrar todos
-            visitantes = visitanteRepository.findAll();
+            visitantesFiltrados = visitanteRepository.findAll();
         }
-        
-        // Pasar los valores actuales de los filtros a la vista
-        model.addAttribute("visitantes", visitantes);
+
+        // Configuración de paginación
+        int pageSize = 20;
+        if (page < 0) page = 0;
+
+        int totalVisitantes = visitantesFiltrados.size();
+        int totalPages = (int) Math.ceil((double) totalVisitantes / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        if (page >= totalPages) page = totalPages - 1;
+
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, totalVisitantes);
+        List<Visitante> visitantesPaginados =
+                totalVisitantes == 0 ? new java.util.ArrayList<>() : visitantesFiltrados.subList(start, end);
+
+        // Pasar los valores actuales de los filtros y la paginación a la vista
+        model.addAttribute("visitantes", visitantesPaginados);
         model.addAttribute("estadoActual", estado != null ? estado : "");
         model.addAttribute("documentoActual", documento != null ? documento : "");
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalVisitantes", totalVisitantes);
         return "admin/visitantes/listado";
     }
 
