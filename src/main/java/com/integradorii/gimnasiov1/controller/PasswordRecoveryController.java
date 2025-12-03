@@ -60,31 +60,6 @@ public class PasswordRecoveryController {
     public String mostrarFormularioRecuperacion() {
         return "recuperacion";
     }
-
-    /**
-     * Muestra la vista para establecer nueva contraseña
-     * 
-     * Ruta: GET /password-recovery/nueva-contrasena?email=xxx&codigo=yyy
-     * Acceso: PÚBLICO (pero requiere parámetros válidos)
-     * Vista: nueva-contrasena.html
-     * 
-     * Solo se accede después de verificar código correctamente
-     * 
-     * @param email Email del usuario (pasado desde verificación de código)
-     * @param codigo Código verificado (pasado desde verificación)
-     * @return Vista para establecer nueva contraseña, o redirección si faltan parámetros
-     */
-    @GetMapping("/nueva-contrasena")
-    public String mostrarFormularioNuevaContrasena(
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String codigo) {
-        // Redireccionar a inicio si no hay email o código (acceso directo no permitido)
-        if (email == null || codigo == null) {
-            return "redirect:/password-recovery";
-        }
-        return "nueva-contrasena";
-    }
-
     /**
      * API REST: Solicitar código de recuperación por email
      * 
@@ -204,6 +179,30 @@ public class PasswordRecoveryController {
             response.put("message", "Error al verificar el código. Por favor intenta de nuevo");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    /**
+     * Muestra la vista para establecer nueva contraseña
+     * 
+     * Ruta: GET /password-recovery/nueva-contrasena?email=xxx&codigo=yyy
+     * Acceso: PÚBLICO (pero requiere parámetros válidos)
+     * Vista: nueva-contrasena.html
+     * 
+     * Solo se accede después de verificar código correctamente
+     * 
+     * @param email Email del usuario (pasado desde verificación de código)
+     * @param codigo Código verificado (pasado desde verificación)
+     * @return Vista para establecer nueva contraseña, o redirección si faltan parámetros
+     */
+    @GetMapping("/nueva-contrasena")
+    public String mostrarFormularioNuevaContrasena(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String codigo) {
+        // Redireccionar a inicio si no hay email o código (acceso directo no permitido)
+        if (email == null || codigo == null) {
+            return "redirect:/password-recovery";
+        }
+        return "nueva-contrasena";
     }
 
     /**

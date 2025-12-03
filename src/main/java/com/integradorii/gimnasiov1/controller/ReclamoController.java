@@ -16,6 +16,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controlador de Reclamos del lado del deportista.
+ *
+ * Función de sistema cubierta:
+ *  - "Gestión de reclamos": permite crear y consultar reclamos del deportista.
+ *
+ * Rutas principales:
+ *  - GET  /reclamos              -> Vista con listado de reclamos del usuario autenticado.
+ *  - POST /reclamos/crear        -> API REST para registrar un nuevo reclamo.
+ *  - GET  /reclamos/mis-reclamos -> API REST que devuelve los reclamos del deportista en JSON.
+ */
 @Controller
 @RequestMapping("/reclamos")
 public class ReclamoController {
@@ -28,6 +39,16 @@ public class ReclamoController {
         this.personaRepository = personaRepository;
     }
     
+    /**
+     * Muestra la vista de reclamos del deportista autenticado.
+     *
+     * Flujo general:
+     *  - Verifica que haya un usuario autenticado en el contexto de seguridad.
+     *  - Recupera la entidad Persona asociada al email del usuario.
+     *  - Obtiene desde el servicio la lista de reclamos de ese deportista.
+     *  - Carga en el modelo los datos del usuario y sus reclamos para
+     *    renderizar la plantilla Thymeleaf `reclamos.html`.
+     */
     @GetMapping
     public String mostrarReclamos(Model model, 
                                   @AuthenticationPrincipal UserDetails userDetails) {
@@ -51,6 +72,16 @@ public class ReclamoController {
         return "reclamos";
     }
     
+    /**
+     * Endpoint REST para crear un nuevo reclamo.
+     *
+     * - Solo puede ser invocado por un deportista autenticado.
+     * - Utiliza el email presente en el contexto de seguridad para
+     *   recuperar la entidad Persona correspondiente.
+     * - Delegará en `ReclamoService` la creación y validación del reclamo.
+     * - Devuelve un JSON con indicadores de éxito, mensaje descriptivo
+     *   y el identificador del reclamo generado.
+     */
     @PostMapping("/crear")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> crearReclamo(
@@ -107,6 +138,14 @@ public class ReclamoController {
         }
     }
     
+    /**
+     * Endpoint REST que devuelve los reclamos del deportista autenticado.
+     *
+     * Suele ser consumido mediante peticiones AJAX desde la vista para
+     * actualizar el listado de reclamos sin recargar toda la página.
+     * Si el usuario no está autenticado o no se encuentra la Persona
+     * asociada, se devuelve el código de error HTTP correspondiente.
+     */
     @GetMapping("/mis-reclamos")
     @ResponseBody
     public ResponseEntity<List<Reclamo>> obtenerMisReclamos(

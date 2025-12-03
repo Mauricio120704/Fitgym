@@ -17,6 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación personalizada de {@link UserDetailsService} para Spring Security.
+ *
+ * Responsabilidades principales:
+ *  - Cargar credenciales y roles de "personal" desde la tabla {@code usuarios}.
+ *  - Cargar credenciales de "deportistas" desde la tabla {@code personas}.
+ *  - Construir un {@link UserDetails} con la contraseña encriptada y la lista
+ *    de {@link GrantedAuthority} que representan los roles del sistema.
+ *
+ * Reglas generales:
+ *  - Primero intenta autenticar contra la tabla de personal administrativo.
+ *  - Si no encuentra el email allí, busca en la tabla de deportistas.
+ *  - Para personal, normaliza el código de rol (ADMIN, RECEP, ENTRENADOR, etc.).
+ *  - Para deportistas, asigna siempre {@code ROLE_CLIENTE}.
+ *  - Marca la cuenta como bloqueada si el usuario/persona no está activo.
+ */
 @Service
 @Transactional(readOnly = true)
 public class CustomUserDetailsService implements UserDetailsService {
@@ -29,6 +45,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.usuarioRepository = usuarioRepository;
     }
     
+    /**
+     * Normaliza el código de rol proveniente de base de datos.
+     *
+     * Acepta diferentes variantes (por ejemplo "ADMIN" o "ADMINISTRADOR")
+     * y devuelve un valor canónico como "ADMINISTRADOR", "RECEPCIONISTA"
+     * o "ENTRENADOR". Esto simplifica el mapeo posterior a "ROLE_XXX".
+     */
     private String canonicalRole(String codigo) {
         if (codigo == null) return "USUARIO";
         String c = codigo.trim().toUpperCase();
@@ -48,6 +71,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    /**
+     * Carga un usuario por su email (username) para el proceso de login.
+     *
+     * Flujo detallado:
+     *  1. Intenta encontrar el email en la tabla {@code usuarios} (personal).
+     *     - Si existe, construye un {@link UserDetails} con el rol mapeado
+     *       a partir de {@code usuario.getRol().getCodigo()}.
+     *  2. Si no lo encuentra, busca en la tabla {@code personas} (deportistas).
+     *     - Si existe, asigna siempre la autoridad {@code ROLE_CLIENTE}.
+     *  3. En ambos casos:
+     *     - Devuelve el hash de contraseña almacenado.
+     *     - Marca la cuenta como bloqueada si el registro no está activo
+     *       o, en el caso de personas, si está marcada como bloqueada.
+     *  4. Si no se encuentra el email en ninguna tabla, lanza
+     *     {@link UsernameNotFoundException}.
+     */
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         System.out.println("=== DEBUG LOGIN ===");
         System.out.println("Email: " + email);

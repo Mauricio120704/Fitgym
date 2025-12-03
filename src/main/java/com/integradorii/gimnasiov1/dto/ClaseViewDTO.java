@@ -8,6 +8,7 @@ public class ClaseViewDTO {
     private Long id;
     private String nombre;
     private String instructor;
+    private Long instructorId;
     private LocalDate fecha;
     private LocalTime hora;
     private Integer duracion;
@@ -25,7 +26,7 @@ public class ClaseViewDTO {
 
     public ClaseViewDTO() {}
 
-    public ClaseViewDTO(Long id, String nombre, String instructor, LocalDate fecha, LocalTime hora,
+    public ClaseViewDTO(Long id, String nombre, String instructor, Long instructorId, LocalDate fecha, LocalTime hora,
                          Integer duracion, Integer cuposPremium, Integer cuposElite,
                          Long ocupadosBasico, Long ocupadosPremium, Long ocupadosElite,
                          Long tipoClaseId, String tipoClaseNombre,
@@ -34,6 +35,7 @@ public class ClaseViewDTO {
         this.id = id;
         this.nombre = nombre;
         this.instructor = instructor;
+        this.instructorId = instructorId;
         this.fecha = fecha;
         this.hora = hora;
         this.duracion = duracion;
@@ -56,6 +58,8 @@ public class ClaseViewDTO {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getInstructor() { return instructor; }
     public void setInstructor(String instructor) { this.instructor = instructor; }
+    public Long getInstructorId() { return instructorId; }
+    public void setInstructorId(Long instructorId) { this.instructorId = instructorId; }
     public LocalDate getFecha() { return fecha; }
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
     public LocalTime getHora() { return hora; }

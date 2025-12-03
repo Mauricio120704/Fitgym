@@ -10,6 +10,7 @@ public class IncidenciaViewDTO {
     private String prioridad; // UI: ALTA/MEDIA/BAJA
     private String estado;    // UI: ABIERTO/RESUELTO
     private OffsetDateTime fechaReporte;
+    private OffsetDateTime fechaCierre;
     private String reportadoPor;
     private String asignadoA; // puede ser null
     private String imagenes;  // Datos binarios de la imagen
@@ -17,7 +18,7 @@ public class IncidenciaViewDTO {
     public IncidenciaViewDTO() {}
 
     public IncidenciaViewDTO(Long id, String titulo, String descripcion, String categoria, String prioridad,
-                             String estado, OffsetDateTime fechaReporte, String reportadoPor,
+                             String estado, OffsetDateTime fechaReporte, OffsetDateTime fechaCierre, String reportadoPor,
                              String asignadoA, String imagenes) {
         this.id = id;
         this.titulo = titulo;
@@ -26,6 +27,7 @@ public class IncidenciaViewDTO {
         this.prioridad = prioridad;
         this.estado = estado;
         this.fechaReporte = fechaReporte;
+        this.fechaCierre = fechaCierre;
         this.reportadoPor = reportadoPor;
         this.asignadoA = asignadoA;
         this.imagenes = imagenes;
@@ -45,6 +47,8 @@ public class IncidenciaViewDTO {
     public void setEstado(String estado) { this.estado = estado; }
     public OffsetDateTime getFechaReporte() { return fechaReporte; }
     public void setFechaReporte(OffsetDateTime fechaReporte) { this.fechaReporte = fechaReporte; }
+    public OffsetDateTime getFechaCierre() { return fechaCierre; }
+    public void setFechaCierre(OffsetDateTime fechaCierre) { this.fechaCierre = fechaCierre; }
     public String getReportadoPor() { return reportadoPor; }
     public void setReportadoPor(String reportadoPor) { this.reportadoPor = reportadoPor; }
     public String getAsignadoA() { return asignadoA; }

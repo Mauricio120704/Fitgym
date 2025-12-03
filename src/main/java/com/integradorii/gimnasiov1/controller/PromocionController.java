@@ -70,6 +70,11 @@ public class PromocionController {
                 ? promocionRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(q, q)
                 : promocionRepository.findAll();
 
+        // Excluir promociones eliminadas lógicamente
+        base = base.stream()
+                .filter(p -> !p.isEliminado())
+                .collect(Collectors.toList());
+
         if (q != null) {
             model.addAttribute("q", q);
         }
@@ -162,11 +167,7 @@ public class PromocionController {
         // Tipo de promoción: por defecto MEMBRESIA si no se especifica
         Promocion.TipoPromocion tipoPromoEnum = Promocion.TipoPromocion.MEMBRESIA;
         if (tipoPromocion != null && !tipoPromocion.isBlank()) {
-            try {
-                tipoPromoEnum = Promocion.TipoPromocion.valueOf(tipoPromocion);
-            } catch (IllegalArgumentException ignored) {
-                tipoPromoEnum = Promocion.TipoPromocion.MEMBRESIA;
-            }
+            tipoPromoEnum = Promocion.TipoPromocion.valueOf(tipoPromocion);
         }
         p.setTipoPromocion(tipoPromoEnum);
 
@@ -213,6 +214,9 @@ public class PromocionController {
         Optional<Promocion> opt = promocionRepository.findById(id);
         if (opt.isPresent()) {
             Promocion p = opt.get();
+            if (p.isEliminado()) {
+                return "redirect:/promociones";
+            }
             Promocion.Estado anterior = p.getEstado();
             if (anterior == Promocion.Estado.INACTIVE) {
                 p.setEstado(Promocion.Estado.ACTIVE);
@@ -238,6 +242,9 @@ public class PromocionController {
                             @RequestParam(value = "fechaInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
                             @RequestParam(value = "fechaFin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
         Promocion p = promocionRepository.findById(id).orElseThrow();
+        if (p.isEliminado()) {
+            return "redirect:/promociones";
+        }
         Promocion.Estado anterior = p.getEstado();
         if (inicio == null) inicio = fechaInicio;
         if (fin == null) fin = fechaFin;
@@ -260,8 +267,16 @@ public class PromocionController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones/{id}/delete")
     public String delete(@PathVariable long id) {
-        if (promocionRepository.existsById(id)) {
-            promocionRepository.deleteById(id);
+        Optional<Promocion> opt = promocionRepository.findById(id);
+        if (opt.isPresent()) {
+            Promocion p = opt.get();
+            if (!p.isEliminado()) {
+                Promocion.Estado anterior = p.getEstado();
+                p.setEliminado(true);
+                promocionRepository.save(p);
+                guardarHistorial(p, PromocionHistorial.Accion.ELIMINAR, anterior, null,
+                        "Eliminación de promoción");
+            }
         }
         return "redirect:/promociones";
     }
@@ -344,19 +359,6 @@ public class PromocionController {
         model.addAttribute("historial", historialRepository.findAllWithPromocionOrderByRealizadoEnDesc());
         model.addAttribute("activeMenu", "promociones");
         return "promociones_historial";
-    }
-
-    /**
-     * GET /promociones/{id}/historial - Historial por promoción
-     */
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
-    @GetMapping("/promociones/{id}/historial")
-    public String historialPorPromocion(@PathVariable long id, Model model) {
-        Promocion p = promocionRepository.findById(id).orElseThrow();
-        model.addAttribute("promocion", p);
-        model.addAttribute("historial", historialRepository.findByPromocionIdOrderByRealizadoEnDesc(id));
-        model.addAttribute("activeMenu", "promociones");
-        return "promocion_historial";
     }
 
     @GetMapping("/promociones/clases-disponibles")

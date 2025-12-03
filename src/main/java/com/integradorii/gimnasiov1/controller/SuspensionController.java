@@ -257,7 +257,7 @@ public class SuspensionController {
                 Path uploadDir = Paths.get("uploads", "suspensiones").toAbsolutePath().normalize();
                 Files.createDirectories(uploadDir);
                 Path targetPath = uploadDir.resolve(storedFileName);
-                archivo.transferTo(targetPath.toFile());
+                archivo.transferTo(java.util.Objects.requireNonNull(targetPath.toFile()));
             } catch (IOException ex) {
                 model.addAttribute("error", "No se pudo guardar el archivo adjunto. Inténtalo nuevamente más tarde.");
                 return "suspension";

@@ -32,17 +32,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * API de notificaciones para el panel del deportista.
  *
  * Genera notificaciones "on the fly" a partir del estado actual de la base de datos,
  * sin almacenar una tabla de notificaciones persistentes.
  *
- * Tipos de notificación generados:
- * - Estado de la suscripción: vencida, próxima a vencer, próximo pago.
- * - Falta de suscripción activa.
- * - Nuevas promociones relevantes creadas recientemente.
- * - Nuevas clases disponibles en los próximos días.
- * - Próximas clases reservadas por el deportista.
  */
 @RestController
 @RequestMapping("/api/deportista")
@@ -199,7 +192,10 @@ public class NotificacionesDeportistaController {
 
         // Bloque 2: nuevas promociones creadas recientemente (últimos 7 días) y vigentes
         LocalDateTime haceSieteDias = LocalDateTime.now().minusDays(7);
-        List<Promocion> promocionesActivas = promocionRepository.findByEstado(Promocion.Estado.ACTIVE);
+        List<Promocion> promocionesActivas = promocionRepository.findByEstado(Promocion.Estado.ACTIVE)
+                .stream()
+                .filter(p -> !p.isEliminado())
+                .toList();
         int maxPromos = 3;
         int contadorPromos = 0;
         for (Promocion p : promocionesActivas) {

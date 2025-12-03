@@ -79,7 +79,7 @@ public class AdminDeportistasController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/{id}/bloquear")
-    public String bloquearDeportista(@PathVariable Long id,
+    public String bloquearDeportista(@PathVariable long id,
                                      @RequestParam(required = false) String motivo,
                                      RedirectAttributes redirectAttributes) {
         Persona persona = personaRepository.findById(id)
@@ -99,7 +99,7 @@ public class AdminDeportistasController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/{id}/desbloquear")
-    public String desbloquearDeportista(@PathVariable Long id,
+    public String desbloquearDeportista(@PathVariable long id,
                                         RedirectAttributes redirectAttributes) {
         Persona persona = personaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID de deportista invalido: " + id));

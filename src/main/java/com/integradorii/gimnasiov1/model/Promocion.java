@@ -51,6 +51,9 @@ public class Promocion {
     @Column(nullable = false, length = 15)
     private Estado estado = Estado.ACTIVE;
 
+    @Column(name = "eliminado", nullable = false)
+    private boolean eliminado = false;
+
     @Column(name = "creado_en", nullable = false)
     private LocalDateTime creadoEn = LocalDateTime.now();
 
@@ -101,6 +104,9 @@ public class Promocion {
 
     public Estado getEstado() { return estado; }
     public void setEstado(Estado estado) { this.estado = estado; }
+
+    public boolean isEliminado() { return eliminado; }
+    public void setEliminado(boolean eliminado) { this.eliminado = eliminado; }
 
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }

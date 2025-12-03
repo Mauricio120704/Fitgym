@@ -21,15 +21,15 @@ public class EquipoService {
         return equipoRepository.findAll();
     }
 
-    public Optional<Equipo> findById(Long id) {
+    public Optional<Equipo> findById(long id) {
         return equipoRepository.findById(id);
     }
 
     public Equipo save(Equipo equipo) {
-        return equipoRepository.save(equipo);
+        return equipoRepository.save(java.util.Objects.requireNonNull(equipo));
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         equipoRepository.deleteById(id);
     }
 
@@ -65,7 +65,7 @@ public class EquipoService {
         return equipoRepository.findEquiposOrdenadosPorProximoMantenimiento();
     }
 
-    public Equipo actualizarEstado(Long id, String nuevoEstado) {
+    public Equipo actualizarEstado(long id, String nuevoEstado) {
         Optional<Equipo> equipoOpt = equipoRepository.findById(id);
         if (equipoOpt.isPresent()) {
             Equipo equipo = equipoOpt.get();
@@ -75,7 +75,7 @@ public class EquipoService {
         return null;
     }
 
-    public Equipo actualizarProximoMantenimiento(Long id, LocalDate proximoMantenimiento) {
+    public Equipo actualizarProximoMantenimiento(long id, LocalDate proximoMantenimiento) {
         Optional<Equipo> equipoOpt = equipoRepository.findById(id);
         if (equipoOpt.isPresent()) {
             Equipo equipo = equipoOpt.get();
@@ -87,18 +87,18 @@ public class EquipoService {
 
     // Pageable variants
     public Page<Equipo> findAll(Pageable pageable) {
-        return equipoRepository.findAll(pageable);
+        return equipoRepository.findAll(java.util.Objects.requireNonNull(pageable));
     }
 
     public Page<Equipo> findByEstado(String estado, Pageable pageable) {
-        return equipoRepository.findByEstado(estado, pageable);
+        return equipoRepository.findByEstado(estado, java.util.Objects.requireNonNull(pageable));
     }
 
     public Page<Equipo> findByTipo(String tipo, Pageable pageable) {
-        return equipoRepository.findByTipo(tipo, pageable);
+        return equipoRepository.findByTipo(tipo, java.util.Objects.requireNonNull(pageable));
     }
 
     public Page<Equipo> buscarEquiposPorTermino(String termino, Pageable pageable) {
-        return equipoRepository.buscarEquiposPorTermino(termino, pageable);
+        return equipoRepository.buscarEquiposPorTermino(termino, java.util.Objects.requireNonNull(pageable));
     }
 }

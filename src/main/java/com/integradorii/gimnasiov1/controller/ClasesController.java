@@ -305,26 +305,38 @@ public class ClasesController {
                 OffsetDateTime odt = zdt.toOffsetDateTime();
 
                 c.setFecha(odt);
-                System.out.println("Hora guardada (UTC): " + odt);
             } catch (Exception e) {
-                System.err.println("Error al parsear fecha/hora: " + e.getMessage());
             }
         }
 
         // Buscar entrenador por nombre y apellido en tabla usuarios
-        String instructor = String.valueOf(body.getOrDefault("instructor", ""));
-        if (!instructor.isBlank()) {
-            String[] parts = instructor.trim().split(" ", 2);
-            String nombre = parts[0];
-            String apellido = parts.length > 1 ? parts[1] : "";
-            Usuario entren = usuarioRepository.findActiveEntrenadores().stream()
-                    .filter(u -> u.getNombre().equalsIgnoreCase(nombre) &&
-                                 (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
-                    .findFirst().orElse(null);
-            c.setEntrenador(entren);
-        } else {
-            c.setEntrenador(null);
+        Usuario entren = null;
+
+        // Intentar primero por ID de instructor (nuevo flujo)
+        try {
+            Object instructorIdObj = body.get("instructorId");
+            if (instructorIdObj != null) {
+                Long instructorId = Long.parseLong(String.valueOf(instructorIdObj));
+                entren = usuarioRepository.findById(instructorId).orElse(null);
+            }
+        } catch (Exception e) {
         }
+
+        // Fallback: búsqueda por nombre/apellido como antes
+        if (entren == null) {
+            String instructor = String.valueOf(body.getOrDefault("instructor", ""));
+            if (!instructor.isBlank()) {
+                String[] parts = instructor.trim().split(" ", 2);
+                String nombre = parts[0];
+                String apellido = parts.length > 1 ? parts[1] : "";
+                entren = usuarioRepository.findActiveEntrenadores().stream()
+                        .filter(u -> u.getNombre().equalsIgnoreCase(nombre) &&
+                                     (apellido.isBlank() || u.getApellido().equalsIgnoreCase(apellido)))
+                        .findFirst().orElse(null);
+            }
+        }
+
+        c.setEntrenador(entren);
 
         // Estado por defecto
         if (c.getEstado() == null || c.getEstado().isBlank()) {
@@ -360,7 +372,14 @@ public class ClasesController {
 
     // Convierte Object a int con valor por defecto
     private int parseInt(Object v, int def) {
-        try { return v == null ? def : Integer.parseInt(String.valueOf(v)); } catch (Exception e) { return def; }
+        if (v == null) {
+            return def;
+        }
+        String s = String.valueOf(v).trim();
+        if (s.isEmpty()) {
+            return def;
+        }
+        return Integer.parseInt(s);
     }
 
     // Convierte Clase a JSON para respuesta API

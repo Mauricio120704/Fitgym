@@ -161,7 +161,6 @@ public class SecurityConfig {
                 // - /reservas: Reservar clases
                 .requestMatchers("/perfil", "/cliente/**", "/entrenamientos", "/evaluaciones", "/reclamos", "/reservas", "/suspension", "/api/reservas/**", "/deportista/comunidad", "/api/comunidad/**").hasRole("CLIENTE")
                 
-                // ===== RUTAS PARA TODO EL PERSONAL (ADMIN, RECEPCIONISTA, ENTRENADOR) =====
                 // - /miembros/**: Gestión de miembros
                 // - /incidencias/**: Gestión de incidencias
                 // - /pagos: Historial de pagos (vista admin)

@@ -83,6 +83,85 @@ public class HomeController {
         return "registro";
     }
 
+    /**
+     * POST /registro - Registra nuevo deportista/cliente
+     * Validaciones: email único, DNI único, contraseñas coinciden
+     * Envía email de verificación, cuenta inactiva hasta verificar
+     */
+    @PostMapping("/registro")
+    public String registrarDeportista(@Valid @ModelAttribute("usuario") RegistroUsuarioDTO dto,
+                                   BindingResult result,
+                                   Model model,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
+
+        // Validar errores de validación
+        if (result.hasErrors()) {
+            model.addAttribute("usuario", dto);
+            return "registro";
+        }
+
+        // Verificar si las contraseñas coinciden
+        if (dto.getPassword() == null || !dto.getPassword().equals(dto.getConfirmPassword())) {
+            model.addAttribute("error", "Las contraseñas no coinciden");
+            model.addAttribute("usuario", dto);
+            return "registro";
+        }
+
+        // Verificar si el email ya existe
+        if (personaRepository.existsByEmail(dto.getEmail())) {
+            model.addAttribute("error", "El email ya está registrado");
+            model.addAttribute("usuario", dto);
+            return "registro";
+        }
+
+        // Verificar si el DNI ya existe
+        if (personaRepository.existsByDni(dto.getDni())) {
+            model.addAttribute("error", "El DNI ya está registrado");
+            model.addAttribute("usuario", dto);
+            return "registro";
+        }
+
+        try {
+            Persona p = new Persona();
+            p.setNombre(dto.getNombre());
+            p.setApellido(dto.getApellido());
+            p.setEmail(dto.getEmail());
+            p.setTelefono(dto.getTelefono());
+            p.setDni(dto.getDni());
+            p.setFechaRegistro(LocalDate.now());
+            // La membresía inicia como INACTIVA hasta que el deportista contrate un plan
+            p.setMembresiaActiva(Boolean.FALSE);
+            
+            // Cuenta inactiva hasta verificar email
+            p.setActivo(Boolean.FALSE);
+            p.setEmailVerificado(Boolean.FALSE);
+
+            // IMPORTANTE: Registro público solo crea deportistas
+            // Personal se crea desde /miembros por administrador
+            
+            // Encriptar la contraseña antes de guardarla
+            String hashedPassword = passwordEncoderService.encode(dto.getPassword());
+            p.setContraseña(hashedPassword);
+
+            Persona personaGuardada = personaRepository.save(p);
+
+            // Crear token y enviar email de verificación
+            verificationTokenService.crearTokenYEnviarEmail(personaGuardada);
+
+            // Redirigir a página de confirmación en lugar de auto-login
+            model.addAttribute("success", "Registro exitoso. Por favor, revisa tu correo electrónico para verificar tu cuenta.");
+            model.addAttribute("email", personaGuardada.getEmail());
+            return "registro-exitoso";
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            model.addAttribute("error", "Error al procesar el registro: " + ex.getMessage());
+            model.addAttribute("usuario", dto);
+            return "registro";
+        }
+    }
+
     // GET /recuperacion - Página de recuperación de contraseña
     @GetMapping("/recuperacion")
     public String recuperacion() {
@@ -386,85 +465,6 @@ public class HomeController {
             // En caso de error, devolver una página ligera o redirigir para evitar que el servidor cierre la conexión abruptamente
             model.addAttribute("error", "No se pudo cargar el perfil: " + ex.getMessage());
             return "perfil-usuario";
-        }
-    }
-
-    /**
-     * POST /registro - Registra nuevo deportista/cliente
-     * Validaciones: email único, DNI único, contraseñas coinciden
-     * Envía email de verificación, cuenta inactiva hasta verificar
-     */
-    @PostMapping("/registro")
-    public String registrarDeportista(@Valid @ModelAttribute("usuario") RegistroUsuarioDTO dto,
-                                   BindingResult result,
-                                   Model model,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response) {
-
-        // Validar errores de validación
-        if (result.hasErrors()) {
-            model.addAttribute("usuario", dto);
-            return "registro";
-        }
-
-        // Verificar si las contraseñas coinciden
-        if (dto.getPassword() == null || !dto.getPassword().equals(dto.getConfirmPassword())) {
-            model.addAttribute("error", "Las contraseñas no coinciden");
-            model.addAttribute("usuario", dto);
-            return "registro";
-        }
-
-        // Verificar si el email ya existe
-        if (personaRepository.existsByEmail(dto.getEmail())) {
-            model.addAttribute("error", "El email ya está registrado");
-            model.addAttribute("usuario", dto);
-            return "registro";
-        }
-
-        // Verificar si el DNI ya existe
-        if (personaRepository.existsByDni(dto.getDni())) {
-            model.addAttribute("error", "El DNI ya está registrado");
-            model.addAttribute("usuario", dto);
-            return "registro";
-        }
-
-        try {
-            Persona p = new Persona();
-            p.setNombre(dto.getNombre());
-            p.setApellido(dto.getApellido());
-            p.setEmail(dto.getEmail());
-            p.setTelefono(dto.getTelefono());
-            p.setDni(dto.getDni());
-            p.setFechaRegistro(LocalDate.now());
-            // La membresía inicia como INACTIVA hasta que el deportista contrate un plan
-            p.setMembresiaActiva(Boolean.FALSE);
-            
-            // Cuenta inactiva hasta verificar email
-            p.setActivo(Boolean.FALSE);
-            p.setEmailVerificado(Boolean.FALSE);
-
-            // IMPORTANTE: Registro público solo crea deportistas
-            // Personal se crea desde /miembros por administrador
-            
-            // Encriptar la contraseña antes de guardarla
-            String hashedPassword = passwordEncoderService.encode(dto.getPassword());
-            p.setContraseña(hashedPassword);
-
-            Persona personaGuardada = personaRepository.save(p);
-
-            // Crear token y enviar email de verificación
-            verificationTokenService.crearTokenYEnviarEmail(personaGuardada);
-
-            // Redirigir a página de confirmación en lugar de auto-login
-            model.addAttribute("success", "Registro exitoso. Por favor, revisa tu correo electrónico para verificar tu cuenta.");
-            model.addAttribute("email", personaGuardada.getEmail());
-            return "registro-exitoso";
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            model.addAttribute("error", "Error al procesar el registro: " + ex.getMessage());
-            model.addAttribute("usuario", dto);
-            return "registro";
         }
     }
 

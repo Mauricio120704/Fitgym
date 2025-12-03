@@ -39,6 +39,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para que el administrador gestione las solicitudes de
+ * suspensión de membresía enviadas por los deportistas.
+ *
+ * Función de sistema cubierta (lado administrador):
+ *  - Listar las solicitudes de suspensión en estado "pendiente".
+ *  - Aprobar o rechazar cada solicitud, actualizando la suscripción asociada.
+ *  - Permitir la descarga de archivos adjuntos (por ejemplo certificados).
+ *  - Notificar al deportista por email el resultado de la solicitud.
+ *
+ * Ruta base: /api/admin/suspensiones
+ * Acceso: ROLE_ADMINISTRADOR (controlado por @PreAuthorize a nivel de clase).
+ */
 @RestController
 @RequestMapping("/api/admin/suspensiones")
 @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -60,6 +73,12 @@ public class AdminSuspensionApiController {
         this.emailService = emailService;
     }
 
+    /**
+     * Devuelve el listado de solicitudes de suspensión en estado "pendiente".
+     *
+     * Se utiliza normalmente para poblar la tabla del panel de administración
+     * con un DTO simplificado por cada suspensión, listo para mostrar en la UI.
+     */
     @GetMapping("/pendientes")
     public ResponseEntity<List<SuspensionAdminDTO>> listarPendientes() {
         List<SuspensionMembresia> suspensiones = suspensionRepository.findByEstadoIgnoreCase("pendiente");
@@ -69,9 +88,21 @@ public class AdminSuspensionApiController {
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * Aprueba una solicitud de suspensión identificada por su ID.
+     *
+     * Flujo principal:
+     *  - Verifica que la suspensión exista y esté en estado "pendiente".
+     *  - Calcula la cantidad de días entre fecha de inicio y fin.
+     *  - Extiende la fecha de fin de la suscripción y el próximo pago
+     *    en la misma cantidad de días.
+     *  - Registra el administrador que aprobó la solicitud.
+     *  - Cambia el estado a "aprobada" y envía notificación por email
+     *    al deportista con el resultado.
+     */
     @PostMapping("/{id}/aprobar")
     @Transactional
-    public ResponseEntity<?> aprobarSuspension(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<?> aprobarSuspension(@PathVariable long id, Principal principal) {
         Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -122,9 +153,21 @@ public class AdminSuspensionApiController {
         return ResponseEntity.ok(mapToDto(suspension));
     }
 
+    /**
+     * Rechaza una solicitud de suspensión pendiente.
+     *
+     * Flujo principal:
+     *  - Verifica que la suspensión exista y siga en estado "pendiente".
+     *  - Registra, si está disponible, el administrador que realiza la acción.
+     *  - Cambia el estado a "rechazada" y persiste el cambio.
+     *  - Envía un email al deportista informando que su solicitud fue rechazada.
+     *
+     * El parámetro {@code payload} permite, a futuro, recibir datos adicionales
+     * como una nota o comentario del administrador sin romper la API actual.
+     */
     @PostMapping("/{id}/rechazar")
     @Transactional
-    public ResponseEntity<?> rechazarSuspension(@PathVariable Long id,
+    public ResponseEntity<?> rechazarSuspension(@PathVariable long id,
                                                 @RequestBody(required = false) Map<String, Object> payload,
                                                 Principal principal) {
         Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
@@ -155,8 +198,16 @@ public class AdminSuspensionApiController {
         return ResponseEntity.ok(mapToDto(suspension));
     }
 
+    /**
+     * Permite descargar el archivo adjunto asociado a una solicitud de
+     * suspensión (por ejemplo, un certificado médico o comprobante).
+     *
+     * Valida que la suspensión y el archivo existan, resuelve la ruta física
+     * en el sistema de archivos y devuelve un {@link Resource} con cabeceras
+     * de descarga apropiadas (Content-Type y Content-Disposition).
+     */
     @GetMapping("/{id}/archivo")
-    public ResponseEntity<Resource> descargarAdjunto(@PathVariable Long id) {
+    public ResponseEntity<Resource> descargarAdjunto(@PathVariable long id) {
         Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -176,7 +227,7 @@ public class AdminSuspensionApiController {
                 return ResponseEntity.notFound().build();
             }
 
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new UrlResource(java.util.Objects.requireNonNull(filePath.toUri()));
             if (!resource.exists() || !resource.isReadable()) {
                 return ResponseEntity.notFound().build();
             }
@@ -203,6 +254,16 @@ public class AdminSuspensionApiController {
         }
     }
 
+    /**
+     * Envía una notificación por email al deportista con el resultado final de
+     * su solicitud de suspensión ("Aprobada" o "Rechazada").
+     *
+     * Construye un mensaje de texto plano incluyendo:
+     *  - Nombre completo del deportista.
+     *  - Rango de fechas de la suspensión.
+     *  - Motivo registrado.
+     * y delega el envío en {@link EmailService}.
+     */
     private void notificarResultadoSuspension(SuspensionMembresia suspension, String estadoFinal) {
         Persona usuario = suspension.getUsuario();
         if (usuario == null) {
@@ -257,6 +318,18 @@ public class AdminSuspensionApiController {
         }
     }
 
+    /**
+     * Convierte una entidad {@link SuspensionMembresia} en un
+     * {@link SuspensionAdminDTO} listo para ser consumido por el frontend
+     * del panel de administración.
+     *
+     * El DTO incluye:
+     *  - Datos del deportista (nombre completo, DNI).
+     *  - Información del plan y fecha de expiración de la suscripción.
+     *  - Rango de fechas y cantidad de días de suspensión.
+     *  - Estado legible (Pendiente, Aprobada, Rechazada).
+     *  - Información del archivo adjunto (nombre visible y URL de descarga).
+     */
     private SuspensionAdminDTO mapToDto(SuspensionMembresia suspension) {
         SuspensionAdminDTO dto = new SuspensionAdminDTO();
         dto.setId(suspension.getId());
