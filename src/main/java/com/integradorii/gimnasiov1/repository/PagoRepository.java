@@ -30,4 +30,20 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
+
+    /**
+     * Search all payments for admin with filters by status and search term
+     */
+    @Query("SELECT p FROM Pago p JOIN p.deportista d WHERE " +
+           "(:estado = 'todos' OR p.estado = :estado) AND " +
+           "(LOWER(d.nombre) LIKE LOWER(CONCAT('%', :buscar, '%')) OR " +
+           "LOWER(d.apellido) LIKE LOWER(CONCAT('%', :buscar, '%')) OR " +
+           "LOWER(d.dni) LIKE LOWER(CONCAT('%', :buscar, '%')) OR " +
+           "LOWER(d.email) LIKE LOWER(CONCAT('%', :buscar, '%')) OR " +
+           "LOWER(p.codigoPago) LIKE LOWER(CONCAT('%', :buscar, '%'))) " +
+           "ORDER BY p.fecha DESC")
+    List<Pago> searchAdmin(
+        @Param("estado") String estado,
+        @Param("buscar") String buscar
+    );
 }
