@@ -8,77 +8,6 @@
     <link rel="stylesheet" th:href="@{/Estilos/sidebar-common.css}">
     <link rel="stylesheet" th:href="@{/Estilos/custom-select.css}">
     <link rel="stylesheet" th:href="@{/css/buttons.css}">
-    <style>
-        /* Mejorar visualización de selects/dropdowns */
-        select {
-            position: relative;
-            z-index: 10;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1.5em 1.5em;
-            padding-right: 2.5rem;
-            border: 2px solid #e5e7eb;
-            transition: all 0.2s ease;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        
-        select:hover {
-            border-color: #d1d5db;
-            background-color: white;
-        }
-        
-        select:focus {
-            z-index: 50;
-            border-color: #f97316;
-            background-color: white;
-            outline: 2px solid #f97316;
-            outline-offset: 2px;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-        }
-        
-        select:active {
-            background-color: white;
-        }
-        
-        /* Estilos para las opciones del dropdown */
-        select option {
-            background-color: white;
-            color: #1f2937;
-            padding: 12px 8px;
-            border: 1px solid #e5e7eb;
-            line-height: 1.6;
-            margin: 2px 0;
-        }
-        
-        select option:first-child {
-            background-color: #f9fafb;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        
-        select option:hover {
-            background-color: #f3f4f6;
-            color: #1f2937;
-        }
-        
-        select option:checked {
-            background: linear-gradient(#f97316, #f97316);
-            background-color: #f97316;
-            color: white;
-            font-weight: 500;
-        }
-        
-        /* Contenedor relativo para mejor control */
-        select {
-            width: 100%;
-            min-height: 44px;
-        }
-    </style>
     <script>
         (function() {
             const expanded = localStorage.getItem('sidebarExpanded') === 'true';
@@ -259,6 +188,7 @@
                                                         th:data-id="${clase.id}"
                                                         th:data-nombre="${clase.nombre}"
                                                         th:data-instructor="${clase.instructor}"
+                                                        th:data-instructor-id="${clase.instructorId}"
                                                         th:data-fecha="${#temporals.format(clase.fecha, 'yyyy-MM-dd')}"
                                                         th:data-hora="${#temporals.format(clase.hora, 'HH:mm')}"
                                                         th:data-duracion="${clase.duracion}"
@@ -373,7 +303,7 @@
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white">
                                 <option value="">Seleccionar instructor</option>
                                 <option th:each="inst : ${instructores}"
-                                        th:value="${inst.nombre + ' ' + inst.apellido}"
+                                        th:value="${inst.id}"
                                         th:text="${inst.nombre + ' ' + inst.apellido}">
                                 </option>
                             </select>
@@ -668,7 +598,7 @@
                 }
                 
                 const claseData = {
-                    instructor: document.getElementById('clase-instructor').value,
+                    instructorId: document.getElementById('clase-instructor').value,
                     fecha: document.getElementById('clase-fecha').value,
                     hora: document.getElementById('clase-hora').value,
                     duracion: parseInt(document.getElementById('clase-duracion').value),
@@ -718,17 +648,18 @@
                 // Llenar el formulario con los datos
                 (function() {
                     const sel = document.getElementById('clase-instructor');
-                    const value = btn.dataset.instructor || '';
+                    const instructorId = btn.dataset.instructorId || '';
+                    const instructorNombre = btn.dataset.instructor || '';
                     if (sel) {
                         let exists = false;
                         for (let i = 0; i < sel.options.length; i++) {
-                            if (sel.options[i].value === value) { exists = true; break; }
+                            if (sel.options[i].value === instructorId) { exists = true; break; }
                         }
-                        if (!exists && value) {
-                            const opt = new Option(value, value, true, true);
+                        if (!exists && instructorId) {
+                            const opt = new Option(instructorNombre || ('Instructor #' + instructorId), instructorId, true, true);
                             sel.add(opt);
                         } else {
-                            sel.value = value;
+                            sel.value = instructorId;
                         }
                     }
                 })();

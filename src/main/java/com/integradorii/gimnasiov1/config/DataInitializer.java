@@ -1,10 +1,5 @@
 package com.integradorii.gimnasiov1.config;
 
-import com.integradorii.gimnasiov1.model.EstadoLocker;
-import com.integradorii.gimnasiov1.model.Locker;
-import com.integradorii.gimnasiov1.repository.LockerRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration

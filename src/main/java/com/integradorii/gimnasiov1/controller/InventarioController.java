@@ -52,7 +52,7 @@ public class InventarioController {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), inventario.size());
         List<Inventario> pageContent = start <= end ? inventario.subList(start, end) : List.of();
-        Page<Inventario> inventarioPage = new PageImpl<>(pageContent, pageable, inventario.size());
+        Page<Inventario> inventarioPage = new PageImpl<>(java.util.Objects.requireNonNull(pageContent), pageable, inventario.size());
 
         // Estadísticas del dashboard
         InventarioService.DashboardStats stats = inventarioService.getDashboardStats();
@@ -119,7 +119,7 @@ public class InventarioController {
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model,
+    public String mostrarFormularioEditar(@PathVariable long id, Model model,
                                          RedirectAttributes redirectAttributes) {
         try {
             Inventario inventario = inventarioService.findById(id)
@@ -138,7 +138,7 @@ public class InventarioController {
     }
 
     @PostMapping("/actualizar/{id}")
-    public String actualizarInventario(@PathVariable Long id,
+    public String actualizarInventario(@PathVariable long id,
                                       @ModelAttribute Inventario inventario,
                                       RedirectAttributes redirectAttributes) {
         try {
@@ -155,7 +155,7 @@ public class InventarioController {
     }
 
     @GetMapping("/detalle/{id}")
-    public String verDetalle(@PathVariable Long id, Model model,
+    public String verDetalle(@PathVariable long id, Model model,
                             RedirectAttributes redirectAttributes) {
         try {
             Inventario inventario = inventarioService.findById(id)
@@ -174,7 +174,7 @@ public class InventarioController {
     }
 
     @PostMapping("/eliminar/{id}")
-    public String eliminarInventario(@PathVariable Long id,
+    public String eliminarInventario(@PathVariable long id,
                                    RedirectAttributes redirectAttributes) {
         try {
             inventarioService.deleteById(id);
@@ -190,7 +190,7 @@ public class InventarioController {
 
     // Operaciones de stock
     @GetMapping("/ajustar-stock/{id}")
-    public String mostrarFormularioAjustarStock(@PathVariable Long id, Model model,
+    public String mostrarFormularioAjustarStock(@PathVariable long id, Model model,
                                               RedirectAttributes redirectAttributes) {
         try {
             Inventario inventario = inventarioService.findById(id)
@@ -207,7 +207,7 @@ public class InventarioController {
     }
 
     @PostMapping("/actualizar-stock/{id}")
-    public String actualizarStock(@PathVariable Long id,
+    public String actualizarStock(@PathVariable long id,
                                  @RequestParam Integer nuevaCantidad,
                                  RedirectAttributes redirectAttributes) {
         try {

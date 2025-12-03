@@ -130,7 +130,7 @@ public class ComunidadForoController {
      * - Se limita a 800 caracteres por respuesta.
      */
     @PostMapping("/posts/{postId}/respuestas")
-    public ResponseEntity<Map<String, Object>> crearRespuesta(@PathVariable("postId") Long postId,
+    public ResponseEntity<Map<String, Object>> crearRespuesta(@PathVariable("postId") long postId,
                                                               @RequestParam("contenido") String contenido,
                                                               @AuthenticationPrincipal UserDetails userDetails) {
         Map<String, Object> resp = new HashMap<>();

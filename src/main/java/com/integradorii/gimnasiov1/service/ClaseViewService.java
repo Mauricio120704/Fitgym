@@ -25,6 +25,8 @@ public class ClaseViewService {
                (c.getEntrenador().getApellido() == null ? "" : (" " + c.getEntrenador().getApellido()))).trim()
             : "";
 
+    Long instructorId = c.getEntrenador() != null ? c.getEntrenador().getId() : null;
+
     // Convertir la fecha a la zona horaria del sistema
     LocalDate fecha = null;
     LocalTime hora = null;
@@ -58,6 +60,7 @@ public class ClaseViewService {
             c.getId(),
             c.getNombre(),
             instructor,
+            instructorId,
             fecha,
             hora,
             c.getDuracionMinutos(),

@@ -40,8 +40,6 @@ public interface EquipoRepository extends JpaRepository<Equipo, Long> {
     List<Equipo> findEquiposOrdenadosPorProximoMantenimiento();
 
     // Pageable variants
-    Page<Equipo> findAll(Pageable pageable);
-
     Page<Equipo> findByEstado(String estado, Pageable pageable);
 
     Page<Equipo> findByTipo(String tipo, Pageable pageable);

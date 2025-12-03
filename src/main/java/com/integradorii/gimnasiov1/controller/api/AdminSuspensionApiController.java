@@ -71,7 +71,7 @@ public class AdminSuspensionApiController {
 
     @PostMapping("/{id}/aprobar")
     @Transactional
-    public ResponseEntity<?> aprobarSuspension(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<?> aprobarSuspension(@PathVariable long id, Principal principal) {
         Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -124,7 +124,7 @@ public class AdminSuspensionApiController {
 
     @PostMapping("/{id}/rechazar")
     @Transactional
-    public ResponseEntity<?> rechazarSuspension(@PathVariable Long id,
+    public ResponseEntity<?> rechazarSuspension(@PathVariable long id,
                                                 @RequestBody(required = false) Map<String, Object> payload,
                                                 Principal principal) {
         Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
@@ -156,7 +156,7 @@ public class AdminSuspensionApiController {
     }
 
     @GetMapping("/{id}/archivo")
-    public ResponseEntity<Resource> descargarAdjunto(@PathVariable Long id) {
+    public ResponseEntity<Resource> descargarAdjunto(@PathVariable long id) {
         Optional<SuspensionMembresia> opt = suspensionRepository.findById(id);
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -176,7 +176,7 @@ public class AdminSuspensionApiController {
                 return ResponseEntity.notFound().build();
             }
 
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new UrlResource(java.util.Objects.requireNonNull(filePath.toUri()));
             if (!resource.exists() || !resource.isReadable()) {
                 return ResponseEntity.notFound().build();
             }
