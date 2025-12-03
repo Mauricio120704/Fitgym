@@ -46,7 +46,10 @@ public class PromocionesDeportistaController {
     public String promocionesVigentes(Model model,
                                       @AuthenticationPrincipal UserDetails userDetails) {
         LocalDate hoy = LocalDate.now();
-        List<Promocion> base = promocionRepository.findByEstado(Promocion.Estado.ACTIVE);
+        List<Promocion> base = promocionRepository.findByEstado(Promocion.Estado.ACTIVE)
+                .stream()
+                .filter(p -> !p.isEliminado())
+                .collect(Collectors.toList());
         List<Promocion> vigentes = base.stream()
                 .filter(p -> (p.getFechaInicio() == null || !p.getFechaInicio().isAfter(hoy))
                         && (p.getFechaFin() == null || !p.getFechaFin().isBefore(hoy)))

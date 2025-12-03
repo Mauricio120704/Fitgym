@@ -45,34 +45,23 @@
               <div class="item" th:each="h : ${historial}">
                 <div class="when" th:text="${#temporals.format(h.realizadoEn, 'dd MMM yyyy HH:mm')}">01 Ene 2025 10:00</div>
                 <div>
-                  <div class="row" style="justify-content: space-between; width: 100%;">
-                    <div class="row" style="gap:.75rem; flex-wrap:wrap;">
-                      <a class="promo-link" th:href="@{'/promociones#promo-' + ${h.promocion.id}}" th:text="${h.promocion.nombre}">Nombre Promoción</a>
-                      <span class="badge"
-                        th:classappend="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).CREAR} ? ' badge-success' :
-                                        (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).EDITAR} ? ' badge-info' :
-                                        (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).REACTIVAR} ? ' badge-emerald' :
-                                        (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).ELIMINAR} ? ' badge-danger' : ' badge-warning')))">
-                        <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).CREAR}">Creación</span>
-                        <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).EDITAR}">Edición</span>
-                        <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).REACTIVAR}">Reactivación</span>
-                        <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).ELIMINAR}">Eliminación</span>
-                        <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).TOGGLE}">Cambio de estado</span>
-                      </span>
-                      <span class="muted">Estado:</span>
-                      <span class="mono" th:text="${h.estadoAnterior != null ? (h.estadoAnterior.name() == 'ACTIVE' ? 'ACTIVA' : (h.estadoAnterior.name() == 'INACTIVE' ? 'INACTIVA' : 'EXPIRADA')) : '-'}">-</span>
-                      <span class="muted">→</span>
-                      <span class="mono" th:text="${h.estadoNuevo != null ? (h.estadoNuevo.name() == 'ACTIVE' ? 'ACTIVA' : (h.estadoNuevo.name() == 'INACTIVE' ? 'INACTIVA' : 'EXPIRADA')) : '-'}">-</span>
-                    </div>
-                    <form th:action="@{'/promociones/' + ${h.promocion.id} + '/delete'}" method="post" onsubmit="return confirm('¿Eliminar esta promoción?');" style="margin-left:auto;">
-                      <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                      <button type="submit" class="btn btn-danger">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span>Eliminar</span>
-                      </button>
-                    </form>
+                  <div class="row" style="gap:.75rem; flex-wrap:wrap;">
+                    <a class="promo-link" th:href="@{'/promociones#promo-' + ${h.promocion.id}}" th:text="${h.promocion.nombre}">Nombre Promoción</a>
+                    <span class="badge"
+                      th:classappend="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).CREAR} ? ' badge-success' :
+                                      (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).EDITAR} ? ' badge-info' :
+                                      (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).REACTIVAR} ? ' badge-emerald' :
+                                      (${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).ELIMINAR} ? ' badge-danger' : ' badge-warning')))">
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).CREAR}">Creación</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).EDITAR}">Edición</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).REACTIVAR}">Reactivación</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).ELIMINAR}">Eliminación</span>
+                      <span th:if="${h.accion == T(com.integradorii.gimnasiov1.model.PromocionHistorial$Accion).TOGGLE}">Cambio de estado</span>
+                    </span>
+                    <span class="muted">Estado:</span>
+                    <span class="mono" th:text="${h.estadoAnterior != null ? (h.estadoAnterior.name() == 'ACTIVE' ? 'ACTIVA' : (h.estadoAnterior.name() == 'INACTIVE' ? 'INACTIVA' : 'EXPIRADA')) : '-'}">-</span>
+                    <span class="muted">→</span>
+                    <span class="mono" th:text="${h.estadoNuevo != null ? (h.estadoNuevo.name() == 'ACTIVE' ? 'ACTIVA' : (h.estadoNuevo.name() == 'INACTIVE' ? 'INACTIVA' : 'EXPIRADA')) : '-'}">-</span>
                   </div>
                   <div class="muted" th:if="${h.usuario != null}">Usuario: <span th:text="${h.usuario}">correo</span></div>
                   <div class="muted" th:if="${h.detalle != null && !h.detalle.isEmpty()}" th:text="${h.detalle}">Detalle</div>

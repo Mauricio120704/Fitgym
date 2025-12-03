@@ -641,6 +641,9 @@ public class CheckoutController {
         }
 
         Promocion promo = opt.get();
+        if (promo.isEliminado()) {
+            return null;
+        }
         LocalDate hoy = LocalDate.now();
 
         boolean vigentePorFecha = 
@@ -678,6 +681,9 @@ public class CheckoutController {
         }
 
         Promocion promo = opt.get();
+        if (promo.isEliminado()) {
+            return null;
+        }
         LocalDate hoy = LocalDate.now();
 
         boolean vigentePorFecha =

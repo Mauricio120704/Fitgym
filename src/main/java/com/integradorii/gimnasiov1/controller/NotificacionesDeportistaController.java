@@ -192,7 +192,10 @@ public class NotificacionesDeportistaController {
 
         // Bloque 2: nuevas promociones creadas recientemente (últimos 7 días) y vigentes
         LocalDateTime haceSieteDias = LocalDateTime.now().minusDays(7);
-        List<Promocion> promocionesActivas = promocionRepository.findByEstado(Promocion.Estado.ACTIVE);
+        List<Promocion> promocionesActivas = promocionRepository.findByEstado(Promocion.Estado.ACTIVE)
+                .stream()
+                .filter(p -> !p.isEliminado())
+                .toList();
         int maxPromos = 3;
         int contadorPromos = 0;
         for (Promocion p : promocionesActivas) {

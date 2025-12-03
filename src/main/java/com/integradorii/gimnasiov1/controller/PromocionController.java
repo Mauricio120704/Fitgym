@@ -70,6 +70,11 @@ public class PromocionController {
                 ? promocionRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(q, q)
                 : promocionRepository.findAll();
 
+        // Excluir promociones eliminadas lógicamente
+        base = base.stream()
+                .filter(p -> !p.isEliminado())
+                .collect(Collectors.toList());
+
         if (q != null) {
             model.addAttribute("q", q);
         }
@@ -209,6 +214,9 @@ public class PromocionController {
         Optional<Promocion> opt = promocionRepository.findById(id);
         if (opt.isPresent()) {
             Promocion p = opt.get();
+            if (p.isEliminado()) {
+                return "redirect:/promociones";
+            }
             Promocion.Estado anterior = p.getEstado();
             if (anterior == Promocion.Estado.INACTIVE) {
                 p.setEstado(Promocion.Estado.ACTIVE);
@@ -234,6 +242,9 @@ public class PromocionController {
                             @RequestParam(value = "fechaInicio", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
                             @RequestParam(value = "fechaFin", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
         Promocion p = promocionRepository.findById(id).orElseThrow();
+        if (p.isEliminado()) {
+            return "redirect:/promociones";
+        }
         Promocion.Estado anterior = p.getEstado();
         if (inicio == null) inicio = fechaInicio;
         if (fin == null) fin = fechaFin;
@@ -256,8 +267,16 @@ public class PromocionController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
     @PostMapping("/promociones/{id}/delete")
     public String delete(@PathVariable long id) {
-        if (promocionRepository.existsById(id)) {
-            promocionRepository.deleteById(id);
+        Optional<Promocion> opt = promocionRepository.findById(id);
+        if (opt.isPresent()) {
+            Promocion p = opt.get();
+            if (!p.isEliminado()) {
+                Promocion.Estado anterior = p.getEstado();
+                p.setEliminado(true);
+                promocionRepository.save(p);
+                guardarHistorial(p, PromocionHistorial.Accion.ELIMINAR, anterior, null,
+                        "Eliminación de promoción");
+            }
         }
         return "redirect:/promociones";
     }
