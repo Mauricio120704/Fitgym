@@ -2,6 +2,10 @@ package com.integradorii.gimnasiov1.controller;
 
 import com.integradorii.gimnasiov1.model.Persona;
 import com.integradorii.gimnasiov1.repository.PersonaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/deportistas")
@@ -34,7 +35,7 @@ public class AdminDeportistasController {
                                     @RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "20") int size,
                                     Model model) {
-
+        // Normalizar página y tamaño
         if (page < 0) {
             page = 0;
         }
@@ -42,63 +43,32 @@ public class AdminDeportistasController {
             size = 20;
         }
 
-        List<Persona> todos = personaRepository.findAll();
-        List<Persona> filtrados = new ArrayList<>(todos);
+        String term = (buscar != null) ? buscar.trim() : "";
+        String estado = (filtroBloqueo != null && !filtroBloqueo.isBlank()) ? filtroBloqueo : "todos";
 
-        if (buscar != null && !buscar.trim().isEmpty()) {
-            String term = buscar.trim().toLowerCase();
-            filtrados = filtrados.stream()
-                    .filter(p ->
-                            (p.getNombre() != null && p.getNombre().toLowerCase().contains(term)) ||
-                            (p.getApellido() != null && p.getApellido().toLowerCase().contains(term)) ||
-                            (p.getEmail() != null && p.getEmail().toLowerCase().contains(term)) ||
-                            (p.getDni() != null && p.getDni().toLowerCase().contains(term)))
-                    .collect(Collectors.toList());
-        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Persona> pageResult = personaRepository.searchDeportistasAdmin(term, estado, pageable);
 
-        String filtro = filtroBloqueo != null ? filtroBloqueo.trim().toLowerCase() : "todos";
-        if ("bloqueados".equals(filtro)) {
-            filtrados = filtrados.stream()
-                    .filter(p -> Boolean.TRUE.equals(p.getBloqueado()))
-                    .collect(Collectors.toList());
-        } else if ("no_bloqueados".equals(filtro)) {
-            filtrados = filtrados.stream()
-                    .filter(p -> !Boolean.TRUE.equals(p.getBloqueado()))
-                    .collect(Collectors.toList());
-        }
+        List<Persona> paginados = pageResult.getContent();
+        long totalFiltrados = pageResult.getTotalElements();
+        int totalPages = pageResult.getTotalPages() == 0 ? 1 : pageResult.getTotalPages();
 
-        filtrados.sort(Comparator.comparing(Persona::getId));
+        int currentPage = pageResult.getNumber();
+        int fromIndex = totalFiltrados == 0 ? 0 : (currentPage * pageResult.getSize()) + 1;
+        int toIndex = totalFiltrados == 0 ? 0 : fromIndex + pageResult.getNumberOfElements() - 1;
 
-        int totalFiltrados = filtrados.size();
-
-        int totalPages = (int) Math.ceil((double) totalFiltrados / size);
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        if (page >= totalPages) {
-            page = totalPages - 1;
-        }
-
-        int start = page * size;
-        int end = Math.min(start + size, totalFiltrados);
-
-        List<Persona> paginados = totalFiltrados == 0 ? new ArrayList<>() : filtrados.subList(start, end);
-
-        long totalDeportistas = todos.size();
-        long totalBloqueados = todos.stream().filter(p -> Boolean.TRUE.equals(p.getBloqueado())).count();
+        long totalDeportistas = personaRepository.count();
+        long totalBloqueados = personaRepository.countByBloqueadoTrue();
         long totalNoBloqueados = totalDeportistas - totalBloqueados;
 
-        int fromIndex = totalFiltrados == 0 ? 0 : start + 1;
-        int toIndex = totalFiltrados == 0 ? 0 : end;
-
         model.addAttribute("deportistas", paginados);
-        model.addAttribute("buscarActual", buscar != null ? buscar : "");
-        model.addAttribute("filtroBloqueo", filtroBloqueo != null ? filtroBloqueo : "todos");
+        model.addAttribute("buscarActual", term);
+        model.addAttribute("filtroBloqueo", estado);
         model.addAttribute("totalDeportistas", totalDeportistas);
         model.addAttribute("totalBloqueados", totalBloqueados);
         model.addAttribute("totalNoBloqueados", totalNoBloqueados);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("pageSize", size);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("pageSize", pageResult.getSize());
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("fromIndex", fromIndex);
         model.addAttribute("toIndex", toIndex);

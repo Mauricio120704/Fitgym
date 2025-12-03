@@ -171,36 +171,23 @@
                             <span th:text="${toIndex}"></span> 
                             de <span th:text="${totalDeportistas}"></span> deportistas
                         </div>
-                        <nav class="flex gap-2 flex-wrap justify-center md:justify-end">
-                            <a th:if="${currentPage > 0}" 
+                        <nav class="flex items-center gap-3 flex-wrap justify-center md:justify-end text-sm">
+                            <a th:if="${currentPage > 0}"
                                th:href="@{/admin/deportistas(page=${currentPage - 1}, buscar=${buscarActual}, filtroBloqueo=${filtroBloqueo})}"
-                               class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
+                               class="px-3 py-1.5 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition">
                                 ← Anterior
                             </a>
-                            <span th:if="${currentPage == 0}" class="px-3 py-2 bg-gray-300 text-gray-500 rounded text-sm cursor-not-allowed">
-                                ← Anterior
-                            </span>
 
-                            <th:block th:each="p : ${#numbers.sequence(0, totalPages - 1)}">
-                                <a th:if="${p != currentPage}"
-                                   th:href="@{/admin/deportistas(page=${p}, buscar=${buscarActual}, filtroBloqueo=${filtroBloqueo})}"
-                                   th:text="${p + 1}"
-                                   class="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
-                                </a>
-                                <span th:if="${p == currentPage}"
-                                      th:text="${p + 1}"
-                                      class="px-3 py-2 bg-blue-500 text-white rounded text-sm font-semibold">
-                                </span>
-                            </th:block>
+                            <span class="px-3 py-1.5 text-gray-700">
+                                Página <span th:text="${currentPage + 1}"></span>
+                                de <span th:text="${totalPages}"></span>
+                            </span>
 
                             <a th:if="${currentPage < totalPages - 1}"
                                th:href="@{/admin/deportistas(page=${currentPage + 1}, buscar=${buscarActual}, filtroBloqueo=${filtroBloqueo})}"
-                               class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
+                               class="px-3 py-1.5 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition">
                                 Siguiente →
                             </a>
-                            <span th:if="${currentPage >= totalPages - 1}" class="px-3 py-2 bg-gray-300 text-gray-500 rounded text-sm cursor-not-allowed">
-                                Siguiente →
-                            </span>
                         </nav>
                     </div>
                 </div>

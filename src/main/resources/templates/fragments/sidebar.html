@@ -32,7 +32,15 @@
                 </li>
                 <li>
                     <a th:href="@{/evaluaciones}" th:classappend="${activeMenu == 'evaluaciones'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700'" class="flex items-center justify-center py-3" title="Evaluaciones">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2"></path></svg>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                            <g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19H20" />
+                                <path d="M7 19V13" />
+                                <path d="M17 19V11" />
+                                <path d="M12 19V7" />
+                                <path d="M9.5 9.5L12 7L14.5 9.5" />
+                            </g>
+                        </svg>
                         <span class="sidebar-text ml-3 hidden">Evaluaciones</span>
                     </a>
                 </li>
@@ -218,14 +226,6 @@
                     <a th:href="@{/entrenador/mis-deportistas}" th:classappend="${activeMenu == 'mis-deportistas'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Mis Deportistas">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         <span class="sidebar-text ml-3 hidden">Mis Deportistas</span>
-                    </a>
-                </li>
-                <li sec:authorize="hasRole('ADMINISTRADOR')">
-                    <a th:href="@{/reportes/ingresos-membresias}" th:classappend="${activeMenu == 'reportes'} ? 'text-blue-600 bg-blue-100 font-semibold' : 'text-gray-700 hover:bg-gray-200'" class="flex items-center justify-center py-3" title="Reportes">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <span class="sidebar-text ml-3 hidden">Reportes Financieros</span>
                     </a>
                 </li>
             </ul>

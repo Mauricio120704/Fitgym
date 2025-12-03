@@ -1,6 +1,8 @@
 package com.integradorii.gimnasiov1.repository;
 
 import com.integradorii.gimnasiov1.model.Persona;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,6 +31,24 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
             "(p.telefono IS NOT NULL AND p.telefono LIKE CONCAT('%', :term, '%')) OR " +
             "LOWER(p.dni) LIKE LOWER(CONCAT('%', :term, '%'))")
     List<Persona> searchDeportistas(@Param("term") String term);
+
+    /**
+     * Búsqueda paginada para el panel de administración de deportistas.
+     * Permite combinar texto de búsqueda y filtro de bloqueo.
+     */
+    @Query("SELECT p FROM Persona p WHERE " +
+           "(:term IS NULL OR :term = '' OR " +
+           "LOWER(p.nombre) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+           "LOWER(p.apellido) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+           "LOWER(p.email) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+           "(p.telefono IS NOT NULL AND p.telefono LIKE CONCAT('%', :term, '%')) OR " +
+           "LOWER(p.dni) LIKE LOWER(CONCAT('%', :term, '%'))) AND " +
+           "(:estado = 'todos' OR " +
+           "(:estado = 'bloqueados' AND p.bloqueado = TRUE) OR " +
+           "(:estado = 'no_bloqueados' AND (p.bloqueado IS NULL OR p.bloqueado = FALSE)))")
+    Page<Persona> searchDeportistasAdmin(@Param("term") String term,
+                                         @Param("estado") String estado,
+                                         Pageable pageable);
 
     List<Persona> findByEmailVerificadoTrueAndActivoTrue();
 
@@ -63,6 +83,11 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
      * Obtener deportistas visibles en comunidad excluyendo por email
      */
     List<Persona> findByPerfilVisibleTrueAndEmailNot(String email);
+
+    /**
+     * Contar deportistas bloqueados (para tarjetas de resumen en admin)
+     */
+    long countByBloqueadoTrue();
     
     /**
      * Obtener deportistas activos (cuenta y email) con suscripción activa a un plan específico
