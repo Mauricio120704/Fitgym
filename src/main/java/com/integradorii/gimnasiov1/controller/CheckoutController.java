@@ -232,7 +232,7 @@ public class CheckoutController {
      *
      */
     @GetMapping("/clase")
-    public String mostrarCheckoutClase(@RequestParam("claseId") Long claseId,
+    public String mostrarCheckoutClase(@RequestParam("claseId") long claseId,
                                        @RequestParam(required = false) Long promoId,
                                        Model model,
                                        @AuthenticationPrincipal UserDetails userDetails) {
@@ -288,7 +288,7 @@ public class CheckoutController {
     @ResponseBody
     @Transactional(readOnly = true) // Solo lectura para validaciones
     public ResponseEntity<Map<String, String>> createCheckoutSessionClase(
-            @RequestParam Long claseId,
+            @RequestParam long claseId,
             @RequestParam String usuario,
             @RequestParam String precio,
             @RequestParam(required = false) Long promoId,
@@ -442,7 +442,7 @@ public class CheckoutController {
                 return "redirect:/reservas?errorPagoClaseStripe=true";
             }
 
-            Long claseId = Long.valueOf(claseIdStr);
+            long claseId = Long.parseLong(claseIdStr);
 
             Persona persona = personaRepository.findByEmail(usuario)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + usuario));
@@ -477,7 +477,7 @@ public class CheckoutController {
 
             if (promoIdStr != null && !promoIdStr.isBlank()) {
                 try {
-                    Long promoId = Long.valueOf(promoIdStr);
+                    long promoId = Long.parseLong(promoIdStr);
                     Optional<Promocion> promoOpt = promocionRepository.findById(promoId);
                     if (promoOpt.isPresent()) {
                         Promocion promo = promoOpt.get();

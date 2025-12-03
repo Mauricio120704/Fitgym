@@ -62,7 +62,8 @@ public class ClaseCalificacionApiController {
         // Si no existe la calificación asociada a la reserva respondemos 404
         if (existing.isEmpty()) return ResponseEntity.notFound().build();
         // Eliminamos usando la entidad encontrada para evitar problemas con queries derivadas
-        repo.delete(existing.get());
+        ClaseCalificacion entity = existing.orElseThrow();
+        repo.delete(entity);
         return ResponseEntity.ok(Map.of("deleted", true));
     }
 }

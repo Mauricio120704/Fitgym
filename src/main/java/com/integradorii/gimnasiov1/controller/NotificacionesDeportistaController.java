@@ -32,17 +32,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * API de notificaciones para el panel del deportista.
  *
  * Genera notificaciones "on the fly" a partir del estado actual de la base de datos,
  * sin almacenar una tabla de notificaciones persistentes.
  *
- * Tipos de notificación generados:
- * - Estado de la suscripción: vencida, próxima a vencer, próximo pago.
- * - Falta de suscripción activa.
- * - Nuevas promociones relevantes creadas recientemente.
- * - Nuevas clases disponibles en los próximos días.
- * - Próximas clases reservadas por el deportista.
  */
 @RestController
 @RequestMapping("/api/deportista")

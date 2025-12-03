@@ -162,11 +162,7 @@ public class PromocionController {
         // Tipo de promoción: por defecto MEMBRESIA si no se especifica
         Promocion.TipoPromocion tipoPromoEnum = Promocion.TipoPromocion.MEMBRESIA;
         if (tipoPromocion != null && !tipoPromocion.isBlank()) {
-            try {
-                tipoPromoEnum = Promocion.TipoPromocion.valueOf(tipoPromocion);
-            } catch (IllegalArgumentException ignored) {
-                tipoPromoEnum = Promocion.TipoPromocion.MEMBRESIA;
-            }
+            tipoPromoEnum = Promocion.TipoPromocion.valueOf(tipoPromocion);
         }
         p.setTipoPromocion(tipoPromoEnum);
 
@@ -344,19 +340,6 @@ public class PromocionController {
         model.addAttribute("historial", historialRepository.findAllWithPromocionOrderByRealizadoEnDesc());
         model.addAttribute("activeMenu", "promociones");
         return "promociones_historial";
-    }
-
-    /**
-     * GET /promociones/{id}/historial - Historial por promoción
-     */
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR','RECEPCIONISTA','ENTRENADOR')")
-    @GetMapping("/promociones/{id}/historial")
-    public String historialPorPromocion(@PathVariable long id, Model model) {
-        Promocion p = promocionRepository.findById(id).orElseThrow();
-        model.addAttribute("promocion", p);
-        model.addAttribute("historial", historialRepository.findByPromocionIdOrderByRealizadoEnDesc(id));
-        model.addAttribute("activeMenu", "promociones");
-        return "promocion_historial";
     }
 
     @GetMapping("/promociones/clases-disponibles")

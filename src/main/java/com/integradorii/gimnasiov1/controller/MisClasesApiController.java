@@ -31,7 +31,7 @@ public class MisClasesApiController {
             // Buscamos al usuario autenticado por email y usamos su ID como deportistaId
             deportistaId = personaRepository.findByEmail(principal.getName())
                     .map(p -> p.getId())
-                    .orElse(null);
+                    .orElse(null);  
         }
         
         // Validar que se tenga un deportistaId

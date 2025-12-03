@@ -3,7 +3,6 @@ package com.integradorii.gimnasiov1.controller;
 import com.integradorii.gimnasiov1.repository.PersonaRepository;
 import com.integradorii.gimnasiov1.repository.PlanRepository;
 import com.integradorii.gimnasiov1.service.NotificacionMasivaService;
-import jakarta.mail.MessagingException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
